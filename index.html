@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>Ryan’s Tools</title>
+<meta name="description" content="Interactive teaching tools for chemistry, physics and math.">
+<style>
+:root{color-scheme:dark;--g950:#030712;--g900:#111827;--g800:#1f2937;--g700:#374151;--g500:#6b7280;--g400:#9ca3af;--g300:#d1d5db;--g100:#f3f4f6;--blue6:#2563eb;--blue4:#60a5fa;--blue3:#93c5fd;--blue7:#1d4ed8;--purple6:#9333ea;--purple4:#c084fc;--pink4:#f472b6;--emerald6:#059669;--emerald4:#34d399;--f-sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--f-mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--g950);color:var(--g100);font-family:var(--f-sans);font-size:14px;line-height:1.55;background-image:linear-gradient(rgba(229,231,235,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(229,231,235,.055) 1px,transparent 1px);background-size:48px 48px}
+a{color:inherit;text-decoration:none}
+header{position:sticky;top:0;z-index:10;background:var(--g900);border-bottom:1px solid var(--g800);padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{background:linear-gradient(to top right,var(--blue6),var(--purple6));padding:8px;border-radius:8px;box-shadow:0 10px 15px -3px #0006;display:grid;place-items:center}
+.logo svg{width:20px;height:20px;color:#fff}
+h1,h2,h3{margin:0}
+h1{font-size:20px}
+.grad{background:linear-gradient(to right,var(--blue4),var(--purple4),var(--pink4));-webkit-background-clip:text;background-clip:text;color:transparent}
+.badge{font-size:12px;font-weight:600;padding:2px 8px;border-radius:4px;background:#1e3a8a99;color:var(--blue3);border:1px solid var(--blue7)}
+.seg{display:flex;align-items:center;background:var(--g800);border:1px solid var(--g700);border-radius:8px;padding:4px;font-size:12px;flex-wrap:wrap}
+.seg a,.seg button{background:transparent;border:0;padding:4px 10px;border-radius:4px;color:var(--g300);cursor:pointer;font:inherit;transition:color .15s,background .15s}
+.seg a:hover,.seg button:hover{color:#fff}
+.seg [aria-pressed=true]{background:var(--blue6);color:#fff;font-weight:600;box-shadow:0 1px 3px #0006}
+.layout{max-width:1360px;margin:0 auto;padding:32px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px));display:grid;grid-template-columns:320px minmax(0,1fr);gap:32px;align-items:start}
+aside{position:sticky;top:70px;max-height:calc(100vh - 86px);overflow-y:auto;display:flex;flex-direction:column;gap:28px;padding-right:4px;scrollbar-width:thin}
+main{display:flex;flex-direction:column;gap:40px;min-width:0}
+.hero{padding:12px 0 0}
+.hero h2{font-size:30px;line-height:1.2}
+.hero p{color:var(--g400);max-width:620px;margin:10px 0 0;font-size:15px}
+.sec-h{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.sec-h h3{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--g300)}
+.card{background:#1f293799;padding:16px;border-radius:12px;border:1px solid rgba(55,65,81,.6)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.tool{display:flex;flex-direction:column;gap:10px;transition:border-color .15s,transform .15s,background .15s}
+.tool:hover{border-color:var(--blue4);background:#1f2937cc;transform:translateY(-2px)}
+.tool .top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.tool h4{margin:0;font-size:16px}
+.tool p{margin:0;color:var(--g400);flex:1}
+.cats{display:flex;flex-direction:column;gap:28px}
+.cat-h{display:flex;align-items:center;gap:10px;margin:0 0 12px;font-size:18px}
+.cat-h .n{font-size:11px;font-weight:600;color:var(--g400);background:var(--g800);border:1px solid var(--g700);border-radius:999px;padding:1px 8px}
+.tool .foot{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:11px;padding:1px 8px;border-radius:999px;background:var(--g800);border:1px solid var(--g700);color:var(--g300)}
+.go{color:var(--blue4);font-weight:600;font-size:12px}
+.soon{border-style:dashed;align-items:center;justify-content:center;text-align:center;color:var(--g500);min-height:150px}
+.about{display:flex;flex-direction:column;gap:14px}
+.avatar{width:80px;height:80px;border-radius:12px;background:linear-gradient(to top right,var(--blue6),var(--purple6));display:grid;place-items:center;font-size:34px;font-weight:700;color:#fff;overflow:hidden;box-shadow:0 10px 15px -3px #0006}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.about h4{margin:0;font-size:18px}
+.about .role{color:var(--blue3);font-size:13px;margin-bottom:8px}
+.about p{margin:0 0 8px;color:var(--g300)}
+.links{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btn{font-size:12px;background:var(--g700);color:var(--g100);border:0;padding:6px 12px;border-radius:8px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .15s;font-family:inherit}
+.btn:hover{background:var(--g600,#4b5563)}
+.btn-go{background:var(--emerald6);box-shadow:0 10px 15px -3px #064e3b4d;padding:8px 18px}
+.btn-go:hover{background:#047857}
+form{display:flex;flex-direction:column;gap:12px}
+.row{display:grid;grid-template-columns:1fr;gap:12px}
+label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--g400);font-weight:500}
+input,select,textarea{background:var(--g900);border:1px solid var(--g700);border-radius:8px;color:var(--g100);padding:8px 10px;font:inherit;font-size:13px;width:100%}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--blue6);outline-offset:-1px}
+textarea{min-height:120px;resize:vertical}
+.hp{position:absolute;left:-9999px;height:0;overflow:hidden}
+.note{font-size:11px;color:var(--g500)}
+#status{font-size:12px;font-family:var(--f-mono)}
+#status.ok{color:var(--emerald4)} #status.err{color:#f87171}
+footer{border-top:1px solid var(--g800);background:var(--g900);padding:16px;text-align:center;color:var(--g500);font-size:12px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}aside{position:static;max-height:none;overflow:visible;order:2}}
+@media(max-width:640px){.hero h2{font-size:24px}}
+</style>
+</head>
+<body>
+<header>
+  <a class="brand" href="#top">
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="2.6" fill="currentColor"/><circle cx="4.5" cy="6" r="1.9" fill="currentColor"/><circle cx="19.5" cy="6" r="1.9" fill="currentColor"/><circle cx="12" cy="21" r="1.9" fill="currentColor"/><path d="M10 10.6 6 7.1M14 10.6l4-3.5M12 14.6v4.6"/></svg></div>
+    <h1><span class="grad" id="siteName">Ryan’s Tools</span></h1>
+  </a>
+</header>
+
+<div class="layout">
+<aside id="sidebar">
+  <section id="about">
+    <div class="sec-h"><h3>About</h3></div>
+    <div class="card about">
+      <div class="avatar" id="avatar"></div>
+      <div>
+        <h4 id="aName"></h4><div class="role" id="aRole"></div>
+        <div id="aBio"></div>
+        <div class="links" id="aLinks"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="report">
+    <div class="sec-h"><h3>Report an Issue</h3></div>
+    <div class="card">
+      <form id="issueForm" novalidate>
+        <div class="row">
+          <label>Which tool?<select id="fTool"></select></label>
+          <label>Type<select id="fType"><option>Bug</option><option>Suggestion</option><option>Question</option><option>Other</option></select></label>
+        </div>
+        <label>What happened?<textarea id="fMsg" placeholder="Describe the problem or idea. For bugs, what did you click and what did you expect to happen?" required></textarea></label>
+        <label>Your email <span class="note">(optional, only if you’d like a reply)</span><input id="fEmail" type="email" autocomplete="email"></label>
+        <label class="hp" aria-hidden="true">Leave blank<input id="fHp" tabindex="-1" autocomplete="off"></label>
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          <button class="btn btn-go" type="submit">Send report</button><span id="status" role="status"></span>
+        </div>
+        <div class="note">Your browser and screen size are included automatically to help reproduce bugs.</div>
+      </form>
+    </div>
+  </section>
+</aside>
+<main id="top">
+  <section class="hero">
+    <h2><span class="grad" id="tagline"></span></h2>
+    <p id="intro"></p>
+  </section>
+
+  <section id="tools">
+    <div class="sec-h"><h3>Tools</h3><div class="seg" id="filters"></div></div>
+    <div class="cats" id="toolGrid"></div>
+  </section>
+
+</main>
+</div>
+<footer id="footer"></footer>
+
+<script>
+// =====================================================================
+// EDIT THIS BLOCK: everything on the page is driven from here
+// =====================================================================
+const SITE = {
+  name: "Ryan’s Tools",
+  tagline: "Interactive teaching tools for chemistry, physics and math",
+  intro: "Free, browser-based apps that run entirely on your device. No installs, no accounts.",
+  email: "you@ryanstools.com",   // where issue reports are sent
+  issueEndpoint: ""              // optional: a Formspree/Getform URL. If empty, reports open in the visitor’s email app
+};
+const ABOUT = {
+  name: "Ryan Ward",
+  role: "PhD Student, UMN",
+  photo: "",                      // optional: path to an image, e.g. "img/ryan.jpg" (otherwise initials are shown)
+  bio: [
+    "Write a short introduction here: who you are and what you teach.",
+    "Add a second paragraph about why you build these tools and who they’re for."
+  ],
+  links: [
+    { label: "Email", href: "mailto:you@ryanstools.com" }
+    // { label: "Website", href: "https://..." }, { label: "GitHub", href: "https://github.com/..." }
+  ]
+};
+// Categories appear on the page in this order. Each tool uses one of these names.
+const CATEGORIES = ["Biology", "Chemistry", "Physics", "Math", "Computing & Simulation", "Music"];
+const TOOLS = [
+  // ---- Biology ----
+  { title: "Cell Tour", version: "v2.8", category: "Biology", href: "tools/cell_tour.html",
+    desc: "Take a guided tour of a cell and its organelles." },
+  { title: "Human Cell Tour", version: "v1.7", category: "Biology", href: "tools/human_cell_tour.html",
+    desc: "Take a guided tour of different types of human cells." },
+  { title: "Cloning Workbench", version: "v3.0", category: "Biology", href: "tools/cloning_workbench.html",
+    desc: "Walk through molecular cloning: digest, react, assemble, transform." },
+  { title: "Human Anatomy Tour", version: "v1.0", category: "Biology", href: "tools/human_anatomy.html",
+    desc: "Explore the organ systems of the human body layer by layer." },
+  // ---- Chemistry ----
+  { title: "Molecular Modeling Kit", version: "v4.1", category: "Chemistry", href: "tools/molecular_modeling_kit.html",
+    desc: "Build molecules atom by atom in 3D, measure bonds and angles, and explore charge, stereochemistry, resonance and hydrogen bonding." },
+  { title: "Atomic Orbital Builder", version: "v2.1", category: "Chemistry", href: "tools/atomic_orbital_builder.html",
+    desc: "Visualize s, p, d and f orbitals in 3D and see how quantum numbers shape each one." },
+  // ---- Physics ----
+  { title: "Phase Change Piston", version: "v2.0", category: "Physics", href: "tools/phase_change_piston.html",
+    desc: "Heat, cool and compress a gas in a piston and watch phase changes unfold at the molecular level." },
+  { title: "Optics Bench", version: "v1.0", category: "Physics", href: "tools/optics.html",
+    desc: "Trace light rays through lenses and mirrors and see how images form." },
+  { title: "Orbits Lab", version: "v1.1", category: "Physics", href: "tools/orbits_lab.html",
+    desc: "Launch bodies and explore gravity, orbits and Kepler’s laws." },
+  { title: "Gear Train Lab", version: "v1.0", category: "Physics", href: "tools/gears_lab.html",
+    desc: "Build gear trains and see how tooth count sets speed, torque and direction." },
+  // ---- Math ----
+  { title: "Fourier Transform Playground", version: "v3.1", category: "Math", href: "tools/fourier_playground.html",
+    desc: "Shape a signal in 1D, 2D or 3D, filter its k-space, and watch the reconstruction update live." },
+  { title: "Complex Plane Graphing Calculator", version: "v1.1", category: "Math", href: "tools/complex_graphing_calculator.html",
+    desc: "Graph functions of a complex variable and see how they map the complex plane." },
+  { title: "Fractals Garden", version: "v1.0", category: "Math", href: "tools/fractals_garden.html",
+    desc: "Zoom into and grow fractals such as the Mandelbrot and Julia sets." },
+  { title: "Ruler and Compass", version: "v1.0", category: "Math", href: "tools/ruler_and_compass.html",
+    desc: "Make classical Euclidean constructions with only a straightedge and a compass." },
+  { title: "Magnet Tiles", version: "v2.1", category: "Math", href: "tools/magnet_tiles.html",
+    desc: "Snap magnetic tiles together and explore how poles attract, repel and build shapes." },
+  // ---- Computing & Simulation ----
+  { title: "Logic Gate Designer", version: "v1.6", category: "Computing & Simulation", href: "tools/logic_gate_designer.html",
+    desc: "Wire up logic gates to build and test digital circuits." },
+  { title: "Conway’s Multiverse", version: "v1.0", category: "Computing & Simulation", href: "tools/conways_multiverse.html",
+    desc: "Run Conway’s Game of Life and other cellular automata and watch complex patterns emerge." },
+  { title: "Particle Life", version: "v1.0", category: "Computing & Simulation", href: "tools/particle_life.html",
+    desc: "Set attraction rules between particle types and watch lifelike patterns self-organize." },
+  // ---- Music ----
+  { title: "Music Theory Composer", version: "v3.2", category: "Music", href: "tools/music_theory_composer.html",
+    desc: "Compose with scales, chords and progressions while hearing the theory in action." }
+  // Add a tool by copying a line above: title, version (optional), category, href (path to the HTML file), desc
+];
+// =====================================================================
+
+const $ = id => document.getElementById(id);
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; return e; };
+
+document.title = SITE.name;
+$('siteName').textContent = SITE.name; $('tagline').textContent = SITE.tagline; $('intro').textContent = SITE.intro;
+$('footer').textContent = `© ${new Date().getFullYear()} ${SITE.name} · ryanstools.com`;
+
+// Tool cards grouped by category, with category filter buttons
+let activeCat = 'All';
+function renderTools() {
+  const wrap = $('toolGrid'); wrap.textContent = '';
+  CATEGORIES.filter(c => activeCat === 'All' || c === activeCat).forEach(c => {
+    const list = TOOLS.filter(t => t.category === c);
+    if (!list.length) return;
+    const sec = el('div'), h = el('h4', 'cat-h', c); h.append(el('span', 'n', String(list.length)));
+    const grid = el('div', 'grid');
+    list.forEach(t => {
+      const a = el('a', 'card tool'); a.href = t.href;
+      const top = el('div', 'top'); top.append(el('h4', '', t.title)); if (t.version) top.append(el('span', 'badge', t.version));
+      const foot = el('div', 'foot'); foot.append(el('span', 'tag', t.category), el('span', 'go', 'Open tool →'));
+      a.append(top, el('p', '', t.desc), foot); grid.append(a);
+    });
+    sec.append(h, grid); wrap.append(sec);
+  });
+}
+['All', ...CATEGORIES].forEach(c => {
+  const b = el('button', '', c); b.type = 'button'; b.setAttribute('aria-pressed', c === activeCat);
+  b.onclick = () => { activeCat = c; [...$('filters').children].forEach(x => x.setAttribute('aria-pressed', x === b)); renderTools(); };
+  $('filters').append(b);
+});
+renderTools();
+
+// About
+$('aName').textContent = ABOUT.name; $('aRole').textContent = ABOUT.role;
+ABOUT.bio.forEach(p => $('aBio').append(el('p', '', p)));
+ABOUT.links.forEach(l => { const a = el('a', 'btn', l.label); a.href = l.href; $('aLinks').append(a); });
+if (ABOUT.photo) { const i = new Image(); i.src = ABOUT.photo; i.alt = ABOUT.name; $('avatar').append(i); }
+else $('avatar').textContent = ABOUT.name.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase();
+
+// Issue reporting
+['Website / other', ...TOOLS.map(t => t.title)].reverse().forEach(n => $('fTool').prepend(new Option(n, n)));
+$('issueForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const st = $('status'), msg = $('fMsg').value.trim();
+  const say = (t, c) => { st.textContent = t; st.className = c || ''; };
+  if ($('fHp').value) return;                       // spam trap
+  if (msg.length < 10) { say('Please add a little more detail.', 'err'); return; }
+  const r = { tool: $('fTool').value, type: $('fType').value, message: msg, email: $('fEmail').value.trim(),
+              page: location.href, browser: navigator.userAgent, screen: `${innerWidth}x${innerHeight}` };
+  if (SITE.issueEndpoint) {
+    try {
+      say('Sending…');
+      const res = await fetch(SITE.issueEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(r) });
+      if (!res.ok) throw 0;
+      say('Thanks! Your report was sent.', 'ok'); e.target.reset();
+    } catch { say('Could not send. Please email ' + SITE.email + ' instead.', 'err'); }
+  } else {
+    const body = `${r.message}\n\n---\nTool: ${r.tool}\nType: ${r.type}\nReply to: ${r.email || '(not given)'}\nBrowser: ${r.browser}\nScreen: ${r.screen}`;
+    location.href = `mailto:${SITE.email}?subject=${encodeURIComponent(`[${r.type}] ${r.tool}`)}&body=${encodeURIComponent(body)}`;
+    say('Opening your email app to send the report…', 'ok');
+  }
+});
+</script>
+</body>
+</html>
