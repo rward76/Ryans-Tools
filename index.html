@@ -37,6 +37,12 @@ main{display:flex;flex-direction:column;gap:40px;min-width:0}
 .card{background:#1f293799;padding:16px;border-radius:12px;border:1px solid rgba(55,65,81,.6)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
 .tool{display:flex;flex-direction:column;gap:10px;transition:border-color .15s,transform .15s,background .15s}
+.tool{position:relative;overflow:hidden}
+.tool.has-ribbon .top{padding-right:48px}  /* keeps the version badge clear of the ribbon */
+.ribbon{position:absolute;top:0;right:0;width:92px;height:92px;overflow:hidden;pointer-events:none}
+.ribbon span{position:absolute;top:22px;right:-33px;width:130px;height:20px;line-height:20px;transform:rotate(45deg);text-align:center;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;box-shadow:0 2px 4px #0006}
+.ribbon-new span{background:var(--emerald6);color:#fff}
+.ribbon-half-baked span{background:#fbbf24;color:#451a03}
 .tool:hover{border-color:var(--blue4);background:#1f2937cc;transform:translateY(-2px)}
 .th{display:flex;align-items:center;gap:10px;min-width:0}
 .ticon{flex:none;width:40px;height:40px;border-radius:8px;background:linear-gradient(to top right,var(--blue6),var(--purple6));display:grid;place-items:center;color:#fff;box-shadow:0 4px 6px -1px #0006;overflow:hidden}
@@ -59,7 +65,9 @@ main{display:flex;flex-direction:column;gap:40px;min-width:0}
 .about h4{margin:0;font-size:18px}
 .about .role{color:var(--blue3);font-size:13px;margin-bottom:8px}
 .about p{margin:0 0 8px;color:var(--g300)}
+.email{color:var(--g300);font-size:13px;overflow-wrap:anywhere}
 .links{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.links:empty{display:none}
 .btn{font-size:12px;background:var(--g700);color:var(--g100);border:0;padding:6px 12px;border-radius:8px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .15s;font-family:inherit}
 .btn:hover{background:var(--g600,#4b5563)}
 .btn-go{background:var(--emerald6);box-shadow:0 10px 15px -3px #064e3b4d;padding:8px 18px}
@@ -96,6 +104,7 @@ footer{border-top:1px solid var(--g800);background:var(--g900);padding:16px;text
       <div>
         <h4 id="aName"></h4><div class="role" id="aRole"></div>
         <div id="aBio"></div>
+        <div class="email" id="aEmail"></div>
         <div class="links" id="aLinks"></div>
       </div>
     </div>
@@ -154,13 +163,13 @@ const ABOUT = {
     "Hey guys I made a thing",
     "Disclaimer: AI was heavily used to make these"
   ],
+  email: SITE.email,              // shown as plain text under the bio
   links: [
-    { label: "Email", href: "mailto:you@ryanstools.com" }
     // { label: "Website", href: "https://..." }, { label: "GitHub", href: "https://github.com/..." }
   ]
 };
 // Categories appear on the page in this order. Each tool uses one of these names.
-const CATEGORIES = ["Biology", "Chemistry", "Physics", "Math", "Computing & Simulation", "Music"];
+const CATEGORIES = ["Biology", "Chemistry", "Physics", "Math", "Computing & Simulation", "Arts"];
 // Card icons, copied from each app's own header logo. To use an image file instead, set a tool's icon to its path, e.g. icon: "cell_tour_icon.svg"
 const ICONS = {
   cell: "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"><ellipse cx=\"12\" cy=\"12\" rx=\"10\" ry=\"8\"/><circle cx=\"10\" cy=\"11\" r=\"3.2\"/><path d=\"M16 8.5c1.2.4 1.8 1.3 1.6 2.4M15.5 15.5h2\"/></svg>",
@@ -169,6 +178,7 @@ const ICONS = {
   anatomy: "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"4.2\" r=\"2.4\"/><path d=\"M12 7.5v7.5M7 9.5l5 1.5 5-1.5M9 22l3-7 3 7\"/></svg>",
   molecule: "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\"><circle cx=\"12\" cy=\"12\" r=\"2.6\" fill=\"currentColor\"/><circle cx=\"4.5\" cy=\"6\" r=\"1.9\" fill=\"currentColor\"/><circle cx=\"19.5\" cy=\"6\" r=\"1.9\" fill=\"currentColor\"/><circle cx=\"12\" cy=\"21\" r=\"1.9\" fill=\"currentColor\"/><path d=\"M10 10.6 6 7.1M14 10.6l4-3.5M12 14.6v4.6\"/></svg>",
   orbital: "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"><circle cx=\"12\" cy=\"12\" r=\"2.2\" fill=\"currentColor\"/><ellipse cx=\"12\" cy=\"12\" rx=\"10\" ry=\"4\"/><ellipse cx=\"12\" cy=\"12\" rx=\"10\" ry=\"4\" transform=\"rotate(60 12 12)\"/><ellipse cx=\"12\" cy=\"12\" rx=\"10\" ry=\"4\" transform=\"rotate(-60 12 12)\"/></svg>",
+  equilibrium: "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 9h13l-3-3\"/><path d=\"M20 15H7l3 3\"/></svg>",
   piston: "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\"><path d=\"M5 6v14h14V6\"/><path d=\"M4 9h16\"/><path d=\"M12 9V2\"/><circle cx=\"9\" cy=\"14\" r=\"1.2\" fill=\"currentColor\"/><circle cx=\"14.5\" cy=\"12.5\" r=\"1.2\" fill=\"currentColor\"/><circle cx=\"13\" cy=\"17\" r=\"1.2\" fill=\"currentColor\"/></svg>",
   optics: "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M10 4l6 13H4z\"/><path d=\"M1 12h6.5\"/><path d=\"M14 11l9-3M14.5 12.5l8.5 0.5M15 14l7 4\"/></svg>",
   orbits: "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\"><circle cx=\"12\" cy=\"12\" r=\"3\"/><ellipse cx=\"12\" cy=\"12\" rx=\"10\" ry=\"5.5\" transform=\"rotate(-25 12 12)\"/><circle cx=\"20.2\" cy=\"8.4\" r=\"1.6\" fill=\"currentColor\"/></svg>",
@@ -179,56 +189,61 @@ const ICONS = {
   compass: "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"4\" r=\"1.8\"/><path d=\"M11 5.7L5 21M13 5.7L19 21M7.5 14.5h9\"/></svg>",
   magnet: "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linejoin=\"round\"><path d=\"M12 2.8 20.5 7.5v9L12 21.2 3.5 16.5v-9z\" fill=\"currentColor\" fill-opacity=\".18\"/><path d=\"M3.5 7.5 12 12l8.5-4.5M12 12v9.2\"/></svg>",
   logic: "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M7 5h5a7 7 0 0 1 0 14H7z\"/><path d=\"M3 9h4M3 15h4M19 12h3\"/></svg>",
-  life: "<svg viewBox=\"0 0 24 24\" fill=\"currentColor\"><rect x=\"9\" y=\"3\" rx=\"1\"/><rect x=\"15\" y=\"9\" rx=\"1\"/><rect x=\"3\" y=\"15\" rx=\"1\"/><rect x=\"9\" y=\"15\" rx=\"1\"/><rect x=\"15\" y=\"15\" rx=\"1\"/></svg>",
+  life: "<svg viewBox=\"0 0 24 24\" fill=\"currentColor\"><rect x=\"9\" y=\"3\" width=\"5\" height=\"5\" rx=\"1\"/><rect x=\"15\" y=\"9\" width=\"5\" height=\"5\" rx=\"1\"/><rect x=\"3\" y=\"15\" width=\"5\" height=\"5\" rx=\"1\"/><rect x=\"9\" y=\"15\" width=\"5\" height=\"5\" rx=\"1\"/><rect x=\"15\" y=\"15\" width=\"5\" height=\"5\" rx=\"1\"/></svg>",
   particles: "<svg viewBox=\"0 0 24 24\" fill=\"currentColor\"><circle cx=\"6\" cy=\"7\" r=\"2.2\"/><circle cx=\"17\" cy=\"6\" r=\"1.6\"/><circle cx=\"12\" cy=\"13\" r=\"2.6\"/><circle cx=\"5\" cy=\"17\" r=\"1.5\"/><circle cx=\"18\" cy=\"17\" r=\"2\"/><path d=\"M8 8.2l2.4 2.9M14.3 11.4l1.9-3.8M10 14.6l-3.4 1.6M14.5 14.2l2 1.6\" stroke=\"currentColor\" stroke-width=\"1.2\" fill=\"none\" opacity=\".7\"/></svg>",
   music: "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M9 18V5l12-2v13\"/><circle cx=\"6\" cy=\"18\" r=\"3\"/><circle cx=\"18\" cy=\"16\" r=\"3\"/></svg>"
 };
+// Ribbons a tool can carry through its status field. status: "default" isn't listed here, so it shows no ribbon. To add another, add a line here and a matching .ribbon-<key> style.
+const RIBBONS = { "new": "New", "half-baked": "Half-baked" };
 const TOOLS = [
   // ---- Biology ----
-  { title: "Cell Tour", icon: ICONS.cell, version: "v2.8", category: "Biology", href: "cell_tour_v2.8.html",
+  { title: "Cell Tour", icon: ICONS.cell, version: "v2.8", category: "Biology", href: "cell_tour_v2.8.html", status: "default",
     desc: "Take a guided tour of a cell and its organelles." },
-  { title: "Human Cell Tour", icon: ICONS.humancell, version: "v1.7", category: "Biology", href: "human_cell_tour_v1.7.html",
+  { title: "Human Cell Tour", icon: ICONS.humancell, version: "v1.7", category: "Biology", href: "human_cell_tour_v1.7.html", status: "default",
     desc: "Take a guided tour of different types of human cells." },
-  { title: "Cloning Workbench", icon: ICONS.cloning, version: "v3.0", category: "Biology", href: "cloning_workbench_v3.0.html",
+  { title: "Cloning Workbench", icon: ICONS.cloning, version: "v3.1", category: "Biology", href: "cloning_workbench_v3.1.html", status: "default",
     desc: "Walk through molecular cloning: digest, react, assemble, transform." },
-  { title: "Human Anatomy Tour", icon: ICONS.anatomy, version: "v1.0", category: "Biology", href: "anatomy_tour_v1.0.html",
+  { title: "Human Anatomy Tour", icon: ICONS.anatomy, version: "v1.7", category: "Biology", href: "anatomy_tour_v1.7.html", status: "half-baked",
     desc: "Explore the organ systems of the human body layer by layer." },
   // ---- Chemistry ----
-  { title: "Molecular Modeling Kit", icon: ICONS.molecule, version: "v4.3", category: "Chemistry", href: "molecular_modeling_kit_v4.3.html",
+  { title: "Molecular Modeling Kit", icon: ICONS.molecule, version: "v4.3", category: "Chemistry", href: "molecular_modeling_kit_v4.3.html", status: "default",
     desc: "Build, analyze, and react molecule in 3D." },
-  { title: "Atomic Orbital Builder", icon: ICONS.orbital, version: "v2.1", category: "Chemistry", href: "atomic_orbital_builder_v2.1.html",
+  { title: "Atomic Orbital Builder", icon: ICONS.orbital, version: "v2.1", category: "Chemistry", href: "atomic_orbital_builder_v2.1.html", status: "default",
     desc: "See how spherical harmonics leads to the shapes of atomic orbitals." },
+  { title: "Reaction Vessel", icon: ICONS.equilibrium, version: "v1.5", category: "Chemistry", href: "reaction_vessel_v1.5.html", status: "new",
+    desc: "Simulate dynamic chemical equilibrium in reversible reactions." },
   // ---- Physics ----
-  { title: "Phase Change Piston", icon: ICONS.piston, version: "v2.0", category: "Physics", href: "phase_change_piston_v2.0.html",
+  { title: "Phase Change Piston", icon: ICONS.piston, version: "v2.1", category: "Physics", href: "phase_change_piston_v2.1.html", status: "default",
     desc: "Heat, cool, and compress a gas in a piston to change phases." },
-  { title: "Optics Bench", icon: ICONS.optics, version: "v1.0", category: "Physics", href: "optics_bench_v1.0.html",
+  { title: "Optics Bench", icon: ICONS.optics, version: "v1.0", category: "Physics", href: "optics_bench_v1.0.html", status: "half-baked",
     desc: "Trace light rays through lenses and mirrors." },
-  { title: "Orbits Lab", icon: ICONS.orbits, version: "v1.2", category: "Physics", href: "orbit_lab_v1.2.html",
+  { title: "Orbits Lab", icon: ICONS.orbits, version: "v1.2", category: "Physics", href: "orbit_lab_v1.2.html", status: "half-baked",
     desc: "Explore the solar system or make your own." },
-  { title: "Gear Train Lab", icon: ICONS.gears, version: "v1.0", category: "Physics", href: "gear_train_lab_v1.0.html",
+  { title: "Gear Train Lab", icon: ICONS.gears, version: "v1.0", category: "Physics", href: "gear_train_lab_v1.0.html", status: "half-baked",
     desc: "Build simple gear trains." },
   // ---- Math ----
-  { title: "Fourier Transform Playground", icon: ICONS.fourier, version: "v3.1", category: "Math", href: "fourier_transform_playground_v3.1.html",
+  { title: "Fourier Transform Playground", icon: ICONS.fourier, version: "v3.1", category: "Math", href: "fourier_transform_playground_v3.1.html", status: "default",
     desc: "Analyze signals with fourier transforms up to 3 dimensions." },
-  { title: "Complex Plane Graphing Calculator", icon: ICONS.complex, version: "v1.1", category: "Math", href: "complex_plane_grapher_v1.1.html",
+  { title: "Complex Plane Graphing Calculator", icon: ICONS.complex, version: "v1.1", category: "Math", href: "complex_plane_grapher_v1.1.html", status: "half-baked",
     desc: "Graph functions of a complex variable." },
-  { title: "Fractal Garden", icon: ICONS.fractal, version: "v1.0", category: "Math", href: "fractal_garden_v1.0.html",
+  { title: "Fractal Garden", icon: ICONS.fractal, version: "v1.0", category: "Math", href: "fractal_garden_v1.0.html", status: "half-baked",
     desc: "Make pretty shapes." },
-  { title: "Ruler and Compass", icon: ICONS.compass, version: "v1.0", category: "Math", href: "ruler_compass_v1.0.html",
+  { title: "Ruler and Compass", icon: ICONS.compass, version: "v1.0", category: "Math", href: "ruler_compass_v1.0.html", status: "half-baked",
     desc: "Make classical Euclidean constructions with only a straightedge and a compass." },
-  { title: "Magnet Tiles", icon: ICONS.magnet, version: "v2.1", category: "Math", href: "magnet_tiles_v2.1.html",
+  { title: "Magnet Tiles", icon: ICONS.magnet, version: "v2.1", category: "Math", href: "magnet_tiles_v2.1.html", status: "default",
     desc: "Shapes! and colors!!" },
   // ---- Computing & Simulation ----
-  { title: "Logic Gate Designer", icon: ICONS.logic, version: "v1.6", category: "Computing & Simulation", href: "logic_gate_designer_v1.6.html",
+  { title: "Logic Gate Designer", icon: ICONS.logic, version: "v1.6", category: "Computing & Simulation", href: "logic_gate_designer_v1.6.html", status: "half-baked",
     desc: "Wire up logic gates to build and test digital circuits." },
-  { title: "Conway’s Multiverse", icon: ICONS.life, version: "v1.0", category: "Computing & Simulation", href: "life_multiverse_v1.0.html",
+  { title: "Conway’s Multiverse", icon: ICONS.life, version: "v1.1", category: "Computing & Simulation", href: "life_multiverse_v1.1.html", status: "default",
     desc: "Run Conway's Game of Life, or change the rules." },
-  { title: "Particle Life", icon: ICONS.particles, version: "v1.0", category: "Computing & Simulation", href: "particle_life_v1.0.html",
+  { title: "Particle Life", icon: ICONS.particles, version: "v1.1", category: "Computing & Simulation", href: "particle_life_v1.1.html", status: "default",
     desc: "Set attraction rules between particle types and watch lifelike patterns self-organize." },
-  // ---- Music ----
-  { title: "Music Theory Composer", icon: ICONS.music, version: "v3.2", category: "Music", href: "music_theory_lab_v3.2.html",
+  // ---- Arts ----
+  { title: "Music Theory Composer", icon: ICONS.music, version: "v3.2", category: "Arts", href: "music_theory_lab_v3.2.html", status: "half-baked",
     desc: "Make harmonies and rhythms" }
   // Add a tool by copying a line above: title, version (optional), category, href (path to the HTML file), desc
+  // status: "default" (no ribbon), "new" or "half-baked" (ribbon on the corner of the tile)
 ];
 // =====================================================================
 
@@ -255,7 +270,9 @@ function renderTools() {
       head.append(el('h4', '', t.title)); top.append(head);
       if (t.version) top.append(el('span', 'badge', t.version));
       const foot = el('div', 'foot'); foot.append(el('span', 'tag', t.category), el('span', 'go', 'Open tool →'));
-      a.append(top, el('p', '', t.desc), foot); grid.append(a);
+      a.append(top, el('p', '', t.desc), foot);
+      if (RIBBONS[t.status]) { const r = el('div', 'ribbon ribbon-' + t.status); r.append(el('span', '', RIBBONS[t.status])); a.classList.add('has-ribbon'); a.append(r); }
+      grid.append(a);
     });
     sec.append(h, grid); wrap.append(sec);
   });
@@ -268,7 +285,7 @@ function renderTools() {
 renderTools();
 
 // About
-$('aName').textContent = ABOUT.name; $('aRole').textContent = ABOUT.role;
+$('aName').textContent = ABOUT.name; $('aRole').textContent = ABOUT.role; $('aEmail').textContent = ABOUT.email;
 ABOUT.bio.forEach(p => $('aBio').append(el('p', '', p)));
 ABOUT.links.forEach(l => { const a = el('a', 'btn', l.label); a.href = l.href; $('aLinks').append(a); });
 if (ABOUT.photo) { const i = new Image(); i.src = ABOUT.photo; i.alt = ABOUT.name; $('avatar').append(i); }
