@@ -1,0 +1,910 @@
+<title>Gear Train Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: same shell as Optics Bench and Logic Gate Designer — header bar, 384px control rail, framed 2D bench viewport with floating glass overlays. Dark-only by design (machined metal reads best on a dark bench). */
+:root{color-scheme:dark;
+--g950:#030712;--g900:#111827;--g800:#1f2937;--g700:#374151;--g600:#4b5563;--g500:#6b7280;--g400:#9ca3af;--g300:#d1d5db;--g200:#e5e7eb;--g100:#f3f4f6;
+--blue7:#1d4ed8;--blue6:#2563eb;--blue5:#3b82f6;--blue4:#60a5fa;--blue3:#93c5fd;
+--purple6:#9333ea;--purple4:#c084fc;--pink4:#f472b6;
+--emerald6:#059669;--emerald5:#10b981;--emerald4:#34d399;
+--amber3:#fcd34d;--amber4:#fbbf24;--rose4:#fb7185;--rose6:#e11d48;
+--f-sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+--f-mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--g950);color:var(--g100);font-family:var(--f-sans);font-size:14px;display:flex;flex-direction:column;overflow:hidden}
+*,*:before,*:after{box-sizing:border-box}
+button,select,output,input{font:inherit;color:inherit}
+button:focus-visible,input:focus-visible{outline:2px solid var(--blue5);outline-offset:2px}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:var(--g900)}::-webkit-scrollbar-thumb{background:var(--g700);border-radius:3px}
+svg.i{width:14px;height:14px;flex:none}
+header{background:var(--g900);border-bottom:1px solid var(--g800);padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;flex:none}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{background:linear-gradient(to top right,var(--blue6),var(--purple6));padding:8px;border-radius:8px;box-shadow:0 10px 15px -3px #0006;display:grid;place-items:center}
+.logo svg{width:20px;height:20px;color:#fff}
+h1{margin:0;font-size:18px;font-weight:700;line-height:1.4;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+h1 .grad{background:linear-gradient(to right,var(--blue4),var(--purple4),var(--pink4));-webkit-background-clip:text;background-clip:text;color:transparent}
+.badge-v{font-size:12px;font-weight:600;padding:2px 8px;border-radius:4px;background:#1e3a8a99;color:var(--blue3);border:1px solid var(--blue7)}
+.hctl{display:flex;align-items:center;flex-wrap:wrap;justify-content:flex-end;gap:12px}
+.seg{display:flex;align-items:center;background:var(--g800);border:1px solid var(--g700);border-radius:8px;padding:4px;font-size:12px;flex-wrap:wrap}
+.seg .lbl{color:var(--g400);padding:0 8px;font-weight:500}
+.seg button{background:transparent;border:0;padding:4px 10px;border-radius:4px;color:var(--g300);cursor:pointer;transition:color .15s,background .15s}
+.seg button:hover{color:#fff}
+.seg button[aria-pressed=true]{background:var(--blue6);color:#fff;font-weight:600;box-shadow:0 1px 3px #0006}
+.seg.wide{display:grid;grid-auto-flow:column;grid-auto-columns:1fr}
+.seg.wide button{padding:4px 6px}
+.btn-clear{background:var(--g700);color:var(--g100);border:0;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;cursor:pointer;transition:background .15s}
+.btn-clear:hover{background:var(--g600)}
+.btn-clear.arm{background:var(--rose6);color:#fff}
+.row{flex:1;display:flex;overflow:hidden;min-height:0;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+aside{width:384px;background:var(--g900);border-right:1px solid var(--g800);overflow-y:auto;flex:none}
+.stack{padding:16px;display:flex;flex-direction:column;gap:14px}
+.card{background:#1f293799;padding:14px;border-radius:12px;border:1px solid rgba(55,65,81,.6);display:flex;flex-direction:column;gap:12px}
+.card-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card-h .t{font-size:12px;font-weight:700;color:var(--g200);text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:8px}
+.pill{font-size:10px;background:var(--g700);color:var(--g300);padding:2px 8px;border-radius:999px;font-family:var(--f-mono);white-space:nowrap}
+.pill.hi{background:#05966933;color:var(--emerald4)}
+.pill.bad{background:#e11d4833;color:var(--rose4)}
+.pill.idle{background:#37415199;color:var(--g400)}
+.pill.warn{background:#f59e0b26;color:var(--amber3)}
+.c-blue{color:var(--blue4)}.c-purple{color:var(--purple4)}.c-emerald{color:var(--emerald4)}.c-amber{color:var(--amber3)}.c-pink{color:var(--pink4)}
+.grp{font:600 10px var(--f-mono);color:var(--g500);text-transform:uppercase;letter-spacing:.08em;margin:0 0 -4px}
+.parts{display:grid;gap:6px}
+.parts.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.part{display:flex;flex-direction:column;align-items:center;gap:5px;padding:9px 4px 7px;background:var(--g800);border:1px solid var(--g700);border-radius:8px;color:var(--g200);font-size:10.5px;font-weight:600;cursor:grab;touch-action:pan-y;transition:border-color .15s,background .15s;user-select:none;-webkit-user-select:none;text-align:center;line-height:1.2}
+.part:hover{border-color:var(--blue5);background:#1e293b}
+.part svg{width:40px;height:24px;color:var(--g300)}
+.part:hover svg{color:var(--blue3)}
+.part.tool{cursor:pointer}
+.part.tool[aria-pressed=true]{background:#9333ea33;border-color:var(--purple4);color:#f3e8ff}
+.part.tool[aria-pressed=true] svg{color:var(--purple4)}
+.muted{color:var(--g500);font-size:11px;margin:0;line-height:1.5}
+.muted b{color:var(--g300);font-weight:600}
+.selname{font-size:20px;font-weight:700;color:#fff;margin:0;line-height:1.2}
+.desc{font-size:12px;color:var(--g300);margin:-6px 0 0;line-height:1.5}
+.ctl{display:grid;grid-template-columns:78px minmax(0,1fr) 64px;align-items:center;gap:10px;font-size:12px;color:var(--g300)}
+.ctl output{font:12px var(--f-mono);color:var(--blue3);text-align:right;font-variant-numeric:tabular-nums}
+.ctl.amber output{color:var(--amber3)}
+input[type=range]{width:100%;accent-color:var(--blue5);margin:0}
+.ctl.amber input[type=range]{accent-color:var(--amber4)}
+.btns2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.btn{font-size:11.5px;background:var(--g700);color:var(--g100);border:0;padding:7px 6px;border-radius:8px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .15s}
+.btn:hover{background:var(--g600)}
+.btn[aria-pressed=true]{background:#05966933;color:var(--emerald4);box-shadow:inset 0 0 0 1px #10b98166}
+.btn.danger{background:#e11d4826;color:#fecdd3;border:1px solid #e11d4866}
+.btn.danger:hover{background:#e11d4840}
+.btn.solo{grid-column:span 2}
+.lawbox{background:var(--g950);border:1px solid var(--g800);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.lawbox .big{font:700 22px var(--f-mono);color:#fff;font-variant-numeric:tabular-nums;line-height:1.15}
+.lawbox .big small{font-size:11px;color:var(--g400);font-weight:500;margin-left:6px}
+.lawrow{display:flex;justify-content:space-between;gap:10px;font:11.5px var(--f-mono);color:var(--g400)}
+.lawrow b{color:var(--emerald4);font-weight:600;text-align:right}
+.lawrow b.am{color:var(--amber3)}.lawrow b.bl{color:var(--blue3)}.lawrow b.pk{color:var(--pink4)}.lawrow b.wh{color:var(--g100)}
+.mtab{background:var(--g950);border:1px solid var(--g800);border-radius:8px;padding:8px 10px;display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:5px 12px;font:11.5px var(--f-mono);font-variant-numeric:tabular-nums;align-items:baseline}
+.mtab .h{font:600 9.5px var(--f-mono);color:var(--g500);text-transform:uppercase;letter-spacing:.07em}
+.mtab .nm{font:600 12px var(--f-sans);color:var(--g200);display:flex;align-items:center;gap:6px}
+.mtab .nm i{width:8px;height:8px;border-radius:50%;flex:none}
+.mtab .v{color:var(--g100);text-align:right}
+.mtab .tq{color:var(--amber3);text-align:right}
+.mtab .dim{color:var(--g500)}
+.expr{font:600 12.5px/1.6 var(--f-mono);color:var(--blue3);overflow-wrap:anywhere;background:var(--g950);border:1px dashed var(--g700);border-radius:8px;padding:8px 10px}
+.expr small{display:block;font-weight:500;font-size:10.5px;color:var(--g500);text-transform:uppercase;letter-spacing:.06em}
+.expr span{color:var(--g400);font-weight:500}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font-size:11.5px;font-weight:600;background:var(--g800);color:var(--g300);border:1px solid var(--g700);border-radius:999px;padding:4px 10px;cursor:pointer;white-space:nowrap}
+.chip:hover{border-color:var(--g600)}
+.chip[aria-pressed=true]{background:#9333ea40;border-color:var(--purple4);color:#f3e8ff}
+.wrow{background:var(--g950);border:1px solid var(--g800);border-radius:8px;padding:9px 10px;display:flex;flex-direction:column;gap:8px}
+.wh{display:flex;align-items:center;gap:6px;font-size:12px;flex-wrap:wrap}
+.wh .lay{font:700 9.5px var(--f-mono);text-transform:uppercase;letter-spacing:.08em;padding:2px 6px;border-radius:4px;background:var(--g800);color:var(--g400)}
+.wh .lay.f{background:#1e3a8a66;color:var(--blue3)}
+.wh .lay.m{background:#3730a359;color:#c7d2fe}
+.wh b{color:var(--g100)}
+.wh .spec{font:11px var(--f-mono);color:var(--g500);margin-left:auto}
+.wh .x{background:transparent;border:1px solid var(--g700);color:var(--g400);border-radius:6px;font-size:10.5px;padding:2px 7px;cursor:pointer}
+.wh .x:hover{color:#fff;border-color:var(--g500)}
+.wh .x.rm:hover{color:#fecdd3;border-color:#e11d4888}
+.wrow.empty .wh{color:var(--g500)}
+.wrow.empty .add{display:flex;gap:5px;margin-left:auto;flex-wrap:wrap}
+.wrow.empty .add button{font-size:10.5px;padding:3px 8px;border-radius:6px;border:1px solid var(--g700);background:var(--g800);color:var(--g300);cursor:pointer;font-weight:600}
+.wrow.empty .add button:hover{border-color:var(--blue5);color:#fff}
+ol.path{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:11.5px}
+ol.path li button{width:100%;text-align:left;display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;align-items:start;padding:6px 8px;background:var(--g950);border:1px solid var(--g800);border-radius:6px;cursor:pointer;color:inherit}
+ol.path li button:hover{border-color:var(--g600)}
+ol.path li button[aria-current=true]{border-color:var(--blue5);background:#3b82f614}
+ol.path .ix{font:700 9px var(--f-mono);color:var(--g950);background:var(--g400);border-radius:50%;width:18px;height:18px;display:grid;place-items:center;margin-top:1px}
+ol.path .ix.m{background:var(--amber4)}
+ol.path .ix.p{background:var(--purple4)}
+ol.path .ix.r{background:var(--emerald4)}
+ol.path .k{font-weight:700;color:var(--g100);display:flex;justify-content:space-between;gap:8px}
+ol.path .k span{font:600 11px var(--f-mono);color:var(--emerald4);font-variant-numeric:tabular-nums;white-space:nowrap}
+ol.path .k span.held{color:var(--g400)}
+ol.path .m{font:11px var(--f-mono);color:var(--g400);display:block;margin-top:2px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+ol.path .m b{color:var(--g100);font-weight:600}
+ol.path li.jam{padding:8px 10px;background:#e11d481a;border:1px solid #e11d4866;border-radius:6px;color:#fecdd3;font-size:11.5px;line-height:1.5}
+ol.path li.note{font:11px var(--f-mono);color:var(--g500);padding:2px 4px}
+.eq{display:grid;gap:5px;font:11.5px/1.5 var(--f-mono);color:var(--g300)}
+.eq div{display:flex;justify-content:space-between;gap:10px}
+.eq span{color:var(--g500);font-family:var(--f-sans);font-size:11px;text-align:right}
+.keys{font:10px/1.7 var(--f-mono);color:var(--g500);padding:0 4px;margin-top:-6px}
+main{flex:1;display:flex;min-width:0;background:#11182780;padding:8px}
+.vp{flex:1;position:relative;background:radial-gradient(ellipse at 50% 45%,#0d1522 0%,var(--g950) 72%);border:1px solid var(--g800);border-radius:12px;overflow:hidden;min-height:0}
+#cv{position:absolute;inset:0;display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+#cv.dragging{cursor:grabbing}
+#cv.tool{cursor:crosshair}
+.float{position:absolute;z-index:2;background:#111827e6;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid var(--g700);border-radius:8px;box-shadow:0 10px 15px -3px #00000080}
+.vp-title{top:12px;left:12px;padding:6px 12px;font-size:12px;display:flex;align-items:center;gap:8px;pointer-events:none;max-width:calc(100% - 24px)}
+.vp-title b{color:var(--g200)}
+.vp-title span{color:var(--g400)}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--emerald4);flex:none;transition:background .3s}
+.dot.idle{background:var(--g500)}.dot.jam{background:var(--rose4)}
+.vp-tool{top:50px;left:12px;padding:4px 10px;font:11px var(--f-mono);color:var(--g400);pointer-events:none;max-width:calc(100% - 24px)}
+.vp-tool b{color:var(--blue3);font-weight:600}
+.vp-tool.on b{color:var(--purple4)}
+.toast{top:12px;right:12px;padding:6px 12px;font-size:12px;color:var(--amber3);opacity:0;transform:translateY(-4px);transition:opacity .2s,transform .2s;max-width:45%;pointer-events:none}
+.toast.show{opacity:1;transform:none}
+.zoom{left:12px;bottom:12px;display:flex;align-items:center;gap:2px;padding:4px}
+.zoom button{width:28px;height:28px;border-radius:6px;border:0;background:transparent;color:var(--g300);cursor:pointer;font:600 15px var(--f-mono);display:grid;place-items:center}
+.zoom button:hover{background:var(--g700);color:#fff}
+.zoom span{font:10px var(--f-mono);color:var(--g500);padding:0 6px;min-width:44px;text-align:center}
+.insp{right:12px;bottom:12px;padding:9px 11px;display:flex;flex-direction:column;gap:5px;font-size:11px;color:var(--g300);pointer-events:none}
+.insp .ot{font-size:10px;font-weight:700;color:var(--g400);text-transform:uppercase;letter-spacing:.05em}
+.lg{display:flex;align-items:center;gap:8px}
+.lg i{width:14px;height:14px;border-radius:50%;flex:none;border:1.5px solid}
+.lg i.l0{background:#1a2333;border-color:#5b6778}
+.lg i.l1{background:#22304a;border-color:#8696ae}
+.lg i.l2{background:#2c3e5e;border-color:#b8c9e2}
+.lg i.mo{background:#3a2a12;border-color:var(--amber4)}
+.lg i.ca{background:transparent;border-color:var(--purple4);border-width:3px}
+.lg i.mesh{width:7px;height:7px;background:var(--emerald4);border:0;margin:0 3.5px}
+.ghost{position:fixed;z-index:50;pointer-events:none;padding:5px 10px;font:600 12px var(--f-mono);border-radius:6px;background:var(--blue6);color:#fff;box-shadow:0 8px 20px #0008;transform:translate(-50%,-130%)}
+@media (max-width:820px){
+ html,body{height:auto}
+ body{overflow:auto}
+ .row{flex-direction:column;overflow:visible}
+ main{order:-1;flex:none;height:62vh;min-height:360px}
+ aside{width:100%;border-right:0;border-top:1px solid var(--g800);overflow:visible}
+ .vp-tool{display:none}
+ .insp{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header>
+  <div class="brand">
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="13" r="4.2"/><circle cx="8.5" cy="13" r="6" stroke-dasharray="2.1 1.6" stroke-width="2.4"/><circle cx="18" cy="7.5" r="2.2"/><circle cx="18" cy="7.5" r="3.6" stroke-dasharray="1.6 1.3" stroke-width="2"/></svg></div>
+    <div><h1><span class="grad">Gear Train Lab</span> <span class="badge-v">v1.1</span></h1></div>
+  </div>
+  <div class="hctl">
+    <div class="seg" role="group" aria-label="Animation speed"><span class="lbl">Motion</span><button id="sp0" data-sp="0" aria-pressed="false" title="Pause">❚❚</button><button id="sp1" data-sp="0.0625" aria-pressed="false">1/16×</button><button id="sp2" data-sp="0.25" aria-pressed="false">¼×</button><button id="sp3" data-sp="1" aria-pressed="true">1×</button></div>
+    <div class="seg" role="group" aria-label="Readouts"><span class="lbl">Readouts</span><button id="roM" data-ro="meters" aria-pressed="true">Meters</button><button id="roA" data-ro="all" aria-pressed="false">All</button><button id="roO" data-ro="off" aria-pressed="false">Off</button></div>
+    <button class="btn-clear" id="clearBtn"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg><span id="clearTxt">Clear bench</span></button>
+  </div>
+</header>
+
+<div class="row">
+  <aside>
+    <div class="stack">
+      <section class="card">
+        <div class="card-h"><span class="t"><svg class="i c-amber" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="6" width="13" height="12" rx="2"/><path d="M15 12h4M19 9v6M5 9v6M8 9v6M11 9v6"/></svg>Motor</span><span class="pill" id="mPill">12.6 W</span></div>
+        <div class="ctl amber"><label for="mRpm">Speed</label><input type="range" id="mRpm" min="1" max="300" step="1" value="60"><output id="oRpm">60 rpm</output></div>
+        <div class="ctl amber"><label for="mTq">Torque</label><input type="range" id="mTq" min="0.1" max="20" step="0.1" value="2"><output id="oTq">2.0 N·m</output></div>
+        <div class="seg wide" role="group" aria-label="Motor direction"><button id="dirCW" aria-pressed="true">↻ Clockwise</button><button id="dirCCW" aria-pressed="false">↺ Counter-clockwise</button></div>
+        <div class="ctl"><label for="mEff">Efficiency<br><span style="color:var(--g500);font-size:10.5px">per stage</span></label><input type="range" id="mEff" min="80" max="100" step="1" value="100"><output id="oEff">100%</output></div>
+        <div class="lawbox">
+          <div class="lawrow"><span>Input power  P = τ·ω</span><b class="am" id="mPow">12.57 W</b></div>
+          <div class="lawrow"><span>Shaft speed  ω</span><b class="wh" id="mOmega">6.28 rad/s</b></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-h"><span class="t"><svg class="i c-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Parts</span><span class="pill">tap or drag in</span></div>
+        <div class="seg wide" role="group" aria-label="Layer for new parts"><button id="lay0" data-lay="0" aria-pressed="false">Back</button><button id="lay1" data-lay="1" aria-pressed="false">Middle</button><button id="lay2" data-lay="2" aria-pressed="true">Front</button></div>
+        <div class="parts g4">
+          <button class="part" data-type="gear"><svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="20" cy="12" r="7"/><circle cx="20" cy="12" r="8.6" stroke-width="2.6" stroke-dasharray="1.7 1.5"/><circle cx="20" cy="12" r="1.4"/></svg>Gear</button>
+          <button class="part" data-type="pulley"><svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="20" cy="12" r="9"/><circle cx="20" cy="12" r="7.4"/><path d="M20 12v-7.4M20 12l7 2.3M20 12l-7 2.3M20 12l4.3 6M20 12l-4.3 6"/></svg>Pulley</button>
+          <button class="part tool" data-tool="belt" id="tBelt" aria-pressed="false"><svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="12" r="4"/><circle cx="30" cy="12" r="7"/><path d="M10 8l20-3M10 16l20 3" stroke-width="2"/></svg>Belt</button>
+          <button class="part" data-type="rack"><svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><circle cx="20" cy="7" r="5.5" stroke-dasharray="1.6 1.4" stroke-width="2.2"/><path d="M3 21h34v-5h-1.5l-1-2.5h-2l-1 2.5h-2.5l-1-2.5h-2l-1 2.5h-2.5l-1-2.5h-2l-1 2.5h-2.5l-1-2.5h-2l-1 2.5h-2.5l-1-2.5h-2l-1 2.5H3z"/></svg>Rack</button>
+          <button class="part" data-type="worm"><svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="6" y="2" width="28" height="7" rx="2"/><path d="M11 2l2 7M16 2l2 7M21 2l2 7M26 2l2 7"/><circle cx="20" cy="17.5" r="5" stroke-dasharray="1.6 1.3" stroke-width="2.2"/></svg>Worm</button>
+          <button class="part" data-type="plan"><svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="20" cy="12" r="10.5"/><circle cx="20" cy="12" r="3"/><circle cx="20" cy="5.6" r="3"/><circle cx="25.5" cy="15.2" r="3"/><circle cx="14.5" cy="15.2" r="3"/></svg>Planetary</button>
+          <button class="part" data-type="diff"><svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="20" cy="12" r="10.5" stroke-dasharray="1.6 1.3" stroke-width="2.2"/><circle cx="20" cy="12" r="3.2"/><circle cx="20" cy="6" r="2.5" stroke="#60a5fa"/><circle cx="24.4" cy="7.8" r="2.5" stroke="#f472b6"/><circle cx="15.2" cy="15.2" r="2.5" stroke="#60a5fa"/><circle cx="25.2" cy="15.6" r="2.5" stroke="#f472b6"/></svg>Differential</button>
+          <button class="part tool" data-tool="meter" id="tMeter" aria-pressed="false"><svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M10 18a10 10 0 0 1 20 0"/><path d="M20 18l5-7"/><path d="M12 14l1.5 1M20 8v2M28 14l-1.5 1"/></svg>Meter</button>
+        </div>
+        <p class="muted">Tap a part to connect it to the selected shaft, already in mesh. Drag a part to drop it anywhere, or onto a hub to stack it on that shaft. Set teeth, diameters and lengths in the <b>Selected</b> panel. Gears only mesh with gears on the <b>same layer</b>.</p>
+      </section>
+
+      <section class="card" id="selCard" hidden></section>
+
+      <section class="card">
+        <div class="card-h"><span class="t"><svg class="i c-emerald" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg>Drivetrain</span><span class="pill" id="dtPill"></span></div>
+        <ol class="path" id="dtList"></ol>
+        <p class="muted">Torque is what each part can deliver if it carries the whole load. A differential is the exception: it always splits torque equally between its outputs.</p>
+      </section>
+
+      <section class="card">
+        <div class="card-h"><span class="t"><svg class="i c-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19V5l8 7 8-7v14"/></svg>Examples</span></div>
+        <div class="chips" id="presetChips" role="group" aria-label="Example trains"></div>
+        <p class="muted" id="presetNote"></p>
+      </section>
+
+      <section class="card">
+        <div class="card-h"><span class="t"><svg class="i c-pink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 4h14M5 20h14M9 4c0 5 6 5 6 8s-6 3-6 8M15 4c0 5-6 5-6 8"/></svg>The rules</span></div>
+        <div class="eq">
+          <div>ω₂ / ω₁ = N₁ / N₂<span>gear mesh, teeth</span></div>
+          <div>ω₂ / ω₁ = D₁ / D₂<span>belt, diameters</span></div>
+          <div>ω_wheel / ω_worm = starts / N<span>worm drive</span></div>
+          <div>v = ω · r,  F = τ / r<span>rack and pinion</span></div>
+          <div>ω_s + k·ω_r = (1+k)·ω_c<span>planetary, k = Z_ring / Z_sun</span></div>
+          <div>ω_L + ω_R = 2·ω_c<span>differential</span></div>
+          <div>P = τ · ω = F · v<span>power</span></div>
+        </div>
+        <p class="muted">Each external mesh reverses direction; open belts keep it, crossed belts reverse it. Gears use module 2, so pitch diameter = 2 mm × teeth and the rack's tooth pitch is 2π mm.</p>
+      </section>
+      <p class="keys">Drag parts to move · drag empty bench to pan · scroll to zoom<br>Delete removes selection · Esc ends a tool</p>
+    </div>
+  </aside>
+
+  <main>
+    <div class="vp" id="vp">
+      <canvas id="cv" aria-label="Gear train bench"></canvas>
+      <div class="float vp-title"><i class="dot" id="vpDot"></i><b id="vpName"></b><span id="vpInfo"></span></div>
+      <div class="float vp-tool" id="vpTool">Tool: <b>Select &amp; move</b></div>
+      <div class="float toast" id="toast"></div>
+      <div class="float zoom"><button id="zOut" aria-label="Zoom out">−</button><span id="zPct">100%</span><button id="zIn" aria-label="Zoom in">+</button><button id="zFit" aria-label="Fit to view" title="Fit">⤢</button></div>
+      <div class="float insp">
+        <span class="ot">Key</span>
+        <div class="lg"><i class="l2"></i>Front layer</div>
+        <div class="lg"><i class="l1"></i>Middle layer</div>
+        <div class="lg"><i class="l0"></i>Back layer</div>
+        <div class="lg"><i class="mo"></i>Motor shaft</div>
+        <div class="lg"><i class="ca"></i>Planet carrier</div>
+        <div class="lg"><i class="mesh"></i>Teeth in mesh</div>
+      </div>
+    </div>
+  </main>
+</div>
+<div class="ghost" id="ghost" hidden></div>
+
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const TAU=Math.PI*2,TOL=0.6,ADD=2,PITCH=TAU,WR=7,WT0=10,RB=8;
+const LN=['Back','Middle','Front'],LC=['b','m','f'];
+const frac=x=>x-Math.floor(x),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const deg=r=>(((Math.round(r*180/Math.PI))%360)+360)%360;
+const C={grid1:'#111a29',grid2:'#1a2638',
+  lay:[['#1a2333','#5b6778'],['#22304a','#8696ae'],['#2c3e5e','#b8c9e2']],
+  mo:[['#2a1f0e','#b8892a'],['#33260f','#d9a12c'],['#3d2c10','#fbbf24']],
+  jam:['#3b1420','#fb7185'],sel:'#60a5fa',cw:'#60a5fa',ccw:'#f472b6',mesh:'#34d399',
+  carrier:'#c084fc',left:'#60a5fa',right:'#f472b6',belt:'#4a5260',beltTick:'#cbd5e1',bad:'#fb7185',ground:'#9ca3af'};
+
+/* ---------- model ---------- */
+const G=n=>({k:'g',n,off:0}),Pu=d=>({k:'p',d,off:0});
+const Wm=o=>Object.assign({k:'w',st:1,len:48,dir:0,hand:1,eta:50,off:0},o||{});
+const radius=w=>w.k==='g'?w.n:w.k==='p'?w.d/2:WR;
+const outer=w=>w.k==='w'?WR+2:radius(w)+ADD;
+const lay=(L,w)=>{const a=[null,null,null];a[L]=w;return a};
+const wName=w=>w.k==='g'?`${w.n}T gear`:w.k==='p'?`Ø${w.d} pulley`:`${w.st}-start worm`;
+const S={motor:{rpm:60,tq:2,dir:1,eff:100},axles:[],belts:[],racks:[],nextId:1,sel:null,tool:'select',layer:2,speed:1,ro:'meters',preset:'',beltFrom:null,jam:null};
+const byId=id=>S.axles.find(a=>a.id===id);
+const rackById=id=>S.racks.find(r=>r.id===id);
+const motorAx=()=>S.axles.find(a=>a.motor);
+function letter(i){return i<26?String.fromCharCode(65+i):String.fromCharCode(65+i%26)+(Math.floor(i/26)+1)}
+function nextName(){const u=new Set(S.axles.map(a=>a.name));for(let i=0;;i++){const n=letter(i);if(n==='M'||n==='R')continue;if(!u.has(n))return n}}
+function newAxle(x,y,ws,o={}){const a={id:S.nextId++,name:o.motor?'M':nextName(),x,y,w:[ws[0]||null,ws[1]||null,ws[2]||null],mod:o.mod||null,mem:[],meter:!!o.meter,motor:!!o.motor,clash:false};
+  a.mem=(a.mod?[0,1,2]:[0]).map(()=>({ang:0}));if(a.mod)a.mod.int={};S.axles.push(a);return a}
+const planZr=m=>m.zs+2*m.zp;
+const DZS=12,DZP=9,DD=21,DGAM=2*Math.asin(9/21);
+const modMin=a=>a.mod.type==='plan'?planZr(a.mod)+8:40;
+function modCoef(a){if(a.mod.type==='plan'){const k=planZr(a.mod)/a.mod.zs;return[-(1+k),k,1]}return[1,-2,1]}
+const MODINFO={plan:{label:'Planetary gearset',mem:['Carrier','Ring','Sun'],port:['Carrier','Ring gear','Sun shaft'],col:['#c084fc','#8696ae','#fcd34d']},
+  diff:{label:'Differential',mem:['Right output','Carrier','Left output'],port:['Right output','Carrier ring gear','Left output'],col:['#f472b6','#c084fc','#60a5fa']}};
+const HOLDMI={carrier:0,ring:1,sun:2};
+function newModule(type,x,y,o={}){const m=type==='plan'?{type,zs:18,zp:12,hold:'ring'}:{type,road:'turn',turn:.3};
+  const ws=type==='plan'?[G(30),G(planZr(m)+10),G(16)]:[G(16),G(44),G(16)];return newAxle(x,y,ws,Object.assign({mod:m},o))}
+function newRack(x,y,ang,len,L,flip,o={}){let i=1;while(S.racks.some(r=>r.name==='R'+i))i++;const r={id:S.nextId++,name:'R'+i,x,y,ang,len,L,flip:!!flip,ph:0,meter:!!o.meter,clash:false};S.racks.push(r);return r}
+function chain(src,L,ws,deg_,o){const R=radius(src.w[L])+radius(ws[L]),t=deg_*Math.PI/180;return newAxle(src.x+R*Math.cos(t),src.y+R*Math.sin(t),ws,o)}
+function belt(a,b,L,crossed){const bt={a:a.id,b:b.id,L,x:!!crossed,off:0,bad:false};S.belts.push(bt);return bt}
+const wormFrame=(a,w)=>{const d=[Math.cos(w.dir),Math.sin(w.dir)];return{d,n:[-d[1],d[0]]}};
+const rackFrame=r=>{const d=[Math.cos(r.ang),Math.sin(r.ang)],n=[-d[1],d[0]],s=r.flip?-1:1;return{d,n,s,m:[n[0]*s,n[1]*s]}};
+
+/* ---------- presets ---------- */
+const F=2,MI=1,B=0;
+const PRESETS={
+ 'Simple reduction':{note:'A 12-tooth pinion drives a 48-tooth gear. The output turns 48/12 = 4× slower with 4× the torque.',make(){const m=newAxle(0,0,lay(F,G(12)),{motor:1,meter:1});chain(m,F,lay(F,G(48)),0,{meter:1})}},
+ 'Overdrive':{note:'A big gear drives a small one: speed goes up 3×, torque drops to a third. Power stays the same.',make(){const m=newAxle(0,0,lay(F,G(48)),{motor:1,meter:1});chain(m,F,lay(F,G(16)),0,{meter:1})}},
+ 'Idler gear':{note:'The 12T middle gear sets direction but not ratio: 12/20 × 40/12 = 40/20. Without it the output would turn the other way.',make(){const m=newAxle(0,0,lay(F,G(20)),{motor:1,meter:1});const i=chain(m,F,lay(F,G(12)),0,{meter:1});chain(i,F,lay(F,G(40)),-30,{meter:1})}},
+ 'Compound train':{note:'Each middle shaft carries two gears that turn together, so stage ratios multiply: 30/12 × 45/15 × 36/12 = 22.5.',make(){const m=newAxle(0,0,lay(F,G(12)),{motor:1,meter:1});const a=chain(m,F,[G(15),null,G(30)],0,{meter:1});const b=chain(a,B,[G(45),null,G(12)],50,{meter:1});chain(b,F,lay(F,G(36)),-10,{meter:1})}},
+ 'Belt drive':{note:'A belt keeps both pulleys turning the same way. Ratio = driven diameter ÷ driver diameter = 120/40 = 3.',make(){const m=newAxle(0,0,lay(F,Pu(40)),{motor:1,meter:1});const a=newAxle(150,0,lay(F,Pu(120)),{meter:1});belt(m,a,F,false)}},
+ 'Crossed belt':{note:'Crossing the belt reverses the driven pulley. Belt speed is the same at both rims.',make(){const m=newAxle(0,0,lay(F,Pu(60)),{motor:1,meter:1});const a=newAxle(140,0,lay(F,Pu(80)),{meter:1});belt(m,a,F,true)}},
+ 'Gears + belt':{note:'Stages of any kind chain together. A 3:1 mesh feeds a 3:1 belt on the back layer for 9:1 overall.',make(){const m=newAxle(0,0,lay(F,G(12)),{motor:1,meter:1});const a=chain(m,F,[Pu(30),null,G(36)],0,{meter:1});const b=newAxle(a.x,a.y+105,lay(B,Pu(90)),{meter:1});belt(a,b,B,false)}},
+ 'Planetary':{note:'The motor turns the sun. With the ring held, the planets roll around inside it and drag the carrier along: sun ÷ carrier = 1 + Z_ring/Z_sun = 1 + 42/18 = 3.33. Try holding the carrier or the sun instead.',make(){newModule('plan',0,0,{meter:1});newAxle(-34,0,lay(F,G(18)),{motor:1,meter:1});newAxle(60,0,lay(B,G(30)),{meter:1})}},
+ 'Differential':{note:'The motor turns the carrier. In a turn the outer wheel speeds up and the inner wheel slows by the same amount, but both still get the same torque. Lift a wheel to see why a car gets stuck on ice.',make(){newAxle(0,0,lay(MI,G(12)),{motor:1,meter:1});newModule('diff',56,0,{meter:1});const t=50*Math.PI/180;newAxle(56+56*Math.cos(t),-56*Math.sin(t),lay(F,G(40)),{meter:1});newAxle(56+56*Math.cos(t),56*Math.sin(t),lay(B,G(40)),{meter:1})}},
+ 'Worm drive':{note:'One turn of a single-start worm moves the wheel by one tooth, so a 30-tooth wheel gives 30 : 1 in one stage. Sliding friction wastes power, and the wheel cannot drive the worm backwards: the drive self-locks.',make(){newAxle(0,0,lay(MI,Wm()),{motor:1,meter:1});const w=newAxle(WT0+24,30+WR,[null,G(30),G(12)],{meter:1});chain(w,F,lay(F,G(36)),20,{meter:1})}},
+ 'Rack & pinion':{note:'A pinion turns rotation into straight-line motion: v = ω·r and F = τ / r. The rack then turns a second pinion. At the end of its travel the motor reverses.',make(){newAxle(0,0,lay(F,G(12)),{motor:1,meter:1});newRack(70,12,0,300,F,true,{meter:1});newAxle(150,-12,lay(F,G(24)),{meter:1})}},
+ 'Jammed loop':{note:'Three gears meshed in a ring: each pair must turn opposite ways, which is impossible for three. The train locks and the motor stalls.',make(){newAxle(0,0,lay(F,G(20)),{motor:1,meter:1});newAxle(40,0,lay(F,G(20)),{meter:1});newAxle(20,-34.641,lay(F,G(20)),{meter:1})}}
+};
+function loadPreset(name){S.motor.dir=1;$('dirCW').setAttribute('aria-pressed',true);$('dirCCW').setAttribute('aria-pressed',false);S.axles=[];S.belts=[];S.racks=[];S.nextId=1;S.sel=null;S.beltFrom=null;PRESETS[name].make();S.preset=name;solve();fit();selSig=null;renderChips();updatePanels()}
+function markCustom(){if(S.preset!=='Custom build'){S.preset='Custom build';renderChips()}}
+
+/* ---------- geometry ---------- */
+function contacts(a,b){const res={clash:false,links:[]};const d=Math.hypot(b.x-a.x,b.y-a.y);if(d<7)res.clash=true;
+  for(let L=0;L<3;L++){const wa=a.w[L],wb=b.w[L];if(!wa||!wb)continue;
+    if(wa.k==='w'||wb.k==='w'){wormPair(a,wa,b,wb,L,res);continue}
+    if(wa.k==='g'&&wb.k==='g'){const R=wa.n+wb.n;if(Math.abs(d-R)<=TOL)res.links.push({t:'mesh',L});else if(d<R)res.clash=true}
+    else if(d<outer(wa)+outer(wb))res.clash=true}
+  return res}
+function wormPair(a,wa,b,wb,L,res){
+  if(wa.k==='w'&&wb.k==='w'){const fa=wormFrame(a,wa),fb=wormFrame(b,wb);let mn=1e9;for(let i=0;i<=10;i++){const t=WT0+wa.len*i/10,px=a.x+fa.d[0]*t,py=a.y+fa.d[1]*t;const tt=clamp((px-b.x)*fb.d[0]+(py-b.y)*fb.d[1],WT0,WT0+wb.len);mn=Math.min(mn,Math.hypot(px-b.x-fb.d[0]*tt,py-b.y-fb.d[1]*tt))}if(mn<2*(WR+2))res.clash=true;return}
+  let A=a,W=wa,Bx=b,X=wb;if(wb.k==='w'){A=b;W=wb;Bx=a;X=wa}
+  const f=wormFrame(A,W),rx=Bx.x-A.x,ry=Bx.y-A.y,t=rx*f.d[0]+ry*f.d[1],q=rx*f.n[0]+ry*f.n[1];
+  if(X.k==='g'&&t>=WT0+3&&t<=WT0+W.len-3&&Math.abs(Math.abs(q)-(X.n+WR))<=TOL){res.links.push({t:'worm',L,wa:A,wb:Bx,sig:q>=0?1:-1,t0:t});return}
+  const tc=clamp(t,WT0,WT0+W.len),dd=Math.hypot(t-tc,q);const lim=X.k==='g'?X.n+WR-TOL:outer(X)+WR+2;
+  if(dd<lim||Math.hypot(rx,ry)<(X.k==='g'?X.n:outer(X))+8)res.clash=true}
+function rackContacts(r,a,res){const w=a.w[r.L];if(!w||w.k==='w')return;const f=rackFrame(r),rx=a.x-r.x,ry=a.y-r.y,t=rx*f.d[0]+ry*f.d[1],q=rx*f.m[0]+ry*f.m[1],h=r.len/2;
+  if(w.k==='g'){if(Math.abs(t)<=h-3&&Math.abs(q-w.n)<=TOL){res.links.push({t0:t});return}
+    const tc=clamp(t,-h,h),qc=clamp(q,-2.5-RB,0);if(Math.hypot(t-tc,q-qc)<w.n-TOL)res.clash=true}
+  else{const tc=clamp(t,-h,h),qc=clamp(q,-2.5-RB,2);if(Math.hypot(t-tc,q-qc)<outer(w))res.clash=true}}
+function probe(a){let clash=false,n=0;for(const b of S.axles){if(b===a)continue;const c=contacts(a,b);clash=clash||c.clash;n+=c.links.length}
+  for(const r of S.racks){const res={clash:false,links:[]};rackContacts(r,a,res);clash=clash||res.clash;n+=res.links.length}return{clash,n}}
+function probeRack(r){let clash=false,n=0;for(const a of S.axles){const res={clash:false,links:[]};rackContacts(r,a,res);clash=clash||res.clash;n+=res.links.length}return{clash,n}}
+
+/* ---------- solver ---------- */
+let NODES=new Map(),EDGES=[],ADJ=new Map(),DOTS=[],ORDER=[],COMP=new Set();
+const nk=(a,L)=>'a'+a.id+'.'+(a.mod?L:0);
+const memAng=n=>n.ax.mem[n.mi].ang;
+const other=(e,u)=>NODES.get(e.n1===u.key?e.n2:e.n1);
+function linsolve(rows,keys){const n=keys.length,idx=new Map(keys.map((k,i)=>[k,i]));const M=rows.map(r=>{const v=new Float64Array(n+1);for(const [k,c] of r.c)v[idx.get(k)]+=c;v[n]=r.b;let s=0;for(let i=0;i<n;i++)s=Math.max(s,Math.abs(v[i]));if(s>0)for(let i=0;i<=n;i++)v[i]/=s;return v});
+  const m=M.length,piv=[];let row=0;
+  for(let col=0;col<n&&row<m;col++){let best=row,bv=Math.abs(M[row][col]);for(let r=row+1;r<m;r++){const v=Math.abs(M[r][col]);if(v>bv){bv=v;best=r}}if(bv<1e-9)continue;
+    const tmp=M[row];M[row]=M[best];M[best]=tmp;const p=M[row][col];for(let k=col;k<=n;k++)M[row][k]/=p;
+    for(let r=0;r<m;r++){if(r===row)continue;const f=M[r][col];if(Math.abs(f)<1e-15)continue;for(let k=col;k<=n;k++)M[r][k]-=f*M[row][k]}piv.push(col);row++}
+  let ok=true;for(let r=row;r<m;r++)if(Math.abs(M[r][n])>1e-6)ok=false;
+  const x=new Float64Array(n),det=new Array(n).fill(false),isP=new Set(piv);
+  for(let r=0;r<piv.length;r++){const c=piv[r];x[c]=M[r][n];let d=true;for(let k=0;k<n;k++)if(!isP.has(k)&&Math.abs(M[r][k])>1e-9){d=false;break}det[c]=d}
+  return{x,det,ok}}
+function solve(){
+  NODES=new Map();
+  for(const a of S.axles)for(let i=0;i<(a.mod?3:1);i++){const k='a'+a.id+'.'+i;NODES.set(k,{key:k,kind:'rot',ax:a,mi:i,w:0,st:'idle',tq:0,eff:0,depth:0,par:null})}
+  for(const r of S.racks){const k='r'+r.id;NODES.set(k,{key:k,kind:'lin',rack:r,w:0,st:'idle',tq:0,eff:0,depth:0,par:null})}
+  EDGES=[];ADJ=new Map([...NODES.keys()].map(k=>[k,[]]));DOTS=[];const rows=[];
+  const add=e=>{EDGES.push(e);ADJ.get(e.n1).push(e);ADJ.get(e.n2).push(e)};
+  const clashA=new Set(),clashR=new Set(),A=S.axles;
+  for(let i=0;i<A.length;i++)for(let j=i+1;j<A.length;j++){const a=A[i],b=A[j],c=contacts(a,b);if(c.clash){clashA.add(a);clashA.add(b)}
+    for(const l of c.links){
+      if(l.t==='mesh'){const wa=a.w[l.L],wb=b.w[l.L];const e={t:'mesh',L:l.L,a,b,n1:nk(a,l.L),n2:nk(b,l.L)};add(e);rows.push({c:[[e.n1,wa.n],[e.n2,wb.n]],b:0});const R=wa.n+wb.n;DOTS.push({e,L:l.L,x:a.x+(b.x-a.x)*wa.n/R,y:a.y+(b.y-a.y)*wa.n/R})}
+      else{const W=l.wa.w[l.L],X=l.wb.w[l.L],f=wormFrame(l.wa,W);const e={t:'worm',L:l.L,wa:l.wa,wb:l.wb,sig:l.sig,t0:l.t0,n1:nk(l.wa,l.L),n2:nk(l.wb,l.L)};add(e);
+        rows.push({c:[[e.n2,X.n],[e.n1,-l.sig*W.hand*W.st]],b:0});DOTS.push({e,L:l.L,x:l.wa.x+f.d[0]*l.t0+f.n[0]*l.sig*WR,y:l.wa.y+f.d[1]*l.t0+f.n[1]*l.sig*WR})}}}
+  for(const bt of S.belts){const a=byId(bt.a),b=byId(bt.b);bt.bad=true;if(!a||!b)continue;const wa=a.w[bt.L],wb=b.w[bt.L];if(!wa||!wb||wa.k!=='p'||wb.k!=='p')continue;bt.bad=false;
+    const e={t:'belt',bt,L:bt.L,a,b,n1:nk(a,bt.L),n2:nk(b,bt.L)};add(e);rows.push({c:[[e.n1,radius(wa)],[e.n2,-(bt.x?-1:1)*radius(wb)]],b:0})}
+  for(const r of S.racks){const f=rackFrame(r);for(const a of A){const res={clash:false,links:[]};rackContacts(r,a,res);if(res.clash){clashA.add(a);clashR.add(r)}
+    for(const l of res.links){const w=a.w[r.L];const e={t:'rack',L:r.L,r,a,t0:l.t0,n1:nk(a,r.L),n2:'r'+r.id};add(e);rows.push({c:[[e.n2,1],[e.n1,-f.s*w.n]],b:0});DOTS.push({e,L:r.L,x:r.x+f.d[0]*l.t0,y:r.y+f.d[1]*l.t0})}}}
+  for(const a of A)if(a.mod){const c=modCoef(a),k=[0,1,2].map(i=>'a'+a.id+'.'+i),m=a.mod;rows.push({c:k.map((x,i)=>[x,c[i]]),b:0});
+    for(const [i,j] of [[0,1],[0,2],[1,2]])add({t:'epi',a,n1:k[i],n2:k[j]});
+    if(m.type==='plan'){if(m.hold!=='none')rows.push({c:[[k[HOLDMI[m.hold]],1]],b:0})}
+    else if(m.road==='straight')rows.push({c:[[k[2],1],[k[0],-1]],b:0});
+    else if(m.road==='turn')rows.push({c:[[k[2],1+m.turn],[k[0],-(1-m.turn)]],b:0});
+    else if(m.road==='liftL')rows.push({c:[[k[0],1]],b:0});
+    else if(m.road==='liftR')rows.push({c:[[k[2],1]],b:0})}
+  for(const a of A)a.clash=clashA.has(a);for(const r of S.racks)r.clash=clashR.has(r);
+  const M=motorAx();ORDER=[];COMP=new Set();S.jam=null;
+  if(!M){for(const a of A)if(a.mod)alignModule(a);return}
+  const mk='a'+M.id+'.0';rows.push({c:[[mk,1]],b:S.motor.rpm*S.motor.dir});
+  const keys=[...NODES.keys()],sol=linsolve(rows,keys);keys.forEach((k,i)=>{const n=NODES.get(k);n.w=sol.x[i];n.det=sol.det[i]});
+  COMP=new Set([mk]);{const st=[mk];while(st.length){const u=st.pop();for(const e of ADJ.get(u)){const v=e.n1===u?e.n2:e.n1;if(!COMP.has(v)){COMP.add(v);st.push(v)}}}}
+  for(const n of NODES.values())if(!COMP.has(n.key))n.w=0;
+  if(!sol.ok)S.jam='loop';
+  const eta=S.motor.eff/100,m0=NODES.get(mk);m0.st='driven';m0.tq=S.motor.tq;m0.eff=1;ORDER=[m0];const seen=new Set([mk]),q=[m0];
+  while(q.length){const u=q.shift();for(const e of ADJ.get(u.key)){const v=other(e,u);if(seen.has(v.key)||!v.det)continue;
+    if(e.t==='worm'&&u.key===e.n2&&e.n1!==e.n2){S.jam=S.jam||'worm';continue}
+    if(e.t==='epi'){const a=e.a,c=modCoef(a),ratio=Math.abs(c[v.mi]/c[u.mi]);
+      if(a.mod.type==='plan'&&a.mod.hold!=='none'&&HOLDMI[a.mod.hold]===v.mi){v.st='held';v.react=u.tq*ratio;v.depth=u.depth+1;v.par={e,from:u};seen.add(v.key);ORDER.push(v);continue}
+      const lifted=a.mod.type==='diff'&&(a.mod.road==='liftL'||a.mod.road==='liftR')&&v.mi!==1;v.tq=lifted?0:u.tq*ratio*eta;v.eff=u.eff*eta}
+    else xfer(e,u,v,eta);
+    align(e,u,v);v.st='driven';v.depth=u.depth+1;v.par={e,from:u};seen.add(v.key);q.push(v);ORDER.push(v)}}
+  for(const k of COMP){if(seen.has(k))continue;const n=NODES.get(k);n.st=n.det?'held':'free';n.w=n.det?n.w:0}
+  if(!S.jam)for(const k of COMP){const n=NODES.get(k);if((n.ax&&n.ax.clash)||(n.rack&&n.rack.clash)){S.jam='clash';break}}
+  if(S.jam)for(const k of COMP){const n=NODES.get(k);n.st='jam';n.w=0;n.tq=0}
+  for(const a of A)if(a.mod)alignModule(a)}
+function xfer(e,u,v,eta){
+  if(e.t==='mesh')v.tq=u.tq*v.ax.w[e.L].n/u.ax.w[e.L].n*eta;
+  else if(e.t==='belt')v.tq=u.tq*radius(v.ax.w[e.L])/radius(u.ax.w[e.L])*eta;
+  else if(e.t==='worm'){const W=e.wa.w[e.L],X=e.wb.w[e.L];v.tq=u.tq*X.n/W.st*(W.eta/100)*eta;v.eff=u.eff*(W.eta/100)*eta;return}
+  else if(e.t==='rack'){const r=e.a.w[e.L].n/1000;v.tq=v.kind==='lin'?u.tq/r*eta:u.tq*r*eta}
+  v.eff=u.eff*eta}
+function align(e,u,v){
+  if(e.t==='mesh'){const wu=u.ax.w[e.L],wv=v.ax.w[e.L],phi=Math.atan2(v.ax.y-u.ax.y,v.ax.x-u.ax.x);const u1=frac((phi-memAng(u)-wu.off)*wu.n/TAU);wv.off=phi+Math.PI-(0.5-u1)*TAU/wv.n-memAng(v)}
+  else if(e.t==='worm'){const W=e.wa.w[e.L],X=e.wb.w[e.L],f=wormFrame(e.wa,W);const fw=frac((e.t0-W.off-W.hand*W.st*memAng(u))/PITCH),fg=e.sig*(fw-0.5);const pc=Math.atan2(-e.sig*f.n[1],-e.sig*f.n[0]);X.off=pc-fg*TAU/X.n-memAng(v)}
+  else if(e.t==='rack'){const r=e.r,f=rackFrame(r),w=e.a.w[e.L],pc=Math.atan2(-f.m[1],-f.m[0]);
+    if(v.kind==='lin'){const fg=frac((pc-memAng(u)-w.off)*w.n/TAU);r.ph=e.t0-(0.5+f.s*fg)*PITCH}
+    else{const fr=frac((e.t0-r.ph)/PITCH),fg=f.s*(fr-0.5);w.off=pc-fg*TAU/w.n-memAng(v)}}}
+function alignModule(a){const m=a.mod,I=m.int||(m.int={}),th=a.mem.map(x=>x.ang);
+  if(m.type==='plan'){const zs=m.zs,zp=m.zp,zr=planZr(m),tc=th[0],tr=th[1],ts=th[2];I.sun=I.sun||0;const as=ts+I.sun,base=tc-(ts-tc)*zs/zp;I.pl=[];I.beta=[];
+    for(let j=0;j<3;j++){const b=Math.round(j*(zs+zr)/3)*TAU/(zs+zr);I.beta.push(b);const al=tc+b,fs=frac((al-as)*zs/TAU),ap=al+Math.PI-(0.5-fs)*TAU/zp;I.pl.push(ap-base)}
+    const al0=tc+I.beta[0],ap0=I.pl[0]+base,fp=frac((al0-ap0)*zp/TAU);I.ring=al0-(fp+0.5)*TAU/zr-tr}
+  else{const zs=DZS,zp=DZP,tR=th[0],tc=th[1],tL=th[2];I.L=I.L||0;const aL=tL+I.L,b1=tc-(tL-tc)*zs/zp,b2=tc+(tL-tc)*zs/zp;I.p1=[];I.p2=[];
+    for(let j=0;j<3;j++){const al=tc+j*TAU/3,be=al+DGAM;const fs=frac((al-aL)*zs/TAU),ap1=al+Math.PI-(0.5-fs)*TAU/zp;I.p1.push(ap1-b1);
+      const phi=Math.atan2(Math.sin(be)-Math.sin(al),Math.cos(be)-Math.cos(al)),u1=frac((phi-ap1)*zp/TAU),ap2=phi+Math.PI-(0.5-u1)*TAU/zp;I.p2.push(ap2-b2);
+      if(j===0){const dir=be+Math.PI,f2=frac((dir-ap2)*zp/TAU);I.R=dir+Math.PI-(0.5-f2)*TAU/zs-tR}}}}
+
+/* ---------- canvas ---------- */
+const cv=$('cv'),ctx=cv.getContext('2d');let W=1,H=1,DPR=1;const cam={x:60,y:20,s:3};
+function resize(){const r=cv.getBoundingClientRect();DPR=Math.min(2,window.devicePixelRatio||1);W=Math.max(1,r.width);H=Math.max(1,r.height);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR)}
+let fitted=false;new ResizeObserver(()=>{resize();if(!fitted&&W>10){fit();fitted=true}}).observe(cv);
+const w2s=(x,y)=>[(x-cam.x)*cam.s+W/2,(y-cam.y)*cam.s+H/2];
+const s2w=(x,y)=>[(x-W/2)/cam.s+cam.x,(y-H/2)/cam.s+cam.y];
+function bbox(){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;const ext=(x,y,r)=>{x0=Math.min(x0,x-r);x1=Math.max(x1,x+r);y0=Math.min(y0,y-r);y1=Math.max(y1,y+r)};
+  for(const a of S.axles){ext(a.x,a.y,14);for(const w of a.w){if(!w)continue;if(w.k==='w'){const f=wormFrame(a,w);ext(a.x+f.d[0]*(WT0+w.len),a.y+f.d[1]*(WT0+w.len),10)}else ext(a.x,a.y,outer(w))}}
+  for(const r of S.racks){const f=rackFrame(r);for(const s of [-1,1])ext(r.x+f.d[0]*s*r.len/2,r.y+f.d[1]*s*r.len/2,12)}return[x0,y0,x1,y1]}
+function fit(){if(!S.axles.length&&!S.racks.length)return;const [x0,y0,x1,y1]=bbox();const pad=W<500?40:110;cam.x=(x0+x1)/2;cam.y=(y0+y1)/2;cam.s=Math.max(.5,Math.min(9,Math.min((W-pad*2)/(x1-x0||1),(H-pad*2)/(y1-y0||1))));zoomLbl()}
+function zoomLbl(){$('zPct').textContent=Math.round(cam.s/3*100)+'%'}
+function zoomAt(f,sx,sy){const [wx,wy]=s2w(sx,sy);cam.s=Math.max(.5,Math.min(14,cam.s*f));cam.x=wx-(sx-W/2)/cam.s;cam.y=wy-(sy-H/2)/cam.s;zoomLbl()}
+function ensureVisible(){const [x0,y0,x1,y1]=bbox(),[a,b]=w2s(x0,y0),[c,d]=w2s(x1,y1);if(a<0||b<0||c>W||d>H)fit()}
+
+const gearCache=new Map();
+function circ(p,x,y,r){p.moveTo(x+r,y);p.arc(x,y,r,0,TAU)}
+function toothed(p,n,rt,rr,a0){const pt=TAU/n;for(let i=0;i<n;i++){const c=a0+i*pt;[[rr,c-pt*.32],[rt,c-pt*.17],[rt,c+pt*.17],[rr,c+pt*.32]].forEach(([R,a],j)=>{const x=R*Math.cos(a),y=R*Math.sin(a);(i||j)?p.lineTo(x,y):p.moveTo(x,y)})}p.closePath()}
+function gearPath(n){if(gearCache.has(n))return gearCache.get(n);const p=new Path2D();toothed(p,n,n+2,n-2.5,0);circ(p,0,0,Math.min(3,n*.3));
+  if(n>=26){const k=5,hr=n*.17;for(let i=0;i<k;i++){const a=i*TAU/k;circ(p,Math.cos(a)*n*.56,Math.sin(a)*n*.56,hr)}}
+  else if(n>=15){for(let i=0;i<3;i++){const a=i*TAU/3;circ(p,Math.cos(a)*n*.52,Math.sin(a)*n*.52,n*.14)}}
+  else circ(p,n*.55,0,Math.min(1.3,n*.12));
+  gearCache.set(n,p);return p}
+function gearAt(x,y,n,ang,fill,stroke){ctx.save();ctx.translate(x,y);ctx.rotate(ang);const p=gearPath(n);ctx.fillStyle=fill;ctx.strokeStyle=stroke;ctx.fill(p,'evenodd');ctx.stroke(p);ctx.restore()}
+const nodeSt=(a,L)=>{const n=NODES.get(nk(a,L));return n?n.st:'idle'};
+const alphaOf=st=>st==='idle'?.55:st==='free'?.7:1;
+function palette(a,L,st){return(st==='jam'||a.clash)?C.jam:a.motor?C.mo[L]:C.lay[L]}
+
+function drawWheel(a,L){const w=a.w[L],st=nodeSt(a,L),[fill,stroke]=palette(a,L,st),lw=1.2/cam.s,port=a.mod&&L===2;
+  ctx.save();ctx.translate(a.x,a.y);ctx.rotate(a.mem[a.mod?L:0].ang+w.off);const A0=alphaOf(st);ctx.globalAlpha=A0;ctx.lineWidth=lw;ctx.strokeStyle=stroke;ctx.fillStyle=fill;
+  if(w.k==='g'){const p=gearPath(w.n);ctx.globalAlpha=A0*(port?.45:1);ctx.fill(p,'evenodd');ctx.globalAlpha=A0;ctx.stroke(p)}
+  else{const r=radius(w);ctx.beginPath();ctx.arc(0,0,r+ADD,0,TAU);ctx.globalAlpha=A0*(port?.45:1);ctx.fill();ctx.globalAlpha=A0;ctx.stroke();
+    ctx.beginPath();ctx.arc(0,0,r-.6,0,TAU);ctx.lineWidth=1.6;ctx.strokeStyle='#0b1220';ctx.stroke();
+    ctx.beginPath();ctx.arc(0,0,r-2.2,0,TAU);ctx.lineWidth=lw;ctx.strokeStyle=stroke;ctx.globalAlpha=A0*.6;ctx.stroke();
+    const k=r>24?5:3;ctx.lineWidth=clamp(r*.12,1.2,3.2);ctx.lineCap='round';ctx.globalAlpha=A0*.75;ctx.beginPath();
+    for(let i=0;i<k;i++){const t=i*TAU/k;ctx.moveTo(Math.cos(t)*4.5,Math.sin(t)*4.5);ctx.lineTo(Math.cos(t)*(r-3.4),Math.sin(t)*(r-3.4))}ctx.stroke();
+    ctx.globalAlpha=A0;ctx.beginPath();ctx.arc(0,0,4.5,0,TAU);ctx.lineWidth=lw;ctx.fill();ctx.stroke()}
+  ctx.restore()}
+function drawWorm(a,L){const w=a.w[L],n=NODES.get(nk(a,L)),st=n?n.st:'idle',[fill,stroke]=palette(a,L,st),R=WR+2,t1=WT0+w.len;
+  ctx.save();ctx.translate(a.x,a.y);ctx.rotate(w.dir);ctx.globalAlpha=alphaOf(st);ctx.lineWidth=1.2/cam.s;ctx.fillStyle=fill;ctx.strokeStyle=stroke;
+  ctx.fillRect(4,-2,WT0-3,4);ctx.strokeRect(4,-2,WT0-3,4);ctx.fillRect(t1,-2,5,4);ctx.strokeRect(t1,-2,5,4);
+  ctx.beginPath();ctx.rect(-7,-7,14,14);ctx.fill();ctx.stroke();ctx.beginPath();ctx.moveTo(-4,-4);ctx.lineTo(4,4);ctx.moveTo(4,-4);ctx.lineTo(-4,4);ctx.globalAlpha*=.5;ctx.stroke();ctx.globalAlpha=alphaOf(st);
+  ctx.beginPath();ctx.rect(WT0,-R,w.len,2*R);ctx.fill();
+  ctx.save();ctx.clip();const cr=w.off+w.hand*w.st*(n?memAng(n):0);const k0=Math.ceil((WT0-4-cr)/PITCH);ctx.lineWidth=1.6;ctx.strokeStyle=stroke;ctx.beginPath();
+  for(let k=k0;;k++){const t=cr+k*PITCH;if(t>t1+4)break;ctx.moveTo(t-w.hand*2.4,-R);ctx.lineTo(t+w.hand*2.4,R)}ctx.stroke();ctx.restore();
+  ctx.beginPath();ctx.rect(WT0,-R,w.len,2*R);ctx.lineWidth=1.2/cam.s;ctx.stroke();ctx.restore()}
+function drawRack(r){const n=NODES.get('r'+r.id),st=n?n.st:'idle',[fill,stroke]=(st==='jam'||r.clash)?C.jam:C.lay[r.L];
+  ctx.save();ctx.translate(r.x,r.y);ctx.rotate(r.ang);if(r.flip)ctx.scale(1,-1);ctx.globalAlpha=alphaOf(st);
+  const h=r.len/2,p=new Path2D();p.moveTo(-h,-2.5-RB);p.lineTo(-h,-2.5);
+  for(let k=Math.ceil((-h+2-r.ph)/PITCH);;k++){const x=r.ph+k*PITCH;if(x+2>h)break;p.lineTo(x-2,-2.5);p.lineTo(x-1.07,2);p.lineTo(x+1.07,2);p.lineTo(x+2,-2.5)}
+  p.lineTo(h,-2.5);p.lineTo(h,-2.5-RB);p.closePath();ctx.fillStyle=fill;ctx.strokeStyle=stroke;ctx.lineWidth=1.2/cam.s;ctx.fill(p);ctx.stroke(p);
+  const v=n&&n.st==='driven'?n.w:0;ctx.lineWidth=1.3;ctx.globalAlpha*=.8;ctx.beginPath();const yc=-2.5-RB/2;
+  if(Math.abs(v)>1e-9){const s=Math.sign(v);for(const x of [-8,0,8]){ctx.moveTo(x-2*s,yc-2.6);ctx.lineTo(x+2*s,yc);ctx.lineTo(x-2*s,yc+2.6)}}else{for(let x=-h+8;x<h-4;x+=14){ctx.moveTo(x,yc+2.5);ctx.lineTo(x+4,yc-2.5)}ctx.globalAlpha*=.4}
+  ctx.stroke();ctx.restore()}
+function ground(r,k){ctx.save();ctx.strokeStyle=C.ground;ctx.lineWidth=.7;ctx.globalAlpha=1;ctx.beginPath();for(let i=0;i<k*2;i++){const a=i*TAU/(k*2);const b=a+2.2/(r+3);ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r);ctx.lineTo(Math.cos(b)*(r+3.5),Math.sin(b)*(r+3.5))}ctx.stroke();ctx.restore()}
+function carrierArms(cen,held){ctx.save();ctx.strokeStyle=C.carrier;ctx.globalAlpha*=.5;ctx.lineWidth=3.2;ctx.lineCap='round';ctx.beginPath();for(const [x,y] of cen){ctx.moveTo(0,0);ctx.lineTo(x,y)}ctx.stroke();ctx.globalAlpha/=.5;
+  ctx.fillStyle=C.carrier;for(const [x,y] of cen){ctx.beginPath();ctx.arc(x,y,1.8,0,TAU);ctx.fill()}ctx.beginPath();ctx.arc(0,0,5,0,TAU);ctx.fill();if(held)ground(6.5,6);ctx.restore()}
+function drawModule(a){const m=a.mod,I=m.int||{},ns=[0,1,2].map(i=>NODES.get('a'+a.id+'.'+i));const jam=a.clash||ns.some(n=>n&&n.st==='jam'),idle=ns.every(n=>!n||n.st==='idle');
+  const th=a.mem.map(x=>x.ang),[rf,rs]=jam?C.jam:C.lay[1];ctx.save();ctx.translate(a.x,a.y);ctx.lineWidth=1.2/cam.s;ctx.globalAlpha=idle?.6:1;
+  if(m.type==='plan'){const zs=m.zs,zp=m.zp,zr=planZr(m),Ze=a.w[1].n,D=zs+zp,held=i=>m.hold!=='none'&&HOLDMI[m.hold]===i;
+    const p=new Path2D();toothed(p,Ze,Ze+2,Ze-2.5,th[1]+a.w[1].off);toothed(p,zr,zr-2,zr+2.5,th[1]+(I.ring||0));ctx.fillStyle=rf;ctx.strokeStyle=rs;ctx.fill(p,'evenodd');ctx.stroke(p);
+    if(held(1))ground(Ze+4,12);
+    const base=th[0]-(th[2]-th[0])*zs/zp,pf=jam?C.jam[0]:'#1c2840',ps=jam?C.jam[1]:'#a3b3ca',cen=[];
+    for(let j=0;j<3;j++){const al=th[0]+(I.beta?I.beta[j]:j*TAU/3),cx=D*Math.cos(al),cy=D*Math.sin(al);cen.push([cx,cy]);gearAt(cx,cy,zp,base+(I.pl?I.pl[j]:0),pf,ps)}
+    gearAt(0,0,zs,th[2]+(I.sun||0),pf,jam?C.jam[1]:'#e8c46a');if(held(2))ground(zs+3.5,8);carrierArms(cen,held(0))}
+  else{const Zc=a.w[1].n,zs=DZS,zp=DZP,D=DD;const p=new Path2D();toothed(p,Zc,Zc+2,Zc-2.5,th[1]+a.w[1].off);circ(p,0,0,35);ctx.fillStyle=rf;ctx.strokeStyle=rs;ctx.fill(p,'evenodd');ctx.stroke(p);
+    const b1=th[1]-(th[2]-th[1])*zs/zp,b2=th[1]+(th[2]-th[1])*zs/zp,ft='rgba(18,26,42,.88)',cL=jam?C.jam[1]:C.left,cR=jam?C.jam[1]:C.right,cen=[];
+    gearAt(0,0,zs,th[0]+(I.R||0),ft,cR);
+    for(let j=0;j<3;j++){const al=th[1]+j*TAU/3,be=al+DGAM;cen.push([D*Math.cos(al),D*Math.sin(al)],[D*Math.cos(be),D*Math.sin(be)]);gearAt(D*Math.cos(be),D*Math.sin(be),zp,b2+(I.p2?I.p2[j]:0),ft,cR)}
+    for(let j=0;j<3;j++){const al=th[1]+j*TAU/3;gearAt(D*Math.cos(al),D*Math.sin(al),zp,b1+(I.p1?I.p1[j]:0),ft,cL)}
+    ctx.save();ctx.globalAlpha*=.8;gearAt(0,0,zs,th[2]+(I.L||0),'rgba(18,26,42,.5)',cL);ctx.restore();carrierArms(cen,false)}
+  ctx.restore()}
+function beltGeom(bt){const a=byId(bt.a),b=byId(bt.b);if(!a||!b)return null;const wa=a.w[bt.L],wb=b.w[bt.L];if(!wa||!wb||wa.k!=='p'||wb.k!=='p')return{a,b,bad:true};
+  const ra=radius(wa),rb=radius(wb),dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy);const k=bt.x?(ra+rb)/d:(ra-rb)/d;if(Math.abs(k)>=1)return{a,b,bad:true};
+  const al=Math.atan2(dy,dx),ac=Math.acos(k),p1=al+ac,p2=al-ac,e=t=>[Math.cos(t),Math.sin(t)],path=new Path2D();
+  const A1=[a.x+ra*e(p1)[0],a.y+ra*e(p1)[1]],A2=[a.x+ra*e(p2)[0],a.y+ra*e(p2)[1]];let B1,B2;
+  if(!bt.x){B1=[b.x+rb*e(p1)[0],b.y+rb*e(p1)[1]];B2=[b.x+rb*e(p2)[0],b.y+rb*e(p2)[1]];path.moveTo(...A1);path.lineTo(...B1);path.arc(b.x,b.y,rb,p1,p2,true);path.lineTo(...A2);path.arc(a.x,a.y,ra,p2,p1,true)}
+  else{B1=[b.x+rb*e(p1+Math.PI)[0],b.y+rb*e(p1+Math.PI)[1]];B2=[b.x+rb*e(p2+Math.PI)[0],b.y+rb*e(p2+Math.PI)[1]];path.moveTo(...A1);path.lineTo(...B1);path.arc(b.x,b.y,rb,p1+Math.PI,p2+Math.PI,false);path.lineTo(...A2);path.arc(a.x,a.y,ra,p2,p1,true)}
+  path.closePath();return{a,b,path,segs:[[A1,B1],[A2,B2]]}}
+function drawBelt(bt){const g=beltGeom(bt);bt._g=g;if(!g)return;const sel=S.sel&&S.sel.t==='belt'&&S.sel.b===bt;
+  if(g.bad||bt.bad){ctx.save();ctx.strokeStyle=C.bad;ctx.setLineDash([3,3]);ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(g.a.x,g.a.y);ctx.lineTo(g.b.x,g.b.y);ctx.stroke();ctx.restore();return}
+  const st=nodeSt(g.a,bt.L);ctx.save();ctx.lineJoin='round';
+  if(sel){ctx.strokeStyle=C.sel;ctx.lineWidth=2.6+5/cam.s;ctx.globalAlpha=.6;ctx.stroke(g.path);ctx.globalAlpha=1}
+  ctx.strokeStyle=st==='jam'?C.jam[1]:C.belt;ctx.lineWidth=2.6;ctx.stroke(g.path);
+  ctx.strokeStyle=C.beltTick;ctx.lineWidth=.8;ctx.setLineDash([2.4,4]);ctx.lineDashOffset=bt.off;ctx.globalAlpha=st==='driven'?.9:.4;ctx.stroke(g.path);ctx.restore()}
+function drawGrid(){const [x0,y0]=s2w(0,0),[x1,y1]=s2w(W,H);ctx.lineWidth=1;
+  for(const [step,col] of [[10,C.grid1],[50,C.grid2]]){if(step*cam.s<7)continue;ctx.strokeStyle=col;ctx.beginPath();
+    for(let x=Math.floor(x0/step)*step;x<=x1;x+=step){const sx=Math.round(w2s(x,0)[0])+.5;ctx.moveTo(sx,0);ctx.lineTo(sx,H)}
+    for(let y=Math.floor(y0/step)*step;y<=y1;y+=step){const sy=Math.round(w2s(0,y)[1])+.5;ctx.moveTo(0,sy);ctx.lineTo(W,sy)}ctx.stroke()}
+  if(10*cam.s>=7){ctx.fillStyle='#4b5563';ctx.font='10px ui-monospace,Menlo,monospace';ctx.textAlign='center';ctx.fillText('grid squares = 10 mm',W/2,H-12);ctx.textAlign='left'}}
+function drawMotorHousing(m){ctx.save();ctx.translate(m.x,m.y);const s=14;ctx.fillStyle='#17110a';ctx.strokeStyle='#7a5a1c';ctx.lineWidth=1.2/cam.s;
+  ctx.beginPath();ctx.rect(-s,-s,2*s,2*s);ctx.fill();ctx.stroke();ctx.strokeStyle='#3a2a10';ctx.lineWidth=1.4;ctx.beginPath();for(let i=-2;i<=2;i++){ctx.moveTo(-s+2,i*5);ctx.lineTo(s-2,i*5)}ctx.stroke();ctx.restore()}
+function arrow(sx,sy,r,dir,col){const a0=-Math.PI*.82,a1=-Math.PI*.18;ctx.save();ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=2;ctx.lineCap='round';
+  ctx.beginPath();ctx.arc(sx,sy,r,a0,a1);ctx.stroke();const t=dir>0?a1:a0,hx=sx+r*Math.cos(t),hy=sy+r*Math.sin(t),tg=dir>0?t+Math.PI/2:t-Math.PI/2;
+  ctx.beginPath();ctx.moveTo(hx+Math.cos(tg)*5,hy+Math.sin(tg)*5);ctx.lineTo(hx+Math.cos(tg+2.5)*4.5,hy+Math.sin(tg+2.5)*4.5);ctx.lineTo(hx+Math.cos(tg-2.5)*4.5,hy+Math.sin(tg-2.5)*4.5);ctx.closePath();ctx.fill();ctx.restore()}
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+const labelR=a=>{let r=10;for(const w of a.w)if(w&&w.k!=='w')r=Math.max(r,outer(w));return r};
+let ptr=null;
+function draw(){ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clearRect(0,0,W,H);drawGrid();
+  ctx.save();ctx.translate(W/2,H/2);ctx.scale(cam.s,cam.s);ctx.translate(-cam.x,-cam.y);
+  const m=motorAx();if(m)drawMotorHousing(m);const [x0,y0]=s2w(0,0);
+  for(let L=0;L<3;L++){if(L){ctx.fillStyle='rgba(3,7,18,.22)';ctx.fillRect(x0,y0,W/cam.s,H/cam.s)}
+    for(const a of S.axles){const w=a.w[L];if(!w||w.k==='w')continue;if(a.mod&&L===1)drawModule(a);else drawWheel(a,L)}
+    for(const r of S.racks)if(r.L===L)drawRack(r);
+    for(const bt of S.belts)if(bt.L===L)drawBelt(bt);
+    for(const a of S.axles){const w=a.w[L];if(w&&w.k==='w')drawWorm(a,L)}}
+  ctx.restore();
+  for(const d of DOTS){const n=NODES.get(d.e.n1);if(!n||n.st!=='driven')continue;const [x,y]=w2s(d.x,d.y);ctx.fillStyle=C.mesh;ctx.globalAlpha=[.45,.7,1][d.L];ctx.beginPath();ctx.arc(x,y,2.6,0,TAU);ctx.fill();ctx.globalAlpha=1}
+  const s=S.sel;
+  if(s&&s.t==='axle'){const a=byId(s.id);if(a){const [x,y]=w2s(a.x,a.y);ctx.strokeStyle=C.sel;ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.beginPath();ctx.arc(x,y,labelR(a)*cam.s+6,0,TAU);ctx.stroke();ctx.setLineDash([])}}
+  if(s&&s.t==='rack'){const r=rackById(s.id);if(r){const f=rackFrame(r),h=r.len/2+3;const pts=[[-h,-RB-6],[h,-RB-6],[h,5],[-h,5]].map(([t,q])=>w2s(r.x+f.d[0]*t+f.m[0]*q,r.y+f.d[1]*t+f.m[1]*q));ctx.strokeStyle=C.sel;ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(...p):ctx.moveTo(...p));ctx.closePath();ctx.stroke();ctx.setLineDash([])}}
+  if(S.beltFrom){const a=byId(S.beltFrom.id);if(a){const [x,y]=w2s(a.x,a.y);ctx.strokeStyle='#c084fc';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,outer(a.w[S.beltFrom.L])*cam.s+4,0,TAU);ctx.stroke();
+    if(ptr){ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(ptr[0],ptr[1]);ctx.stroke();ctx.setLineDash([])}}}
+  ctx.font='700 10px ui-sans-serif,system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  for(const a of S.axles){const [x,y]=w2s(a.x,a.y);const n=NODES.get(nk(a,0));
+    if(!a.mod&&n&&n.st==='driven'&&Math.abs(n.w)>1e-9)arrow(x,y,17,Math.sign(n.w),n.w>0?C.cw:C.ccw);
+    const sel=s&&s.t==='axle'&&s.id===a.id,jam=a.clash||(n&&n.st==='jam');ctx.beginPath();ctx.arc(x,y,9,0,TAU);
+    ctx.fillStyle=a.motor?'#fbbf24':sel?'#2563eb':jam?'#e11d48':a.mod?'#6d28d9':'#1f2937';ctx.fill();ctx.lineWidth=1.5;ctx.strokeStyle=a.motor?'#fde68a':sel?'#93c5fd':a.mod?'#c4b5fd':'#6b7280';ctx.stroke();
+    ctx.fillStyle=a.motor?'#1c1206':'#f3f4f6';ctx.fillText(a.name,x,y+.5)}
+  for(const r of S.racks){const f=rackFrame(r),[x,y]=w2s(r.x-f.m[0]*(RB+9),r.y-f.m[1]*(RB+9));const sel=s&&s.t==='rack'&&s.id===r.id;rr(x-12,y-8,24,16,8);ctx.fillStyle=sel?'#2563eb':r.clash?'#e11d48':'#065f46';ctx.fill();ctx.strokeStyle=sel?'#93c5fd':'#34d399';ctx.lineWidth=1.2;ctx.stroke();ctx.fillStyle='#ecfdf5';ctx.fillText(r.name,x,y+.5)}
+  ctx.textAlign='left';ctx.textBaseline='alphabetic';drawMeters()}
+
+/* ---------- numbers ---------- */
+function fx(v){const a=Math.abs(v);if(!isFinite(v))return'—';if(a<5e-4)return'0';if(a>=1000)return Math.round(v).toLocaleString('en-US');if(a>=100)return v.toFixed(0);if(a>=10)return v.toFixed(1);if(a>=1)return v.toFixed(2);return v.toFixed(3)}
+const rpmArrow=w=>Math.abs(w)<1e-9?'':w>0?'↻':'↺';
+const mmS=n=>n.w*TAU/60;
+const tqStr=n=>n.kind==='lin'?`${fx(n.tq)} N`:`${fx(n.tq)} N·m`;
+const spStr=n=>n.kind==='lin'?`${fx(Math.abs(mmS(n)))} mm/s`:`${fx(Math.abs(n.w))} rpm ${rpmArrow(n.w)}`;
+function nodeName(n){if(n.kind==='lin')return'Rack '+n.rack.name;const a=n.ax;if(a.motor)return'Motor';if(a.mod)return`${a.name} · ${MODINFO[a.mod.type].mem[n.mi].toLowerCase()}`;return'Shaft '+a.name}
+function ratioStr(r){if(!isFinite(r))return'—';if(Math.abs(r-1)<1e-9)return'1 : 1';return r>1?`${fx(r)} : 1`:`1 : ${fx(1/r)}`}
+function ratioKind(r){if(!isFinite(r))return'';return Math.abs(r-1)<1e-9?'same speed':r>1?'reduction':'speed-up'}
+const motorRpm=()=>S.motor.rpm;
+function chainOf(n){const f=[];let x=n;
+  while(x&&x.par){const e=x.par.e,u=x.par.from;
+    if(e.t==='mesh')f.unshift(`${x.ax.w[e.L].n}/${u.ax.w[e.L].n}`);
+    else if(e.t==='belt')f.unshift(`${x.ax.w[e.L].d}/${u.ax.w[e.L].d}`);
+    else if(e.t==='worm')f.unshift(`${x.ax.w[e.L].n}/${e.wa.w[e.L].st}`);
+    else if(e.t==='rack'){if(x.kind==='rot'&&u.par&&u.par.from.kind==='rot'){const g=u.par.from;f.unshift(`${x.ax.w[e.L].n}/${g.ax.w[u.par.e.L].n}`);x=g;continue}}
+    else if(e.t==='epi'){const r=Math.abs(u.w/x.w);f.unshift(`[${x.ax.mod.type==='plan'?'planetary':'diff'} ${isFinite(r)?fx(r):'∞'}]`)}
+    x=u}return f}
+
+/* ---------- meters ---------- */
+function meterLines(o,isRack){
+  if(isRack){const n=NODES.get('r'+o.id);if(!n||n.st==='idle')return[[`${o.name}  rack not driven`,'#9ca3af'],['0 mm/s','#6b7280']];if(n.st==='jam')return[[`${o.name}  JAMMED`,'#fecdd3'],['locked','#fb7185']];
+    return[[`${o.name}  ${fx(Math.abs(mmS(n)))} mm/s`,'#f3f4f6'],[`F ${fx(n.tq)} N`,'#fcd34d']]}
+  const a=o;
+  if(a.mod){const info=MODINFO[a.mod.type],out=[[`${a.name}  ${a.mod.type==='plan'?'planetary':'differential'}`,'#e9d5ff']];
+    for(const i of [2,1,0]){const n=NODES.get('a'+a.id+'.'+i),nm=info.mem[i].replace(' output','').toLowerCase();
+      if(!n||n.st==='idle')out.push([`${nm}  —`,'#6b7280']);else if(n.st==='jam')out.push([`${nm}  jammed`,'#fb7185']);else if(n.st==='held')out.push([`${nm}  held`,'#9ca3af']);else if(n.st==='free')out.push([`${nm}  free`,'#9ca3af']);
+      else out.push([`${nm}  ${fx(Math.abs(n.w))} rpm ${rpmArrow(n.w)} · ${fx(n.tq)} N·m`,'#fcd34d'])}return out}
+  const n=NODES.get(nk(a,0));
+  if(!n||n.st==='idle')return[[`${a.name}  not driven`,'#9ca3af'],['0 rpm','#6b7280']];
+  if(n.st==='jam')return[[`${a.name}  JAMMED`,'#fecdd3'],['0 rpm · locked','#fb7185']];
+  if(n.st==='held')return[[`${a.name}  held still`,'#d1d5db'],['0 rpm','#9ca3af']];
+  if(n.st==='free')return[[`${a.name}  free`,'#d1d5db'],['speed not set','#9ca3af']];
+  return[[`${a.name}  ${fx(Math.abs(n.w))} rpm ${rpmArrow(n.w)}`,'#f3f4f6'],[`τ ${fx(n.tq)} N·m`,'#fcd34d']]}
+function drawMeters(){if(S.ro==='off')return;const boxes=[];ctx.font='600 11px ui-monospace,Menlo,monospace';
+  const items=[...S.axles.map(a=>({o:a,x:a.x,y:a.y,r:labelR(a),m:a.meter})),...S.racks.map(r=>({o:r,rk:1,x:r.x,y:r.y,r:14,m:r.meter}))];
+  for(const it of items){if(S.ro==='meters'&&!it.m)continue;const [x,y]=w2s(it.x,it.y),r=it.r*cam.s,lines=meterLines(it.o,it.rk);
+    const st=it.rk?(NODES.get('r'+it.o.id)||{}).st:it.o.mod?([0,1,2].map(i=>NODES.get('a'+it.o.id+'.'+i).st).find(s=>s==='driven')||NODES.get('a'+it.o.id+'.0').st):(NODES.get(nk(it.o,0))||{}).st;
+    const acc=st==='jam'?'#fb7185':st==='driven'?'#34d399':'#6b7280';
+    const w=Math.max(...lines.map(l=>ctx.measureText(l[0]).width))+18,h=10+lines.length*14;
+    let bx=x+r*.7+10,by=y-r*.7-10-h;if(bx+w>W-8)bx=x-r*.7-10-w;if(by<8)by=Math.min(H-h-8,y+r*.7+10);bx=Math.max(8,Math.min(W-w-8,bx));
+    for(let k=0;k<14;k++){const hit=boxes.find(b=>bx<b[0]+b[2]+4&&bx+w+4>b[0]&&by<b[1]+b[3]+4&&by+h+4>b[1]);if(!hit)break;by=hit[1]+hit[3]+6}
+    boxes.push([bx,by,w,h]);ctx.strokeStyle='rgba(156,163,175,.5)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(bx+(bx>x?0:w),by+h/2);ctx.stroke();
+    rr(bx,by,w,h,6);ctx.fillStyle='rgba(17,24,39,.92)';ctx.fill();ctx.strokeStyle='#374151';ctx.stroke();ctx.fillStyle=acc;ctx.fillRect(bx+1,by+6,2.5,h-12);
+    lines.forEach((l,i)=>{ctx.fillStyle=l[1];ctx.fillText(l[0],bx+10,by+16+i*14)})}}
+
+/* ---------- panels ---------- */
+let selSig=null,panQ=false;
+function schedPanels(){if(panQ)return;panQ=true;requestAnimationFrame(()=>{panQ=false;updatePanels()})}
+const isSel=n=>{const s=S.sel;if(!s)return false;return n.kind==='lin'?s.t==='rack'&&s.id===n.rack.id:s.t==='axle'&&s.id===n.ax.id};
+function updatePanels(){const m=S.motor,om=m.rpm*TAU/60,jam=!!S.jam;
+  $('oRpm').textContent=m.rpm+' rpm';$('oTq').textContent=m.tq.toFixed(1)+' N·m';$('oEff').textContent=m.eff+'%';
+  $('mPow').textContent=jam?'stalled':fx(m.tq*om)+' W';$('mOmega').textContent=jam?'0 rad/s':fx(om)+' rad/s';$('mPill').textContent=jam?'stalled':fx(m.tq*om)+' W';$('mPill').className='pill'+(jam?' bad':'');
+  const driven=ORDER.filter(n=>n.st==='driven');$('vpName').textContent=S.preset;const dot=$('vpDot');
+  if(jam){dot.className='dot jam';$('vpInfo').textContent=S.jam==='loop'?'· jammed: conflicting speeds':S.jam==='worm'?'· jammed: a worm wheel cannot drive its worm':'· jammed: parts overlap'}
+  else{dot.className='dot'+(driven.length<2?' idle':'');const last=driven.reduce((b,a)=>!b||a.depth>b.depth?a:b,null);
+    $('vpInfo').textContent=driven.length<2?'· add a part that meshes with the motor':last.kind==='lin'?`· ${driven.length} parts moving · rack at ${fx(Math.abs(mmS(last)))} mm/s`:`· ${driven.length} parts moving · last stage ${ratioStr(Math.abs(m.rpm/last.w))}`}
+  const vt=$('vpTool');vt.classList.toggle('on',S.tool!=='select');
+  vt.innerHTML=S.tool==='belt'?(S.beltFrom?'Belt: <b>now click the second pulley</b>':'Belt: <b>click the first pulley</b> · Esc to stop'):S.tool==='meter'?'Meter: <b>click parts to add or remove meters</b> · Esc to stop':'Tool: <b>Select &amp; move</b>';
+  $('cv').classList.toggle('tool',S.tool!=='select');
+  let h='';
+  if(jam)h+=`<li class="jam"><b>Jammed.</b> ${S.jam==='loop'?'Two paths demand different speeds from the same part. Look for a ring of meshes with an odd number of gears, two routes with different ratios, a held member being driven, or a road condition the train cannot meet.':S.jam==='worm'?'Power is trying to flow from a worm wheel back into its worm. Worm drives self-lock: drive the worm shaft instead.':'Two parts on the same layer overlap. Move them apart or put one on another layer.'}</li>`;
+  const list=ORDER.slice().sort((a,b)=>a.depth-b.depth);
+  for(const n of list){const nm=nodeName(n),a=n.ax,cls=n.kind==='lin'?' r':a&&a.motor?' m':a&&a.mod?' p':'';const lbl=n.kind==='lin'?n.rack.name:a.name;
+    let val,sub;if(jam){val='0';sub='locked'}
+    else if(n.st==='held'){val='<span class="held">held</span>';sub=`reaction ${fx(n.react||0)} N·m`}
+    else if(n.kind==='lin'){val=spStr(n);sub=`F <b>${fx(n.tq)} N</b> · ${fx(Math.abs(mmS(n))/(m.rpm/60))} mm per motor turn`}
+    else{val=spStr(n);sub=`τ <b>${fx(n.tq)} N·m</b> · ${a.motor?'input':ratioStr(Math.abs(m.rpm/n.w))}`}
+    h+=`<li><button data-node="${n.key}" aria-current="${isSel(n)}"><span class="ix${cls}">${lbl}</span><span><span class="k">${nm}<span>${val}</span></span><span class="m">${sub}</span>${n.par?`<span class="m">from ${nodeName(n.par.from)} · ${stageText(n)}</span>`:''}</span></button></li>`}
+  const rest=[...COMP].map(k=>NODES.get(k)).filter(n=>!ORDER.includes(n)&&n.st!=='jam');
+  if(rest.length)h+=`<li class="note">Not set by the motor: ${rest.map(n=>nodeName(n)+(n.st==='free'?' (free)':' (held)')).join(', ')}</li>`;
+  const idle=[...S.axles.filter(a=>!COMP.has(nk(a,0))&&!(a.mod&&[1,2].some(i=>COMP.has('a'+a.id+'.'+i)))).map(a=>a.name),...S.racks.filter(r=>!COMP.has('r'+r.id)).map(r=>r.name)];
+  if(idle.length)h+=`<li class="note">Not connected: ${idle.join(', ')}</li>`;
+  $('dtList').innerHTML=h;$('dtPill').textContent=`${ORDER.length} moving parts`;renderSel()}
+function stageText(n){const e=n.par.e,u=n.par.from;
+  if(e.t==='mesh')return`${u.ax.w[e.L].n}T → ${n.ax.w[e.L].n}T mesh`;if(e.t==='belt')return`Ø${u.ax.w[e.L].d} → Ø${n.ax.w[e.L].d} ${e.bt.x?'crossed ':''}belt`;
+  if(e.t==='worm')return`${e.wa.w[e.L].st}-start worm → ${n.ax.w[e.L].n}T wheel`;if(e.t==='rack')return n.kind==='lin'?`${u.ax.w[e.L].n}T pinion → rack`:`rack → ${n.ax.w[e.L].n}T pinion`;
+  return`inside the ${n.ax.mod.type==='plan'?'planetary':'differential'}`}
+
+const ICON={shaft:'<svg class="i c-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8" stroke-dasharray="2.5 2"/></svg>',
+  mod:'<svg class="i c-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5"/><circle cx="12" cy="6.5" r="2"/><circle cx="16.8" cy="14.7" r="2"/><circle cx="7.2" cy="14.7" r="2"/></svg>',
+  rack:'<svg class="i c-emerald" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M2 20h20v-4h-2l-1-3h-2l-1 3h-2l-1-3h-2l-1 3H7l-1-3H4l-1 3H2z"/><circle cx="12" cy="7" r="4"/></svg>',
+  belt:'<svg class="i c-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="12" r="3"/><circle cx="17" cy="12" r="5"/><path d="M6 9l11-2M6 15l11 2"/></svg>'};
+function ctl(id,label,act,L,min,max,step,val){return`<div class="ctl"><label for="${id}">${label}</label><input type="range" id="${id}" data-act="${act}" data-l="${L}" min="${min}" max="${max}" step="${step}" value="${val}"><output id="o${id}"></output></div>`}
+function setOut(id,txt,val){const o=$('o'+id);if(o)o.textContent=txt;const i=$(id);if(i&&document.activeElement!==i&&val!=null)i.value=val}
+function wheelRowHTML(a,L){const w=a.w[L],isMod=!!a.mod,lab=isMod?MODINFO[a.mod.type].port[L]:'',lc=LC[L],tag=`<span class="lay ${lc}">${LN[L]}</span>`;
+  if(isMod&&L===1)return`<div class="wrow"><div class="wh">${tag}<b>${lab}</b><span class="spec" id="wSpec1"></span></div>${ctl('wSz1','Outer teeth','size',1,modMin(a),modMin(a)+40,1,w.n)}</div>`;
+  if(!w)return`<div class="wrow empty"><div class="wh">${tag}${isMod?lab+' · ':''}empty<span class="add"><button data-act="addg" data-l="${L}">+ Gear</button><button data-act="addp" data-l="${L}">+ Pulley</button>${isMod?'':`<button data-act="addw" data-l="${L}">+ Worm</button>`}</span></div></div>`;
+  const mv=isMod?'':`${L<2?`<button class="x" data-act="up" data-l="${L}" title="Move one layer toward the front">▲</button>`:''}${L>0?`<button class="x" data-act="down" data-l="${L}" title="Move one layer toward the back">▼</button>`:''}`;
+  const head=`<div class="wh">${tag}<b>${isMod?lab+' · ':''}${w.k==='g'?'Gear':w.k==='p'?'Pulley':'Worm'}</b><span class="spec" id="wSpec${L}"></span>${mv}<button class="x rm" data-act="rm" data-l="${L}">Remove</button></div>`;
+  if(w.k==='w')return`<div class="wrow">${head}${ctl('wSt'+L,'Starts','wst',L,1,4,1,w.st)}${ctl('wLen'+L,'Length','wlen',L,24,120,4,w.len)}${ctl('wDir'+L,'Angle','wdir',L,0,345,15,deg(w.dir))}${ctl('wEta'+L,'Efficiency','weta',L,20,100,1,w.eta)}<div class="seg wide" role="group" aria-label="Thread hand"><button data-act="hand" data-l="${L}" data-v="1" id="wHR${L}">Right-hand</button><button data-act="hand" data-l="${L}" data-v="-1" id="wHL${L}">Left-hand</button></div></div>`;
+  return`<div class="wrow">${head}${ctl('wSz'+L,w.k==='g'?'Teeth':'Diameter','size',L,w.k==='g'?8:20,w.k==='g'?72:160,w.k==='g'?1:5,w.k==='g'?w.n:w.d)}</div>`}
+function updRows(a){for(const L of [0,1,2]){const w=a.w[L];if(!w)continue;const sp=$('wSpec'+L);if(!sp)continue;
+  if(w.k==='g'){sp.textContent=`pitch Ø${w.n*2} mm`;setOut('wSz'+L,w.n+' T',w.n);if(a.mod&&L===1){const i=$('wSz1');i.min=modMin(a);i.max=modMin(a)+40}}
+  else if(w.k==='p'){sp.textContent=`rim radius ${fx(w.d/2)} mm`;setOut('wSz'+L,w.d+' mm',w.d)}
+  else{sp.textContent=`lead ${fx(w.st*PITCH)} mm`;setOut('wSt'+L,String(w.st),w.st);setOut('wLen'+L,w.len+' mm',w.len);setOut('wDir'+L,deg(w.dir)+'°',deg(w.dir));setOut('wEta'+L,w.eta+'%',w.eta);
+    $('wHR'+L).setAttribute('aria-pressed',w.hand>0);$('wHL'+L).setAttribute('aria-pressed',w.hand<0)}}
+  const mb=$('sMeter');if(mb){mb.setAttribute('aria-pressed',a.meter);mb.textContent=a.meter?'Meter on':'Add meter'}}
+function renderSel(){const card=$('selCard'),s=S.sel;if(!s){card.hidden=true;selSig=null;return}
+  let sig,obj;
+  if(s.t==='axle'){obj=byId(s.id);if(!obj){S.sel=null;card.hidden=true;return}sig='a'+obj.id+':'+obj.w.map(w=>w?w.k:'-').join('')+(obj.mod?obj.mod.type:'')}
+  else if(s.t==='rack'){obj=rackById(s.id);if(!obj){S.sel=null;card.hidden=true;return}sig='r'+obj.id}
+  else{obj=s.b;if(!S.belts.includes(obj)){S.sel=null;card.hidden=true;return}sig='b'+S.belts.indexOf(obj)}
+  if(sig!==selSig){selSig=sig;card.innerHTML=s.t==='axle'?(obj.mod?selModHTML(obj):selAxleHTML(obj)):s.t==='rack'?selRackHTML(obj):selBeltHTML(obj)}
+  card.hidden=false;if(s.t==='axle')(obj.mod?updSelMod:updSelAxle)(obj);else if(s.t==='rack')updSelRack(obj);else updSelBelt(obj)}
+
+function selAxleHTML(a){return`<div class="card-h"><span class="t">${ICON.shaft}Selected shaft</span><span class="pill" id="sPill"></span></div>
+  <p class="selname" id="sName"></p><p class="desc" id="sDesc"></p>
+  <div class="lawbox"><div class="big" id="sRpm"></div><div class="lawrow"><span>Torque available</span><b class="am" id="sTq"></b></div><div class="lawrow"><span>Power</span><b class="wh" id="sPow"></b></div><div class="lawrow"><span>Speed ratio (motor : shaft)</span><b class="bl" id="sRatio"></b></div><div class="lawrow"><span>Torque multiplier</span><b id="sTx"></b></div><div class="lawrow"><span>Direction</span><b id="sDir"></b></div></div>
+  <div class="expr" id="sExpr"></div>${[2,1,0].map(L=>wheelRowHTML(a,L)).join('')}
+  <div class="btns2"><button class="btn" data-act="meter" id="sMeter">Meter</button>${a.motor?'':'<button class="btn danger" data-act="del">Delete shaft</button>'}</div>`}
+function updSelAxle(a){const n=NODES.get(nk(a,0)),st=n?n.st:'idle',m=S.motor,jam=st==='jam',run=st==='driven';const pill=$('sPill');
+  pill.textContent=a.motor?(jam?'stalled':'input'):jam?'jammed':run?'driven':st==='idle'?'not driven':st;pill.className='pill'+(jam?' bad':run?' hi':st==='held'||st==='free'?' warn':' idle');
+  $('sName').textContent=a.motor?'Motor shaft M':'Shaft '+a.name;
+  $('sDesc').textContent=a.motor?'The motor turns this shaft. Every other speed comes from here.':a.clash?'A wheel on this shaft overlaps another part on the same layer.':st==='idle'?'Nothing connects this shaft to the motor yet. Mesh a gear, add a belt, or stack a wheel on a driven shaft.':jam?'Part of a locked train.':st==='held'?'Locked in place by a held member.':st==='free'?'Connected, but nothing fixes its speed yet.':`Driven by ${nodeName(n.par.from)} through a ${stageText(n)}.`;
+  const rpm=run?Math.abs(n.w):0;$('sRpm').innerHTML=`${fx(rpm)}<small>rpm · ${fx(rpm*TAU/60)} rad/s</small>`;
+  const tq=run?n.tq:0;$('sTq').textContent=fx(tq)+' N·m';$('sPow').textContent=fx(tq*rpm*TAU/60)+' W';
+  const r=run?Math.abs(m.rpm/n.w):NaN;$('sRatio').textContent=run?ratioStr(r)+(a.motor?'':' '+ratioKind(r)):'—';$('sTx').textContent=run?'× '+fx(tq/m.tq):'—';
+  const dir=$('sDir');if(!run||!rpm){dir.textContent='—';dir.className='wh'}else{dir.textContent=n.w>0?'↻ clockwise':'↺ counter-clockwise';dir.className=n.w>0?'bl':'pk'}
+  const ex=$('sExpr');if(a.motor)ex.innerHTML='<small>Ratio chain</small>This is the input. Select another part to see how its ratio builds up.';
+  else if(!run)ex.innerHTML='<small>Ratio chain</small>No ratio: this shaft is '+(jam?'locked.':'not turning under the motor.');
+  else{const ch=chainOf(n);ex.innerHTML=`<small>Ratio chain · driven ÷ driver${m.eff<100?' · η = '+m.eff+'% per stage':''}</small>${ch.join(' × ')} = ${fx(r)}<br><span>${fx(m.rpm)} rpm ÷ ${fx(r)} = ${fx(rpm)} rpm · ${fx(m.tq)} N·m × ${fx(r)}${Math.abs(n.eff-1)>1e-9?' × '+fx(n.eff)+' efficiency':''} = ${fx(tq)} N·m</span>`}
+  updRows(a)}
+
+function selModHTML(a){const m=a.mod,info=MODINFO[m.type];let h=`<div class="card-h"><span class="t">${ICON.mod}${info.label}</span><span class="pill" id="sPill"></span></div><p class="selname" id="sName"></p><p class="desc" id="sDesc"></p><div class="mtab" id="mTab"></div><div class="expr" id="sExpr"></div>`;
+  if(m.type==='plan')h+=`${ctl('mZs','Sun teeth','zs',-1,8,40,1,m.zs)}${ctl('mZp','Planet teeth','zp',-1,8,30,1,m.zp)}<p class="grp">Hold still</p><div class="seg wide" role="group" aria-label="Held member">${['ring','carrier','sun','none'].map(v=>`<button data-act="hold" data-v="${v}" id="hold-${v}">${v==='none'?'Nothing':v[0].toUpperCase()+v.slice(1)}</button>`).join('')}</div>`;
+  else h+=`<p class="grp">Road</p><div class="chips" role="group" aria-label="Road condition">${[['straight','Straight'],['turn','Turning'],['liftL','Left wheel lifted'],['liftR','Right wheel lifted'],['free','No road']].map(([v,l])=>`<button class="chip" data-act="road" data-v="${v}" id="road-${v}">${l}</button>`).join('')}</div><div id="turnRow">${ctl('mTurn','Turn','turn',-1,-60,60,5,Math.round(m.turn*100))}</div>`;
+  h+=[2,1,0].map(L=>wheelRowHTML(a,L)).join('')+`<div class="btns2"><button class="btn" data-act="meter" id="sMeter">Meter</button><button class="btn danger" data-act="del">Delete</button></div>`;return h}
+function updSelMod(a){const m=a.mod,info=MODINFO[m.type],ns=[0,1,2].map(i=>NODES.get('a'+a.id+'.'+i)),sts=ns.map(n=>n?n.st:'idle'),pill=$('sPill');
+  const jam=sts.includes('jam'),run=sts.includes('driven');pill.textContent=jam?'jammed':run?(sts.includes('free')?'partly set':'driven'):sts.includes('free')?'free':'not driven';pill.className='pill'+(jam?' bad':run&&!sts.includes('free')?' hi':run?' warn':' idle');
+  $('sName').textContent=`${info.label} ${a.name}`;const zr=m.type==='plan'?planZr(m):0,k=m.type==='plan'?zr/m.zs:1;
+  let d;if(m.type==='plan'){d={ring:`Ring held: the sun drives the carrier the same way, ${fx(1+k)}× slower. Carrier ratio = 1 + Zring/Zsun = 1 + ${zr}/${m.zs}.`,carrier:`Carrier held: the planets act as idlers, so the ring turns backwards, ${fx(k)}× slower than the sun (Zring/Zsun = ${zr}/${m.zs}).`,sun:`Sun held: ring and carrier turn the same way. Carrier = ring × Zring/(Zring+Zsun) = ring × ${fx(zr/(zr+m.zs))}.`,none:'Nothing held: the set has two degrees of freedom. Drive two members, or hold one, to fix every speed.'}[m.hold]}
+  else d={straight:'Driving straight: both outputs turn with the carrier. Each gets half the carrier torque.',turn:`Turning ${m.turn>=0?'left':'right'}: the outer (${m.turn>=0?'right':'left'}) output runs faster and the inner one slower by the same amount. The torque split stays 50 / 50.`,liftL:'Left wheel in the air: it spins at twice the carrier speed while the right wheel stops. With nothing to push against, neither wheel gets any torque.',liftR:'Right wheel in the air: it spins at twice the carrier speed while the left wheel stops. With nothing to push against, neither wheel gets any torque.',free:'No road condition: the outputs are set only by whatever else they connect to.'}[m.road];
+  $('sDesc').textContent=a.clash?'This unit overlaps another part on the same layer.':d;
+  let t='<span class="h">Member</span><span class="h" style="text-align:right">Speed</span><span class="h" style="text-align:right">Torque</span>';
+  for(const i of [2,1,0]){const n=ns[i],st=sts[i];let v,q;if(st==='driven'){v=`${fx(Math.abs(n.w))} rpm ${rpmArrow(n.w)}`;q=fx(n.tq)+' N·m'}else if(st==='held'){v='held';q=n.react!=null?fx(n.react)+' N·m*':'—'}else if(st==='free'){v='free';q='—'}else if(st==='jam'){v='0';q='—'}else{v='—';q='—'}
+    t+=`<span class="nm"><i style="background:${info.col[i]}"></i>${info.mem[i]}</span><span class="v${st==='driven'?'':' dim'}">${v}</span><span class="tq${st==='driven'?'':' dim'}">${q}</span>`}
+  $('mTab').innerHTML=t+(sts.includes('held')&&m.type==='plan'?'<span class="dim" style="grid-column:1/-1;font-size:10.5px">* reaction torque the holder must supply</span>':'');
+  const w=ns.map(n=>n&&n.st!=='idle'?n.w:0);const ex=$('sExpr');
+  if(m.type==='plan')ex.innerHTML=`<small>Willis equation · k = Zring / Zsun = ${zr}/${m.zs} = ${fx(k)}</small>ω_sun + ${fx(k)}·ω_ring = ${fx(1+k)}·ω_carrier<br><span>${fx(w[2])} + ${fx(k)} × ${fx(w[1])} = ${fx(1+k)} × ${fx(w[0])}</span>`;
+  else ex.innerHTML=`<small>Differential rule</small>ω_left + ω_right = 2·ω_carrier<br><span>${fx(w[2])} + ${fx(w[0])} = 2 × ${fx(w[1])}</span><br><span>τ_left = τ_right = τ_carrier ÷ 2${m.road.startsWith('lift')?' · but a lifted wheel takes 0':''}</span>`;
+  if(m.type==='plan'){setOut('mZs',m.zs+' T',m.zs);setOut('mZp',m.zp+' T',m.zp);for(const v of ['ring','carrier','sun','none'])$('hold-'+v).setAttribute('aria-pressed',m.hold===v)}
+  else{for(const v of ['straight','turn','liftL','liftR','free'])$('road-'+v).setAttribute('aria-pressed',m.road===v);$('turnRow').hidden=m.road!=='turn';const tv=Math.round(m.turn*100);setOut('mTurn',tv===0?'none':`${Math.abs(tv)}% ${tv>0?'left':'right'}`,tv)}
+  updRows(a)}
+
+function selRackHTML(r){return`<div class="card-h"><span class="t">${ICON.rack}Selected rack</span><span class="pill" id="sPill"></span></div><p class="selname" id="sName"></p><p class="desc" id="sDesc"></p>
+  <div class="lawbox"><div class="big" id="sRpm"></div><div class="lawrow"><span>Force  F = τ / r</span><b class="am" id="sTq"></b></div><div class="lawrow"><span>Power  P = F·v</span><b class="wh" id="sPow"></b></div><div class="lawrow"><span>Travel per motor turn</span><b class="bl" id="sRatio"></b></div></div>
+  <div class="expr" id="sExpr"></div>${ctl('rLen','Length','rlen',-1,60,320,10,r.len)}${ctl('rAng','Angle','rang',-1,0,345,15,deg(r.ang))}
+  <p class="grp">Layer</p><div class="seg wide" role="group" aria-label="Rack layer">${[0,1,2].map(L=>`<button data-act="rlay" data-v="${L}" id="rL${L}">${LN[L]}</button>`).join('')}</div>
+  <div class="btns2"><button class="btn" data-act="rflip">Flip teeth side</button><button class="btn" data-act="meter" id="sMeter">Meter</button><button class="btn danger solo" data-act="del">Delete rack</button></div>
+  <p class="muted">When a pinion reaches the end of the rack, the motor reverses so the rack runs back.</p>`}
+function updSelRack(r){const n=NODES.get('r'+r.id),st=n?n.st:'idle',run=st==='driven',pill=$('sPill');pill.textContent=st==='jam'?'jammed':run?'driven':st==='idle'?'not driven':st;pill.className='pill'+(st==='jam'?' bad':run?' hi':' idle');
+  $('sName').textContent='Rack '+r.name;$('sDesc').textContent=r.clash?'The rack overlaps a wheel. Move it, or line its teeth up with a gear.':run?`Driven by ${nodeName(n.par.from)}. A rack slides instead of turning.`:'Line its teeth up with a gear on the same layer. Drag near a gear and it snaps into mesh.';
+  const v=run?Math.abs(mmS(n)):0,F_=run?n.tq:0;$('sRpm').innerHTML=`${fx(v)}<small>mm/s · ${fx(v/1000)} m/s</small>`;$('sTq').textContent=fx(F_)+' N';$('sPow').textContent=fx(F_*v/1000)+' W';
+  $('sRatio').textContent=run?fx(v/(S.motor.rpm/60))+' mm':'—';
+  const ex=$('sExpr');if(run&&n.par.from.kind==='rot'){const g=n.par.from,N=g.ax.w[n.par.e.L].n;ex.innerHTML=`<small>Pinion ${g.ax.name} · pitch radius ${N} mm</small>v = ω·r = ${fx(Math.abs(g.w))} rpm × 2π/60 × ${N} mm = ${fx(v)} mm/s<br><span>F = τ / r = ${fx(g.tq)} N·m ÷ ${fx(N/1000)} m${S.motor.eff<100?' × η':''} = ${fx(F_)} N</span>`}else ex.innerHTML='<small>Rack and pinion</small>v = ω·r · F = τ / r';
+  setOut('rLen',r.len+' mm',r.len);setOut('rAng',deg(r.ang)+'°',deg(r.ang));for(const L of [0,1,2])$('rL'+L).setAttribute('aria-pressed',r.L===L);
+  const mb=$('sMeter');mb.setAttribute('aria-pressed',r.meter);mb.textContent=r.meter?'Meter on':'Add meter'}
+function selBeltHTML(){return`<div class="card-h"><span class="t">${ICON.belt}Selected belt</span><span class="pill" id="bPill"></span></div><p class="selname" id="bName"></p><p class="desc" id="bDesc"></p>
+  <div class="seg wide" role="group" aria-label="Belt type"><button data-act="bopen" id="bOpen">Open</button><button data-act="bcross" id="bCross">Crossed</button></div>
+  <div class="lawbox"><div class="lawrow"><span>Ratio  D₂ / D₁</span><b class="bl" id="bRatio"></b></div><div class="lawrow"><span>Belt speed  v = ω·r</span><b class="am" id="bV"></b></div><div class="lawrow"><span>Direction</span><b class="wh" id="bDir"></b></div></div>
+  <button class="btn danger" data-act="del">Delete belt</button>`}
+function updSelBelt(bt){const a=byId(bt.a),b=byId(bt.b);if(!a||!b)return;$('bName').textContent=`Belt ${a.name} – ${b.name}`;$('bOpen').setAttribute('aria-pressed',!bt.x);$('bCross').setAttribute('aria-pressed',bt.x);
+  const na=NODES.get(nk(a,bt.L)),nb=NODES.get(nk(b,bt.L)),run=na&&na.st==='driven';$('bPill').textContent=bt.bad?'broken':run?'running':na&&na.st==='jam'?'jammed':'idle';$('bPill').className='pill'+(bt.bad||(na&&na.st==='jam')?' bad':run?' hi':' idle');
+  if(bt.bad){$('bDesc').textContent='Both ends need pulleys on the same layer.';$('bRatio').textContent=$('bV').textContent=$('bDir').textContent='—';return}
+  const [dr,dn]=na.depth<=nb.depth?[a,b]:[b,a],wd=dr.w[bt.L],wn=dn.w[bt.L],nd=NODES.get(nk(dr,bt.L));
+  $('bDesc').textContent=`${dr.name}'s Ø${wd.d} pulley drives ${dn.name}'s Ø${wn.d} pulley on the ${LN[bt.L].toLowerCase()} layer.`;
+  $('bRatio').textContent=`${wn.d}/${wd.d} = ${fx(wn.d/wd.d)}`;$('bV').textContent=run?fx(Math.abs(nd.w)*TAU/60*radius(wd)/1000)+' m/s':'0 m/s';$('bDir').textContent=bt.x?'reversed':'same way'}
+
+/* ---------- edits ---------- */
+function resizeWheel(a,L,val){const w=a.w[L],old=radius(w);if(w.k==='g')w.n=val;else w.d=val;const D=radius(w)-old;if(w.k!=='g'||!D)return;
+  const key=nk(a,L),node=NODES.get(key);if(!node)return;
+  const kids=new Map();for(const n of NODES.values())if(n.par){const k=n.par.from.key;if(!kids.has(k))kids.set(k,[]);kids.get(k).push(n)}
+  const subtree=(root,skip)=>{const ax=new Set(),rk=new Set(),st=[root],seen=new Set();while(st.length){const n=st.pop();if(!n||seen.has(n.key))continue;seen.add(n.key);
+    if(n.ax){if(n.ax===skip)continue;if(!ax.has(n.ax)){ax.add(n.ax);for(let i=0;i<(n.ax.mod?3:1);i++)st.push(NODES.get('a'+n.ax.id+'.'+i))}}else rk.add(n.rack);for(const c of kids.get(n.key)||[])st.push(c)}return{ax,rk}};
+  const shift=(s,dx,dy)=>{for(const x of s.ax){x.x+=dx;x.y+=dy}for(const r of s.rk){r.x+=dx;r.y+=dy}};
+  const edges=(ADJ.get(key)||[]).filter(e=>(e.t==='mesh'&&e.L===L)||(e.t==='worm'&&e.L===L&&e.wb===a)||(e.t==='rack'&&e.a===a));
+  for(const e of edges){const o=other(e,node);if(!o||!o.par||o.par.e!==e)continue;
+    if(e.t==='mesh'){const b=o.ax,dd=Math.hypot(b.x-a.x,b.y-a.y)||1;shift(subtree(o,a),(b.x-a.x)/dd*D,(b.y-a.y)/dd*D)}
+    else if(e.t==='rack'){const f=rackFrame(e.r);shift(subtree(o,a),-f.m[0]*D,-f.m[1]*D)}}
+  const p=node.par;if(p&&edges.includes(p.e)){const e=p.e;let dx=0,dy=0;
+    if(e.t==='mesh'){const b=p.from.ax,dd=Math.hypot(a.x-b.x,a.y-b.y)||1;dx=(a.x-b.x)/dd*D;dy=(a.y-b.y)/dd*D}
+    else if(e.t==='rack'){const f=rackFrame(e.r);dx=f.m[0]*D;dy=f.m[1]*D}
+    else if(e.t==='worm'){const f=wormFrame(e.wa,e.wa.w[L]);dx=f.n[0]*e.sig*D;dy=f.n[1]*e.sig*D}
+    shift(subtree(node,null),dx,dy)}}
+function removeAxle(a){S.axles=S.axles.filter(x=>x!==a);S.belts=S.belts.filter(b=>b.a!==a.id&&b.b!==a.id);if(S.beltFrom&&S.beltFrom.id===a.id)S.beltFrom=null}
+function removeWheel(a,L){if(a.mod){a.w[L]=null}else{if(a.w.filter(Boolean).length<2){if(a.motor){toast('The motor needs at least one wheel.');return}deleteAxle(a);return}a.w[L]=null}
+  S.belts=S.belts.filter(b=>!((b.a===a.id||b.b===a.id)&&b.L===L));selSig=null;markCustom();solve();updatePanels()}
+function deleteAxle(a){if(a.motor){toast('The motor stays on the bench.');return}removeAxle(a);S.sel=null;markCustom();solve();updatePanels()}
+function deleteSel(){const s=S.sel;if(!s)return;if(s.t==='axle'){const a=byId(s.id);if(a)deleteAxle(a);return}
+  if(s.t==='rack')S.racks=S.racks.filter(r=>r.id!==s.id);else S.belts=S.belts.filter(b=>b!==s.b);S.sel=null;markCustom();solve();updatePanels()}
+function swapW(a,L,L2){const t=a.w[L];a.w[L]=a.w[L2];a.w[L2]=t;selSig=null;markCustom();solve();
+  if(S.belts.some(b=>b.bad&&(b.a===a.id||b.b===a.id)))toast('A belt now spans two layers. Move its other pulley too.');else if(a.clash)toast('That layer is crowded: the wheel overlaps another part.')}
+
+/* ---------- placement ---------- */
+const tries=()=>{const t=[0];for(let k=15;k<=180;k+=15)t.push(k,-k);return t};
+function baseAng(host){for(const n of NODES.values())if(n.ax===host&&n.par&&n.par.from.ax&&n.par.from.ax!==host){const p=n.par.from.ax;return Math.atan2(host.y-p.y,host.x-p.x)}return 0}
+function reach(a){let r=10;for(const w of a.w)if(w)r=Math.max(r,w.k==='w'?WT0+w.len:outer(w));return r}
+function placeAround(host,a,dist,need){const b=baseAng(host);for(const t of tries()){const g=b+t*Math.PI/180;a.x=host.x+dist*Math.cos(g);a.y=host.y+dist*Math.sin(g);const p=probe(a);if(!p.clash&&p.n===need)return true}return false}
+function placeFree(host,a){const b=host?baseAng(host):0,cx=host?host.x:cam.x,cy=host?host.y:cam.y,R=(host?reach(host):0)+reach(a);
+  for(const ex of [20,60,120,200,300])for(const t of tries()){const g=b+t*Math.PI/180;a.x=cx+(R+ex)*Math.cos(g);a.y=cy+(R+ex)*Math.sin(g);const p=probe(a);if(!p.clash&&!p.n)return true}return false}
+function pickHost(){const s=S.sel;if(s&&s.t==='axle'){const a=byId(s.id);if(a)return a}let best=null;for(const n of ORDER){if(n.kind!=='rot'||n.st!=='driven')continue;if(!best||n.depth>=best.depth)best=n}return best?best.ax:motorAx()}
+function bestLayer(host,kind){let best=-1,bs=-1e9;for(let L=0;L<3;L++){const w=host.w[L];if(!w||w.k!==kind)continue;let s=0;const n=NODES.get(nk(host,L));
+  if(n){if(n.st==='driven')s+=2;if(n.st==='held')s-=4;if(n.par&&n.par.e.t!=='epi'&&n.par.e.L===L)s-=3}if(L===S.layer)s+=1;if(s>bs){bs=s;best=L}}return best}
+function finish(sel,msg){markCustom();solve();select(sel);if(msg)toast(msg);ensureVisible()}
+function addPart(type,at){if(S.tool!=='select')setTool(S.tool);if(at)return dropPart(type,at);const host=pickHost();
+  if(type==='gear'||type==='pulley')return attachWheel(host,type==='gear'?'g':'p');if(type==='rack')return attachRack(host);if(type==='worm')return attachWorm(host);return attachModule(host,type)}
+function attachWheel(host,k){const mk=()=>k==='g'?G(24):Pu(60);
+  if(k==='g'&&S.sel&&S.sel.t==='rack'){const r=rackById(S.sel.id);if(r){const f=rackFrame(r),a=newAxle(0,0,lay(r.L,G(24)));for(const t of [0,40,-40,80,-80,120,-120]){if(Math.abs(t)>r.len/2-30)continue;a.x=r.x+f.d[0]*t+f.m[0]*24;a.y=r.y+f.d[1]*t+f.m[1]*24;const p=probe(a);if(!p.clash&&p.n===1)return finish({t:'axle',id:a.id},`${a.name}: 24T pinion meshes with rack ${r.name}`)}removeAxle(a)}}
+  if(!host){const a=newAxle(cam.x,cam.y,lay(S.layer,mk()));return finish({t:'axle',id:a.id})}
+  const L=bestLayer(host,k);
+  if(L<0){if(!host.mod){const fl=[S.layer,2,1,0].find(l=>!host.w[l]);if(fl!=null){host.w[fl]=mk();if(!probe(host).clash)return finish({t:'axle',id:host.id},`Added a ${wName(host.w[fl])} to the ${LN[fl].toLowerCase()} layer of ${host.motor?'the motor':'shaft '+host.name}`);host.w[fl]=null}}
+    const a=newAxle(0,0,lay(S.layer,mk()));placeFree(host,a);return finish({t:'axle',id:a.id},`${a.name} placed but not connected. ${k==='g'?'Drag it against a gear on the same layer.':'Use the Belt tool to link it.'}`)}
+  const a=newAxle(0,0,lay(L,mk())),hw=host.w[L];
+  if(placeAround(host,a,k==='g'?hw.n+24:radius(hw)+30+70,k==='g'?1:0)){if(k==='p')belt(host,a,L,false);return finish({t:'axle',id:a.id},k==='g'?`${a.name}: 24T gear meshes with ${host.name}'s ${hw.n}T`:`${a.name}: belted to ${host.name}'s Ø${hw.d} pulley`)}
+  placeFree(host,a);finish({t:'axle',id:a.id},`${a.name} placed but not connected: no room around ${host.name}.`)}
+function attachRack(host){const L=host?bestLayer(host,'g'):-1;
+  if(L>=0){const N=host.w[L].n;const b=baseAng(host);for(const t of [90,-90,0,180,45,-45,135,-135]){const psi=b+t*Math.PI/180;const r=newRack(host.x+N*Math.cos(psi),host.y+N*Math.sin(psi),psi+Math.PI/2,160,L,false);const p=probeRack(r);if(!p.clash&&p.n===1)return finish({t:'rack',id:r.id},`Rack ${r.name} meshes with ${host.name}'s ${N}T gear`);S.racks.pop()}}
+  const r=newRack(cam.x,cam.y+40,0,160,S.layer,false);finish({t:'rack',id:r.id},`Rack ${r.name} placed. Drag a gear onto its teeth.`)}
+function attachWorm(host){const mkWheel=fl=>lay(fl,G(30));
+  if(host&&!host.mod){const fl=[S.layer,1,2,0].find(l=>!host.w[l]);if(fl!=null){const W=Wm();host.w[fl]=W;const b=baseAng(host);
+    for(const t of [0,90,-90,180,45,-45,135,-135]){W.dir=b+t*Math.PI/180;if(probe(host).clash)continue;const f=wormFrame(host,W),tm=WT0+W.len/2;
+      for(const sg of [1,-1]){const a=newAxle(host.x+f.d[0]*tm+f.n[0]*sg*(30+WR),host.y+f.d[1]*tm+f.n[1]*sg*(30+WR),mkWheel(fl));const p=probe(a);if(!p.clash&&p.n===1)return finish({t:'axle',id:a.id},`Worm on ${host.motor?'the motor':'shaft '+host.name} drives a 30T wheel: 30 : 1`);removeAxle(a)}}
+    host.w[fl]=null}}
+  const wa=newAxle(cam.x-34,cam.y-37,[G(12),Wm(),null]);const wb=newAxle(wa.x+WT0+24,wa.y+30+WR,mkWheel(1));finish({t:'axle',id:wa.id},`Worm drive placed. Mesh its 12T input gear (back layer) with a driven gear.`)}
+function attachModule(host,type){const a=newModule(type,0,0),Lp=type==='plan'?2:1,label=MODINFO[type].label.toLowerCase();
+  if(!host){a.x=cam.x;a.y=cam.y;return finish({t:'axle',id:a.id})}
+  let L=-1,added=false;
+  if(host.w[Lp]&&host.w[Lp].k==='g')L=Lp;
+  else if(!host.mod&&!host.w[Lp]){host.w[Lp]=G(12);if(probe(host).clash)host.w[Lp]=null;else{L=Lp;added=true}}
+  if(L<0)for(const l of [2,1,0])if(host.w[l]&&host.w[l].k==='g'&&a.w[l]&&a.w[l].k==='g'){L=l;break}
+  if(L>=0&&placeAround(host,a,host.w[L].n+a.w[L].n,1))return finish({t:'axle',id:a.id},`${MODINFO[type].label} ${a.name}: ${MODINFO[type].port[L].toLowerCase()} meshes with ${host.name}${added?' (added a 12T pinion on its '+LN[Lp].toLowerCase()+' layer)':''}`);
+  if(added)host.w[Lp]=null;placeFree(host,a);finish({t:'axle',id:a.id},`${a.name}: ${label} placed but not connected.`)}
+function dropPart(type,at){
+  if(type==='gear'||type==='pulley'){const w=type==='gear'?G(24):Pu(60);const host=S.axles.find(a=>Math.hypot(a.x-at[0],a.y-at[1])*cam.s<14);
+    if(host){if(host.mod){toast(`Use the ports in the ${MODINFO[host.mod.type].label.toLowerCase()} panel to add wheels.`);return}const fl=[S.layer,2,1,0].find(l=>!host.w[l]);if(fl==null){toast(`Shaft ${host.name} already has three wheels.`);return}host.w[fl]=w;return finish({t:'axle',id:host.id},`Stacked a ${wName(w)} on the ${LN[fl].toLowerCase()} layer of ${host.name}.`)}
+    const a=newAxle(at[0],at[1],lay(S.layer,w));const [x,y]=snapAxle(a,at[0],at[1]);a.x=x;a.y=y;return finish({t:'axle',id:a.id})}
+  if(type==='rack'){const r=newRack(at[0],at[1],0,160,S.layer,false);const [x,y]=snapRack(r,at[0],at[1]);r.x=x;r.y=y;return finish({t:'rack',id:r.id})}
+  if(type==='worm'){const wa=newAxle(at[0]-34,at[1]-37,[G(12),Wm(),null]);newAxle(wa.x+WT0+24,wa.y+30+WR,lay(1,G(30)));return finish({t:'axle',id:wa.id},'Worm drive placed: worm on the middle layer, 12T input gear on the back.')}
+  const a=newModule(type,at[0],at[1]);const [x,y]=snapAxle(a,at[0],at[1]);a.x=x;a.y=y;finish({t:'axle',id:a.id})}
+
+/* ---------- snapping ---------- */
+function circX(x0,y0,r0,x1,y1,r1){const dx=x1-x0,dy=y1-y0,d=Math.hypot(dx,dy);if(d>r0+r1||d<Math.abs(r0-r1)||!d)return[];const a=(r0*r0-r1*r1+d*d)/(2*d),h=Math.sqrt(Math.max(0,r0*r0-a*a)),mx=x0+a*dx/d,my=y0+a*dy/d;return[[mx+h*dy/d,my-h*dx/d],[mx-h*dy/d,my+h*dx/d]]}
+function snapAxle(a,px,py){const tol=12/cam.s,c=[],circ_=[];
+  for(let L=0;L<3;L++){const wa=a.w[L];if(!wa)continue;
+    if(wa.k==='g'){for(const b of S.axles){if(b===a)continue;const wb=b.w[L];if(!wb)continue;
+        if(wb.k==='g'){const R=wa.n+wb.n,dx=px-b.x,dy=py-b.y,d=Math.hypot(dx,dy)||1;if(Math.abs(d-R)<tol){const o={b,R,x:b.x+dx/d*R,y:b.y+dy/d*R,err:Math.abs(d-R)};c.push(o);circ_.push(o)}}
+        else if(wb.k==='w'){const f=wormFrame(b,wb),rx=px-b.x,ry=py-b.y,t=rx*f.d[0]+ry*f.d[1],q=rx*f.n[0]+ry*f.n[1],tg=(wa.n+WR)*(q>=0?1:-1);if(t>=WT0+3&&t<=WT0+wb.len-3&&Math.abs(q-tg)<tol)c.push({x:px+(tg-q)*f.n[0],y:py+(tg-q)*f.n[1],err:Math.abs(q-tg)})}}
+      for(const r of S.racks){if(r.L!==L)continue;const f=rackFrame(r),rx=px-r.x,ry=py-r.y,t=rx*f.d[0]+ry*f.d[1],q=rx*f.m[0]+ry*f.m[1];if(Math.abs(t)<=r.len/2-3&&Math.abs(q-wa.n)<tol)c.push({x:px+(wa.n-q)*f.m[0],y:py+(wa.n-q)*f.m[1],err:Math.abs(q-wa.n)})}}
+    else if(wa.k==='w'){const f=wormFrame(a,wa);for(const b of S.axles){if(b===a)continue;const wb=b.w[L];if(!wb||wb.k!=='g')continue;const rx=b.x-px,ry=b.y-py,t=rx*f.d[0]+ry*f.d[1],q=rx*f.n[0]+ry*f.n[1],tg=(wb.n+WR)*(q>=0?1:-1);
+      if(t>=WT0+3&&t<=WT0+wa.len-3&&Math.abs(q-tg)<tol)c.push({x:px-(tg-q)*f.n[0],y:py-(tg-q)*f.n[1],err:Math.abs(q-tg)})}}}
+  if(circ_.length>=2){let best=null;for(let i=0;i<circ_.length;i++)for(let j=i+1;j<circ_.length;j++){if(circ_[i].b===circ_[j].b)continue;for(const q of circX(circ_[i].b.x,circ_[i].b.y,circ_[i].R,circ_[j].b.x,circ_[j].b.y,circ_[j].R)){const e=Math.hypot(q[0]-px,q[1]-py);if(e<tol*1.5&&(!best||e<best.e))best={x:q[0],y:q[1],e}}}if(best)return[best.x,best.y]}
+  if(c.length){c.sort((p,q)=>p.err-q.err);return[c[0].x,c[0].y]}return[px,py]}
+function snapRack(r,px,py){const tol=12/cam.s,f=rackFrame(r);let best=null;for(const a of S.axles){const w=a.w[r.L];if(!w||w.k!=='g')continue;const rx=a.x-px,ry=a.y-py,t=rx*f.d[0]+ry*f.d[1],q=rx*f.m[0]+ry*f.m[1];
+  if(Math.abs(t)<=r.len/2-3&&Math.abs(q-w.n)<tol&&(!best||Math.abs(q-w.n)<best.e))best={x:px+(q-w.n)*f.m[0],y:py+(q-w.n)*f.m[1],e:Math.abs(q-w.n)}}return best?[best.x,best.y]:[px,py]}
+
+/* ---------- hit tests ---------- */
+function hitTest(wx,wy){for(const a of S.axles)if(Math.hypot(a.x-wx,a.y-wy)*cam.s<11)return{t:'axle',a,L:[2,1,0].find(l=>a.w[l])??0};
+  for(let L=2;L>=0;L--){
+    for(const a of S.axles){const w=a.w[L];if(!w||w.k!=='w')continue;const f=wormFrame(a,w),rx=wx-a.x,ry=wy-a.y,t=rx*f.d[0]+ry*f.d[1],q=rx*f.n[0]+ry*f.n[1];if(t>=-7&&t<=WT0+w.len+5&&Math.abs(q)<=WR+3)return{t:'axle',a,L}}
+    for(const r of S.racks){if(r.L!==L)continue;const f=rackFrame(r),rx=wx-r.x,ry=wy-r.y,t=rx*f.d[0]+ry*f.d[1],q=rx*f.m[0]+ry*f.m[1];if(Math.abs(t)<=r.len/2&&q>=-2.5-RB-2&&q<=3)return{t:'rack',r}}
+    let best=null;for(const a of S.axles){const w=a.w[L];if(!w||w.k==='w')continue;const d=Math.hypot(a.x-wx,a.y-wy);if(d<outer(w)&&(!best||d<best.d))best={t:'axle',a,L,d}}if(best)return best}
+  return null}
+function hitBelt(wx,wy){const tol=6/cam.s;for(const bt of S.belts){const g=bt._g;if(!g||!g.segs)continue;for(const [p,q] of g.segs)if(segD(wx,wy,p,q)<tol)return bt}return null}
+function segD(x,y,p,q){const dx=q[0]-p[0],dy=q[1]-p[1],l=dx*dx+dy*dy||1;const t=clamp(((x-p[0])*dx+(y-p[1])*dy)/l,0,1);return Math.hypot(x-p[0]-t*dx,y-p[1]-t*dy)}
+
+/* ---------- interaction ---------- */
+function select(s){S.sel=s;selSig=null;updatePanels()}
+function setTool(t){S.tool=S.tool===t?'select':t;S.beltFrom=null;$('tBelt').setAttribute('aria-pressed',S.tool==='belt');$('tMeter').setAttribute('aria-pressed',S.tool==='meter');updatePanels()}
+function beltClick(wx,wy){const h=hitTest(wx,wy);if(!h||h.t!=='axle'){S.beltFrom=null;updatePanels();return}const a=h.a;
+  const L=a.w[h.L]&&a.w[h.L].k==='p'?h.L:[2,1,0].find(l=>a.w[l]&&a.w[l].k==='p');if(L==null){toast('Belts wrap around pulleys. Pick a pulley.');return}
+  if(!S.beltFrom){S.beltFrom={id:a.id,L};updatePanels();return}
+  const f=S.beltFrom;if(f.id===a.id){S.beltFrom=null;updatePanels();return}
+  let L2=L;if(f.L!==L){if(a.w[f.L]&&a.w[f.L].k==='p')L2=f.L;else{toast('Both pulleys must be on the same layer.');return}}
+  if(S.belts.some(b=>((b.a===f.id&&b.b===a.id)||(b.a===a.id&&b.b===f.id))&&b.L===L2)){toast('Those pulleys are already belted.');S.beltFrom=null;updatePanels();return}
+  const bt=belt(byId(f.id),a,L2,false);S.beltFrom=null;markCustom();solve();select({t:'belt',b:bt});toast('Belt added. Pick two more pulleys, or press Esc.')}
+let act=null;const sp=e=>{const r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]};
+cv.addEventListener('pointerdown',e=>{if(e.button>0)return;cv.setPointerCapture(e.pointerId);const [sx,sy]=sp(e),[wx,wy]=s2w(sx,sy);
+  if(S.tool==='belt'){beltClick(wx,wy);return}
+  if(S.tool==='meter'){const h=hitTest(wx,wy);if(h){const o=h.t==='rack'?h.r:h.a;o.meter=!o.meter;if(S.ro==='off')setRo('meters');toast(`Meter ${o.meter?'on':'off'} for ${h.t==='rack'?'rack '+o.name:o.motor?'the motor':o.name}`);updatePanels()}return}
+  const h=hitTest(wx,wy);
+  if(h&&h.t==='axle'){if(!S.sel||S.sel.t!=='axle'||S.sel.id!==h.a.id)select({t:'axle',id:h.a.id});act={k:'drag',a:h.a,ox:h.a.x-wx,oy:h.a.y-wy,sx,sy,moved:false};cv.classList.add('dragging');return}
+  if(h&&h.t==='rack'){if(!S.sel||S.sel.t!=='rack'||S.sel.id!==h.r.id)select({t:'rack',id:h.r.id});act={k:'rack',r:h.r,ox:h.r.x-wx,oy:h.r.y-wy,sx,sy,moved:false};cv.classList.add('dragging');return}
+  const bt=hitBelt(wx,wy);if(bt){select({t:'belt',b:bt});return}
+  if(S.sel)select(null);act={k:'pan',sx,sy,cx:cam.x,cy:cam.y};cv.classList.add('dragging')});
+cv.addEventListener('pointermove',e=>{const [sx,sy]=sp(e);ptr=[sx,sy];if(!act)return;
+  if(act.k==='drag'||act.k==='rack'){if(!act.moved&&Math.hypot(sx-act.sx,sy-act.sy)<3)return;act.moved=true;const [wx,wy]=s2w(sx,sy);
+    if(act.k==='drag'){const [nx,ny]=snapAxle(act.a,wx+act.ox,wy+act.oy);act.a.x=nx;act.a.y=ny}else{const [nx,ny]=snapRack(act.r,wx+act.ox,wy+act.oy);act.r.x=nx;act.r.y=ny}
+    markCustom();solve();schedPanels()}
+  else{cam.x=act.cx-(sx-act.sx)/cam.s;cam.y=act.cy-(sy-act.sy)/cam.s}});
+const endAct=()=>{if(act&&act.moved)updatePanels();act=null;cv.classList.remove('dragging')};
+cv.addEventListener('pointerup',endAct);cv.addEventListener('pointercancel',endAct);cv.addEventListener('pointerleave',()=>{if(!act)ptr=null});
+cv.addEventListener('wheel',e=>{e.preventDefault();const [sx,sy]=sp(e);zoomAt(Math.exp(-e.deltaY*.0015),sx,sy)},{passive:false});
+$('zIn').onclick=()=>zoomAt(1.25,W/2,H/2);$('zOut').onclick=()=>zoomAt(.8,W/2,H/2);$('zFit').onclick=fit;
+
+const PNAME={gear:'Gear',pulley:'Pulley',rack:'Rack',worm:'Worm drive',plan:'Planetary',diff:'Differential'};
+let pd=null,lastDrop=0;const ghost=$('ghost');
+document.querySelectorAll('.part').forEach(btn=>{
+  if(btn.dataset.tool){btn.addEventListener('click',()=>setTool(btn.dataset.tool));return}
+  btn.addEventListener('pointerdown',e=>{if(e.button>0)return;pd={type:btn.dataset.type,x:e.clientX,y:e.clientY,id:e.pointerId,moved:false}});
+  btn.addEventListener('click',()=>{if(Date.now()-lastDrop<400)return;addPart(btn.dataset.type)})});
+window.addEventListener('pointermove',e=>{if(!pd||e.pointerId!==pd.id)return;if(!pd.moved&&Math.hypot(e.clientX-pd.x,e.clientY-pd.y)>8){pd.moved=true;ghost.textContent=PNAME[pd.type];ghost.hidden=false}
+  if(pd.moved){ghost.style.left=e.clientX+'px';ghost.style.top=e.clientY+'px'}});
+window.addEventListener('pointerup',e=>{if(!pd)return;const d=pd;pd=null;ghost.hidden=true;if(!d.moved)return;lastDrop=Date.now();const r=cv.getBoundingClientRect();
+  if(e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom)addPart(d.type,s2w(e.clientX-r.left,e.clientY-r.top))});
+window.addEventListener('pointercancel',()=>{pd=null;ghost.hidden=true});
+
+$('selCard').addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;const act_=t.dataset.act,s=S.sel;if(!s||!act_)return;
+  if(s.t==='belt'){if(act_==='bopen'||act_==='bcross'){s.b.x=act_==='bcross';markCustom();solve();updatePanels()}else if(act_==='del')deleteSel();return}
+  if(s.t==='rack'){const r=rackById(s.id);if(!r)return;if(act_==='meter'){r.meter=!r.meter;if(r.meter&&S.ro==='off')setRo('meters');updatePanels();return}if(act_==='del'){deleteSel();return}
+    if(act_==='rflip')r.flip=!r.flip;else if(act_==='rlay')r.L=+t.dataset.v;markCustom();solve();updatePanels();return}
+  const a=byId(s.id);if(!a)return;const L=+t.dataset.l;
+  switch(act_){case 'rm':removeWheel(a,L);return;case 'up':swapW(a,L,L+1);updatePanels();return;case 'down':swapW(a,L,L-1);updatePanels();return;
+    case 'addg':a.w[L]=G(24);break;case 'addp':a.w[L]=Pu(60);break;case 'addw':a.w[L]=Wm();break;
+    case 'hand':a.w[L].hand=+t.dataset.v;break;case 'hold':a.mod.hold=t.dataset.v;break;case 'road':a.mod.road=t.dataset.v;break;
+    case 'meter':a.meter=!a.meter;if(a.meter&&S.ro==='off')setRo('meters');updatePanels();return;case 'del':deleteAxle(a);return;default:return}
+  if(act_.startsWith('add'))selSig=null;markCustom();solve();updatePanels();if(act_.startsWith('add')&&a.clash)toast('The new wheel overlaps another part on that layer. Move the shaft or change the size.')});
+$('selCard').addEventListener('input',e=>{const t=e.target,act_=t.dataset.act;if(!act_)return;const v=+t.value,L=+t.dataset.l,s=S.sel;if(!s)return;
+  if(s.t==='rack'){const r=rackById(s.id);if(!r)return;if(act_==='rlen')r.len=v;else if(act_==='rang')r.ang=v*Math.PI/180;markCustom();solve();updatePanels();return}
+  const a=byId(s.id);if(!a)return;
+  if(act_==='size')resizeWheel(a,L,v);
+  else if(act_==='wst')a.w[L].st=v;else if(act_==='wlen')a.w[L].len=v;else if(act_==='wdir')a.w[L].dir=v*Math.PI/180;else if(act_==='weta')a.w[L].eta=v;
+  else if(act_==='zs'||act_==='zp'){a.mod[act_]=v;const mn=modMin(a);if(a.w[1].n<mn)resizeWheel(a,1,mn)}
+  else if(act_==='turn')a.mod.turn=v/100;
+  markCustom();solve();updatePanels()});
+$('dtList').addEventListener('click',e=>{const b=e.target.closest('[data-node]');if(!b)return;const n=NODES.get(b.dataset.node);if(!n)return;select(n.kind==='lin'?{t:'rack',id:n.rack.id}:{t:'axle',id:n.ax.id})});
+
+$('mRpm').oninput=e=>{S.motor.rpm=+e.target.value;solve();updatePanels()};
+$('mTq').oninput=e=>{S.motor.tq=+e.target.value;solve();updatePanels()};
+$('mEff').oninput=e=>{S.motor.eff=+e.target.value;solve();updatePanels()};
+const setDir=d=>{S.motor.dir=d;$('dirCW').setAttribute('aria-pressed',d>0);$('dirCCW').setAttribute('aria-pressed',d<0);solve();updatePanels()};
+$('dirCW').onclick=()=>setDir(1);$('dirCCW').onclick=()=>setDir(-1);
+document.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{S.speed=+b.dataset.sp;document.querySelectorAll('[data-sp]').forEach(x=>x.setAttribute('aria-pressed',x===b))});
+function setRo(v){S.ro=v;document.querySelectorAll('[data-ro]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.ro===v))}
+document.querySelectorAll('[data-ro]').forEach(b=>b.onclick=()=>setRo(b.dataset.ro));
+document.querySelectorAll('[data-lay]').forEach(b=>b.onclick=()=>{S.layer=+b.dataset.lay;document.querySelectorAll('[data-lay]').forEach(x=>x.setAttribute('aria-pressed',x===b))});
+let armT=null;$('clearBtn').onclick=()=>{const b=$('clearBtn');if(!b.classList.contains('arm')){b.classList.add('arm');$('clearTxt').textContent='Click again to clear';armT=setTimeout(()=>{b.classList.remove('arm');$('clearTxt').textContent='Clear bench'},2500);return}
+  clearTimeout(armT);b.classList.remove('arm');$('clearTxt').textContent='Clear bench';S.axles=[];S.belts=[];S.racks=[];S.nextId=1;S.sel=null;S.beltFrom=null;newAxle(0,0,lay(F,G(12)),{motor:1,meter:1});S.preset='Custom build';solve();
+  cam.x=60;cam.y=0;cam.s=Math.min(5,W/250);zoomLbl();renderChips();select({t:'axle',id:motorAx().id});toast('Bench cleared. Tap a part to connect it to the motor.')};
+window.addEventListener('keydown',e=>{if(/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))return;
+  if(e.key==='Escape'){if(S.tool!=='select')setTool(S.tool);else select(null)}
+  else if((e.key==='Delete'||e.key==='Backspace')&&S.sel){e.preventDefault();deleteSel()}});
+function renderChips(){$('presetChips').innerHTML=Object.keys(PRESETS).map(n=>`<button class="chip" data-p="${n}" aria-pressed="${S.preset===n}">${n}</button>`).join('');
+  $('presetNote').textContent=PRESETS[S.preset]?PRESETS[S.preset].note:'Your own build. Pick an example to reset the bench.'}
+$('presetChips').addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(b)loadPreset(b.dataset.p)});
+let toastT=null;function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2800)}
+
+/* ---------- loop ---------- */
+let last=performance.now(),revToasts=0;
+function frame(t){const dt=Math.min(.05,(t-last)/1000);last=t;
+  if(S.speed>0){for(const n of NODES.values()){if(n.st!=='driven'||n.kind!=='rot')continue;n.ax.mem[n.mi].ang+=n.w*TAU/60*dt*S.speed}
+    for(const bt of S.belts){if(bt.bad)continue;const a=byId(bt.a);if(!a)continue;const n=NODES.get(nk(a,bt.L));if(n&&n.st==='driven'&&a.w[bt.L])bt.off+=n.w*TAU/60*radius(a.w[bt.L])*dt*S.speed}
+    let rev=false;for(const r of S.racks){const n=NODES.get('r'+r.id);if(!n||n.st!=='driven')continue;const v=mmS(n);if(!v)continue;const f=rackFrame(r),step=v*dt*S.speed;r.x+=f.d[0]*step;r.y+=f.d[1]*step;
+      for(const e of ADJ.get(n.key)||[]){if(e.t!=='rack')continue;const tt=(e.a.x-r.x)*f.d[0]+(e.a.y-r.y)*f.d[1];if((v>0&&tt<-r.len/2+8)||(v<0&&tt>r.len/2-8))rev=true}}
+    if(rev){setDir(-S.motor.dir);if(revToasts++<2)toast('The rack reached the end of its travel, so the motor reversed.')}}
+  draw();requestAnimationFrame(frame)}
+if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){S.speed=.25;document.querySelectorAll('[data-sp]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.sp==='0.25'))}
+resize();loadPreset('Differential');requestAnimationFrame(frame);
+})();
+</script>

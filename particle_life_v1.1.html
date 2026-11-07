@@ -72,6 +72,13 @@ input[type=range]{width:100%;accent-color:var(--blue5);margin:0}
 .toggles{display:flex;flex-direction:column;gap:9px;font-size:12px}
 .tog{display:flex;align-items:center;justify-content:space-between;gap:10px;color:var(--g300);cursor:pointer}
 .tog input{width:16px;height:16px;accent-color:var(--emerald5);cursor:pointer;margin:0}
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.trow{display:flex;align-items:center;gap:6px;background:var(--g800);border:1px solid var(--g700);border-radius:8px;padding:3px 4px 3px 8px;min-width:0}
+.trow[aria-pressed=true]{border-color:var(--purple4);background:#9333ea33}
+.trow button{flex:1;display:flex;align-items:center;gap:6px;background:none;border:0;color:var(--g200);font-size:11.5px;font-weight:600;cursor:pointer;padding:3px 0;text-align:left;min-width:0;overflow:hidden;white-space:nowrap}
+.trow i{width:9px;height:9px;border-radius:50%;flex:none;box-shadow:0 0 6px currentColor}
+.trow input{width:58px;flex:none;background:var(--g950);border:1px solid var(--g700);border-radius:6px;padding:3px 5px;font:12px var(--f-mono);color:var(--blue3);text-align:right}
+.scale.rng{background:linear-gradient(to right,#0b1220,#60a5fa)}
 .keys{font:10px/1.7 var(--f-mono);color:var(--g500);padding:0 4px;margin-top:-6px}
 /* matrix */
 .mx{display:grid;gap:3px;user-select:none;-webkit-user-select:none}
@@ -139,24 +146,28 @@ main{flex:1;display:flex;min-width:0;background:#11182780;padding:8px}
       <section class="card">
         <div class="card-h"><span class="t"><svg class="i c-purple" viewBox="0 0 24 24" fill="currentColor"><circle cx="7" cy="8" r="3"/><circle cx="17" cy="8" r="3"/><circle cx="12" cy="17" r="3"/></svg>Particle types</span><span class="pill" id="kPill">4 types</span></div>
         <label class="ctl"><span>Types</span><input type="range" id="kIn" min="1" max="10" step="1" value="4"><output id="oK">4</output></label>
-        <label class="ctl"><span>Particles</span><input type="range" id="nIn" min="100" max="5000" step="50" value="1500"><output id="oN">1500</output></label>
-        <div class="chips" id="typeChips"></div>
-        <p class="muted">Each type gets its own color. Changing the number of types re-deals colors to the existing particles.</p>
+        <label class="ctl"><span>Total</span><input type="range" id="nIn" min="0" max="5000" step="10" value="1500"><output id="oN">1500</output></label>
+        <div class="tgrid" id="typeChips"></div>
+        <div class="seg wide" id="layoutSeg"><button data-l="spread" aria-pressed="true">Start spread out</button><button data-l="cluster" aria-pressed="false">Start clustered</button></div>
+        <p class="muted">Type a number to set how many of each type. Tap a color to paint with it. Changing the number of types re-deals colors evenly.</p>
       </section>
 
       <section class="card">
         <div class="card-h"><span class="t"><svg class="i c-emerald" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Attraction matrix</span><span class="pill">drag cells ↕</span></div>
+        <div class="seg wide" id="viewSeg"><button data-v="str" aria-pressed="true">Strength</button><button data-v="rng" aria-pressed="false">Range</button></div>
         <div class="mxlab"><span>row feels →</span><span>column ↓ reacts to</span></div>
         <div class="mx" id="mx"></div>
-        <div class="scale"></div>
-        <div class="mxlab"><span>−1 repel</span><span>0</span><span>+1 attract</span></div>
-        <div class="btns4"><button class="btn" id="mRand">Random</button><button class="btn" id="mSym">Symmetrize</button><button class="btn" id="mInv">Invert</button><button class="btn" id="mZero">Clear</button></div>
+        <div class="scale" id="mxScale"></div>
+        <div class="mxlab" id="mxLab"><span>−1 repel</span><span>0</span><span>+1 attract</span></div>
+        <div class="btns4" id="mBtns"><button class="btn" id="mRand">Random</button><button class="btn" id="mSym">Symmetrize</button><button class="btn" id="mInv">Invert</button><button class="btn" id="mZero">Clear</button></div>
+        <div class="btns2" id="rBtns" hidden><button class="btn" id="rAll">All full range</button><button class="btn" id="rRand">Random ranges</button></div>
       </section>
 
       <section class="card">
         <div class="card-h"><span class="t"><svg class="i c-amber" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>Selected rule</span><span class="pill" id="pairPill">row · col</span></div>
         <div class="pairhd"><i id="pA"></i><span id="pAn">Red</span><span class="arrow">feels</span><i id="pB"></i><span id="pBn">Orange</span><span class="verdict neu" id="verdict">neutral</span></div>
         <label class="ctl"><span>Strength</span><input type="range" id="mVal" min="-1" max="1" step="0.01" value="0"><output id="oVal">0.00</output></label>
+        <label class="ctl"><span>Range</span><input type="range" id="rgVal" min="0.1" max="1" step="0.05" value="1"><output id="oRg">1.00</output></label>
         <canvas id="curve"></canvas>
         <p class="desc" id="recip"></p>
         <div class="btns2"><button class="btn" id="pMirror">Mirror (equal &amp; same)</button><button class="btn" id="pChase">Opposite (chase)</button></div>
@@ -203,13 +214,14 @@ main{flex:1;display:flex;min-width:0;background:#11182780;padding:8px}
 
       <section class="card">
         <div class="card-h"><span class="t"><svg class="i c-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>How it works</span></div>
-        <p class="desc">Every particle is a hard ball, like a billiard ball: balls bounce off each other and can never overlap. Each ball also looks at its neighbors within <b>r<sub>max</sub></b>, and the matrix decides how it reacts. A positive number pulls the row type toward the column type; a negative one pushes it away, hardest up close and fading with distance. Inside the core (<b>β·r<sub>max</sub></b>) every pair pushes apart a little. Friction slowly bleeds off speed.</p>
+        <p class="desc">Every particle is a hard ball, like a billiard ball: balls bounce off each other and can never overlap. Each ball also looks at its neighbors within <b>r<sub>max</sub></b>, and the matrix decides how it reacts. A positive number pulls the row type toward the column type; a negative one pushes it away. Either way the push or pull is strongest at the edge of the core and fades to zero at the end of the rule's <b>range</b>, which can be any fraction of <b>r<sub>max</sub></b>. The core grows and shrinks with the range. Inside the core (<b>β × range</b>) every pair pushes apart a little. Friction slowly bleeds off speed.</p>
         <p class="desc">The rules don't have to be fair: red can chase blue while blue runs from red. That broken symmetry is what makes cells, worms and swarms appear from a handful of numbers.</p>
         <ul class="tips">
           <li>Set one type to attract itself (+1) and ignore everything else. What shape forms?</li>
           <li>Load <b>Symmetric</b>, then <b>Chase ring</b>. Watch the drift readout.</li>
           <li>Shrink the core size β. When do clusters collapse into crystals?</li>
           <li>Set every rule to −1. Do the balls spread out evenly?</li>
+          <li>Load <b>Atom</b>, then add electrons or protons. When does the atom lose an electron?</li>
         </ul>
       </section>
 
@@ -239,10 +251,10 @@ const $=id=>document.getElementById(id);
 
 // ---------- state ----------
 let K=4, N=1500;
-const M=new Float32Array(MAXK*MAXK);
+const M=new Float32Array(MAXK*MAXK),RG=new Float32Array(MAXK*MAXK).fill(1);
 const px=new Float32Array(MAXN),py=new Float32Array(MAXN),vx=new Float32Array(MAXN),vy=new Float32Array(MAXN),tp=new Uint8Array(MAXN);
 const P={rMax:.1,beta:.3,force:10,fric:.5,speed:1,size:2.5,wrap:true,trails:false,glow:true,brush:.18,tstr:6};
-let WW=1.6, running=true, sel=[0,1], tool='pull', paintType=0;
+let WW=1.6, running=true, sel=[0,1], tool='pull', paintType=0, mview='str', layout='spread';
 const brush={on:false,hover:false,x:0,y:0};
 let cw=0,ch=0,dpr=1,spr=[],sprD=0;
 const cv=$('cv'), ctx=cv.getContext('2d'), vp=$('vp');
@@ -252,8 +264,22 @@ const halfLife=()=>0.005*Math.pow(60,1-P.fric)+(P.fric>=1?0:0); // fric 0 → 0.
 function rgba(h,a){const n=parseInt(h.slice(1),16);return `rgba(${n>>16},${n>>8&255},${n&255},${a})`}
 
 // ---------- particles ----------
-function spawn(i){px[i]=Math.random()*WW;py[i]=Math.random();vx[i]=vy[i]=0;tp[i]=(Math.random()*K)|0}
-function respawn(){for(let i=0;i<N;i++)spawn(i)}
+// Radius of the starting blob for a clustered start: roughly packs n balls.
+function clusterR(n){return Math.max(.03,Math.sqrt(Math.max(n,1))*(ch?P.size/ch:.003)*1.4)}
+function place(i,rc){
+  if(layout==='cluster'){const a=Math.random()*6.2832,r=rc*Math.sqrt(Math.random());px[i]=WW/2+Math.cos(a)*r;py[i]=.5+Math.sin(a)*r}
+  else{px[i]=Math.random()*WW;py[i]=Math.random()}
+  vx[i]=vy[i]=0;
+}
+function spawn(i){tp[i]=(Math.random()*K)|0;place(i,clusterR(N))}
+function respawn(){const rc=clusterR(N);for(let i=0;i<N;i++)place(i,rc)}
+function typeCounts(){const c=new Array(K).fill(0);for(let i=0;i<N;i++)c[tp[i]]++;return c}
+function setTypeCount(t,n){
+  n=Math.max(0,n|0);let cur=typeCounts()[t];
+  if(n>cur){const rc=clusterR(N+n-cur);for(;cur<n&&N<MAXN;cur++){const i=N++;tp[i]=t;place(i,rc)}}
+  else for(let i=N-1;i>=0&&cur>n;i--)if(tp[i]===t){const l=--N;px[i]=px[l];py[i]=py[l];vx[i]=vx[l];vy[i]=vy[l];tp[i]=tp[l];cur--}
+  syncN();
+}
 function setN(n){n=Math.max(0,Math.min(MAXN,n|0));for(let i=N;i<n;i++)spawn(i);N=n}
 function setK(k){
   const old=K;K=k;
@@ -266,6 +292,9 @@ function setK(k){
 // ---------- matrix presets ----------
 const set=(i,j,v)=>{M[i*MAXK+j]=v};
 const get=(i,j)=>M[i*MAXK+j];
+const setR=(i,j,v)=>{RG[i*MAXK+j]=v};
+const getR=(i,j)=>RG[i*MAXK+j];
+function setSlider(id,out,key,v,fmt){P[key]=v;$(id).value=v;$(out).value=fmt(v)}
 const PRESETS=[
  {id:'random',name:'Random',desc:'<b>Random:</b> every rule drawn at random from −1 to +1. Most random worlds hold at least one surprise — hit it a few times.',
   f(){for(let i=0;i<K;i++)for(let j=0;j<K;j++)set(i,j,+rnd(-1,1).toFixed(2))}},
@@ -279,6 +308,17 @@ const PRESETS=[
   f(){for(let i=0;i<K;i++)for(let j=0;j<K;j++)set(i,j,i===j?1:(j===(i+1)%K?0.2:0))}},
  {id:'chase',name:'Chase ring',desc:'<b>Chase ring:</b> each type hunts the next color (+0.8) and flees the previous one (−0.6). A rock-paper-scissors loop that never settles.',
   f(){for(let i=0;i<K;i++)for(let j=0;j<K;j++)set(i,j,i===j?0.4:(j===(i+1)%K?0.8:(j===(i-1+K)%K?-0.6:0)))}},
+ {id:'atom',name:'Atom',keepRange:true,desc:'<b>Atom:</b> <b style="color:#f87171">Red = protons</b>, <b style="color:#60a5fa">Blue = neutrons</b>, <b style="color:#4ade80">Green = electrons</b>. It starts as carbon, with 6 of each. Protons and neutrons attract each other at short range (0.4), like the strong force, and pack into a nucleus. Electrons are pulled toward protons from far away (range 1.0) but pushed back by the core, so they settle in a shell. Electrons repel each other, so they spread out around it. Change the counts to build other elements or ions.',
+  f(){
+    $('kIn').value=3;$('oK').value=3;setK(3);
+    setSlider('rIn','oR','rMax',.2,v=>v.toFixed(3));setSlider('bIn','oB','beta',.3,v=>v.toFixed(2));
+    setSlider('fIn','oF','force',10,v=>v.toFixed(1));setSlider('hIn','oH','fric',.5,v=>v.toFixed(2));
+    if(P.size<4){setSlider('sIn','oS','size',4,v=>v.toFixed(2));buildSprites()}
+    const m=[[.3,1,.1],[1,1,0],[.8,0,-.6]],r=[[.4,.4,1],[.4,.4,1],[1,1,1]];
+    for(let i=0;i<3;i++)for(let j=0;j<3;j++){set(i,j,m[i][j]);setR(i,j,r[i][j])}
+    N=0;for(let t=0;t<3;t++)for(let q=0;q<6;q++)tp[N++]=t;
+    setLayout('cluster',false);respawn();syncN();sel=[2,0];buildTypes();buildMatrix();
+  }},
  {id:'cells',name:'Cells',desc:'<b>Cells:</b> type 1 forms a tight nucleus; the others wrap around it and around each other in layers, like a membrane. Works best with 3–5 types.',
   f(){for(let i=0;i<K;i++)for(let j=0;j<K;j++){let v;if(i===j)v=i===0?1:0.5;else if(Math.abs(i-j)===1)v=i<j?0.3:0.6;else v=-0.2;set(i,j,v)}}},
 ];
@@ -315,7 +355,7 @@ function collide(){
   if(nbYc.length<ny){nbY=new Int32Array(ny*3);nbYc=new Uint8Array(ny)}
   neighbors(nx,wrap,nbX,nbXc);neighbors(ny,wrap,nbY,nbYc);
   buildGrid(nx,ny,nc);
-  for(let it=0;it<8;it++){
+  for(let it=0;it<14;it++){
     let moved=false;
     for(let i=0;i<N;i++){
       const c=cellOf[i],cx=c%nx,cy=(c-cx)/nx;
@@ -372,9 +412,10 @@ function step(dt){
           let dx=px[j]-xi,dy=py[j]-yi;
           if(wrap){if(dx>hW)dx-=WW;else if(dx<-hW)dx+=WW;if(dy>.5)dy-=1;else if(dy<-.5)dy+=1}
           const d2=dx*dx+dy*dy;if(d2>=rm2||d2===0)continue;
-          const r=Math.sqrt(d2),rr=r/rMax;let f;
-          if(rr<beta)f=rr*ib-1;
-          else{const s=M[ti+tp[j]];if(s===0)continue;f=s<0?s*(1-rr)*i1b:s*(1-Math.abs(2*rr-1-beta)*i1b)}
+          const s=M[ti+tp[j]],rp=rMax*RG[ti+tp[j]];if(d2>=rp*rp)continue;
+          const r=Math.sqrt(d2),rr=r/rp;let f;
+          if(rr<beta)f=rr*ib*(1+s)-1; // core: -1 at contact, ramps to where the rule's force starts
+          else{if(s===0)continue;f=s*(1-rr)*i1b}
           f/=r;ax+=dx*f;ay+=dy*f;
         }
       }
@@ -426,7 +467,7 @@ function brushEdits(){
     if(changed)syncN();
   }
 }
-function syncN(){$('nIn').value=Math.min(5000,N);$('oN').value=N}
+function syncN(){$('nIn').value=Math.min(5000,N);$('oN').value=N;refreshCounts()}
 
 // ---------- rendering ----------
 function buildSprites(){
@@ -451,16 +492,17 @@ function render(){
 function drawCurve(){
   const c=$('curve'),w=c.clientWidth,h=c.clientHeight;if(!w)return;
   c.width=w*dpr;c.height=h*dpr;const g=c.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);
-  const a=get(sel[0],sel[1]),b=P.beta,L=28,R=w-10,T=12,B=h-20,X=r=>L+(R-L)*r/1.1,Y=f=>T+(B-T)*(1-f)/2;
+  const a=get(sel[0],sel[1]),gr=getR(sel[0],sel[1]),b=P.beta*gr,L=28,R=w-10,T=12,B=h-20,X=r=>L+(R-L)*r/1.1,Y=f=>T+(B-T)*(1-f)/2;
   g.font='10px ui-monospace,Menlo,monospace';
   g.fillStyle='#e11d4818';g.fillRect(X(0),T,X(b)-X(0),B-T);
   g.strokeStyle='#374151';g.lineWidth=1;g.beginPath();g.moveTo(L,Y(0));g.lineTo(R,Y(0));g.moveTo(L,T);g.lineTo(L,B);g.stroke();
-  g.setLineDash([3,3]);g.beginPath();g.moveTo(X(b),T);g.lineTo(X(b),B);g.moveTo(X(1),T);g.lineTo(X(1),B);g.stroke();g.setLineDash([]);
-  g.fillStyle='#6b7280';g.textAlign='center';g.fillText('β·r',X(b),h-6);g.fillText('r max',X(1),h-6);g.fillText('0',X(0),h-6);
+  g.setLineDash([3,3]);g.beginPath();g.moveTo(X(b),T);g.lineTo(X(b),B);g.moveTo(X(1),T);g.lineTo(X(1),B);if(gr<.97){g.moveTo(X(gr),T);g.lineTo(X(gr),B)}g.stroke();g.setLineDash([]);
+  g.fillStyle='#6b7280';g.textAlign='center';g.fillText('core',Math.max(X(b),L+30),h-6);g.fillText('r max',X(1),h-6);g.fillText('0',X(0),h-6);
+  if(gr<.97&&X(1)-X(gr)>34&&X(gr)-Math.max(X(b),L+30)>34){g.fillStyle='#93c5fd';g.fillText('range',X(gr),h-6)}
   g.textAlign='right';g.fillText('+1',L-4,Y(1)+4);g.fillText('−1',L-4,Y(-1)+3);
   g.textAlign='left';g.fillStyle='#34d39999';g.fillText('attract',L+4,T+8);g.fillStyle='#fb718599';g.fillText('repel',L+4,B-3);
   // curve
-  const f=r=>r<b?r/b-1:(r<1?(a<0?a*(1-r)/(1-b):a*(1-Math.abs(2*r-1-b)/(1-b))):0);
+  const f=r=>r<b?(r/b)*(1+a)-1:(r<gr?a*(1-r/gr)/(1-P.beta):0);
   g.lineWidth=2;g.beginPath();
   for(let k=0;k<=220;k++){const r=1.1*k/220,y=Y(f(r));k?g.lineTo(X(r),y):g.moveTo(X(r),y)}
   const grad=g.createLinearGradient(0,T,0,B);grad.addColorStop(0,'#34d399');grad.addColorStop(.5,'#9ca3af');grad.addColorStop(1,'#fb7185');
@@ -482,9 +524,11 @@ function buildMatrix(){
 function paintMatrix(){
   const showNum=K<=7;
   mx.querySelectorAll('.cell').forEach(b=>{
-    const i=+b.dataset.i,j=+b.dataset.j,v=get(i,j);
+    const i=+b.dataset.i,j=+b.dataset.j;
+    if(mview==='rng'){const v=getR(i,j);b.style.background=`rgba(96,165,250,${(.1+.75*v).toFixed(3)})`;b.textContent=showNum?v.toFixed(1).replace(/^0/,''):''}
+    else{const v=get(i,j);
     b.style.background=v>=0?`rgba(52,211,153,${(Math.abs(v)*.85).toFixed(3)})`:`rgba(251,113,133,${(Math.abs(v)*.85).toFixed(3)})`;
-    b.textContent=showNum?(v===0?'0':(v>0?'+':'−')+Math.abs(v).toFixed(1).replace(/^0/,'')):'';
+    b.textContent=showNum?(Math.abs(v)<.05?'0':(v>0?'+':'−')+Math.abs(v).toFixed(1).replace(/^0/,'')):'';}
     b.classList.toggle('sel',i===sel[0]&&j===sel[1]);
   });
   updatePair();
@@ -495,6 +539,7 @@ function updatePair(){
   $('pAn').textContent=NAMES[i];$('pBn').textContent=i===j?NAMES[j]+' (itself)':NAMES[j];
   $('pairPill').textContent=`row ${i+1} · col ${j+1}`;
   $('mVal').value=v;$('oVal').value=(v>=0?'+':'')+v.toFixed(2);
+  const rg=getR(i,j);$('rgVal').value=rg;$('oRg').value=rg.toFixed(2);
   const vd=$('verdict');vd.className='verdict '+(v>0.02?'att':v<-0.02?'rep':'neu');vd.textContent=v>0.02?'attracts':v<-0.02?'repels':'ignores';
   const fmt=x=>(x>=0?'+':'−')+Math.abs(x).toFixed(2);
   $('recip').innerHTML=i===j?`This is how <b>${NAMES[i]}</b> treats its own kind. Positive values make it clump; negative values spread it out.`:
@@ -513,22 +558,35 @@ function updateSym(){
 let drag=null;
 mx.addEventListener('pointerdown',e=>{
   const b=e.target.closest('.cell');if(!b)return;e.preventDefault();
-  sel=[+b.dataset.i,+b.dataset.j];drag={y:e.clientY,v:get(sel[0],sel[1]),id:e.pointerId};
+  sel=[+b.dataset.i,+b.dataset.j];drag={y:e.clientY,v:mview==='rng'?getR(sel[0],sel[1]):get(sel[0],sel[1]),id:e.pointerId};
   try{b.setPointerCapture(e.pointerId)}catch(_){}paintMatrix();
 });
 mx.addEventListener('pointermove',e=>{
   if(!drag||e.pointerId!==drag.id)return;
-  const v=Math.max(-1,Math.min(1,drag.v+(drag.y-e.clientY)/90));
-  set(sel[0],sel[1],Math.round(v*100)/100);paintMatrix();clearPreset();
+  if(mview==='rng'){const v=Math.max(.1,Math.min(1,drag.v+(drag.y-e.clientY)/180));setR(sel[0],sel[1],Math.round(v*100)/100)}
+  else{const v=Math.max(-1,Math.min(1,drag.v+(drag.y-e.clientY)/90));set(sel[0],sel[1],Math.round(v*100)/100)}
+  paintMatrix();clearPreset();
 });
 const endDrag=()=>{drag=null};
 mx.addEventListener('pointerup',endDrag);mx.addEventListener('pointercancel',endDrag);
 mx.addEventListener('wheel',e=>{
   const b=e.target.closest('.cell');if(!b)return;e.preventDefault();
   sel=[+b.dataset.i,+b.dataset.j];
-  set(sel[0],sel[1],Math.round(Math.max(-1,Math.min(1,get(sel[0],sel[1])-Math.sign(e.deltaY)*.05))*100)/100);paintMatrix();clearPreset();
+  if(mview==='rng')setR(sel[0],sel[1],Math.round(Math.max(.1,Math.min(1,getR(sel[0],sel[1])-Math.sign(e.deltaY)*.05))*100)/100);
+  else set(sel[0],sel[1],Math.round(Math.max(-1,Math.min(1,get(sel[0],sel[1])-Math.sign(e.deltaY)*.05))*100)/100);
+  paintMatrix();clearPreset();
 },{passive:false});
 $('mVal').addEventListener('input',e=>{set(sel[0],sel[1],+e.target.value);paintMatrix();clearPreset()});
+$('rgVal').addEventListener('input',e=>{setR(sel[0],sel[1],+e.target.value);paintMatrix();clearPreset()});
+function setView(v){
+  mview=v;$('viewSeg').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v));
+  $('mxScale').classList.toggle('rng',v==='rng');$('mBtns').hidden=v==='rng';$('rBtns').hidden=v!=='rng';
+  $('mxLab').innerHTML=v==='rng'?'<span>0.1 short</span><span>1.0 = full r max</span>':'<span>−1 repel</span><span>0</span><span>+1 attract</span>';
+  paintMatrix();
+}
+$('viewSeg').onclick=e=>{const b=e.target.closest('button');if(b)setView(b.dataset.v)};
+$('rAll').onclick=()=>{for(let i=0;i<K;i++)for(let j=0;j<K;j++)setR(i,j,1);paintMatrix();clearPreset();toast('All ranges set to full r max')};
+$('rRand').onclick=()=>{for(let i=0;i<K;i++)for(let j=0;j<K;j++)setR(i,j,Math.round(rnd(.2,1)*20)/20);paintMatrix();clearPreset();toast('Ranges randomized')};
 $('pMirror').onclick=()=>{set(sel[1],sel[0],get(sel[0],sel[1]));paintMatrix();clearPreset();toast('Reverse rule set equal')};
 $('pChase').onclick=()=>{set(sel[1],sel[0],-get(sel[0],sel[1]));paintMatrix();clearPreset();toast('Reverse rule set opposite')};
 $('mRand').onclick=()=>applyPreset('random');
@@ -541,7 +599,9 @@ const pc=$('presetChips');
 pc.innerHTML=PRESETS.map(p=>`<button class="chip" data-p="${p.id}" aria-pressed="false">${p.name}</button>`).join('');
 pc.onclick=e=>{const b=e.target.closest('.chip');if(b)applyPreset(b.dataset.p)};
 function applyPreset(id){
-  const p=PRESETS.find(x=>x.id===id);p.f();
+  const p=PRESETS.find(x=>x.id===id);
+  if(!p.keepRange)RG.fill(1);
+  p.f();
   pc.querySelectorAll('.chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.p===id));
   $('presetDesc').innerHTML=p.desc;paintMatrix();toast(p.name+' rules loaded');
 }
@@ -549,13 +609,18 @@ function clearPreset(){pc.querySelectorAll('.chip').forEach(b=>b.setAttribute('a
 
 // ---------- UI: types ----------
 function buildTypes(){
-  $('typeChips').innerHTML=Array.from({length:K},(_,t)=>`<button class="chip" data-t="${t}" aria-pressed="${t===paintType}"><i style="background:${COLORS[t]};color:${COLORS[t]}"></i>${NAMES[t]}</button>`).join('');
+  const c=typeCounts();
+  $('typeChips').innerHTML=Array.from({length:K},(_,t)=>`<div class="trow" aria-pressed="${t===paintType}"><button data-t="${t}" title="Paint with ${NAMES[t]}"><i style="background:${COLORS[t]};color:${COLORS[t]}"></i>${NAMES[t]}</button><input type="number" min="0" max="${MAXN}" step="1" data-t="${t}" value="${c[t]}" aria-label="Number of ${NAMES[t]} particles"></div>`).join('');
   $('legend').innerHTML=Array.from({length:K},(_,t)=>`<div class="lg"><i style="background:${COLORS[t]};color:${COLORS[t]}"></i>${NAMES[t]}</div>`).join('');
   $('kPill').textContent=K+(K===1?' type':' types');
 }
-$('typeChips').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;paintType=+b.dataset.t;buildTypes();if(tool!=='paint')setTool('paint')};
+$('typeChips').onclick=e=>{const b=e.target.closest('button');if(!b)return;paintType=+b.dataset.t;buildTypes();setTool('paint')};
+$('typeChips').addEventListener('change',e=>{const inp=e.target.closest('input');if(!inp)return;const v=Math.max(0,Math.min(MAXN,Math.round(+inp.value||0)));setTypeCount(+inp.dataset.t,v);inp.value=typeCounts()[+inp.dataset.t];clearPreset()});
+function refreshCounts(){const c=typeCounts();$('typeChips').querySelectorAll('input').forEach(inp=>{if(document.activeElement!==inp)inp.value=c[+inp.dataset.t]})}
+function setLayout(l,doRespawn=true){layout=l;$('layoutSeg').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.l===l));if(doRespawn){respawn();toast(l==='cluster'?'Respawned in a cluster':'Respawned spread out')}}
+$('layoutSeg').onclick=e=>{const b=e.target.closest('button');if(b)setLayout(b.dataset.l)};
 $('kIn').addEventListener('input',e=>{setK(+e.target.value);$('oK').value=K;buildTypes();buildMatrix();clearPreset()});
-$('nIn').addEventListener('input',e=>{setN(+e.target.value);$('oN').value=N});
+$('nIn').addEventListener('input',e=>{setN(+e.target.value);$('oN').value=N;refreshCounts()});
 
 // ---------- UI: physics ----------
 const bind=(id,out,key,fmt,after)=>{const el=$(id);el.addEventListener('input',()=>{P[key]=+el.value;$(out).value=fmt(P[key]);after&&after()})};
@@ -597,6 +662,7 @@ function setRunning(r){
 $('playBtn').onclick=()=>setRunning(!running);
 $('respawnBtn').onclick=()=>{respawn();toast('Particles respawned')};
 document.addEventListener('keydown',e=>{
+  if(e.target.closest('input[type=number],input[type=text],textarea'))return;
   if(e.target.closest('input,button,select'))if(e.key===' ')return;
   if(e.metaKey||e.ctrlKey||e.altKey)return;
   const k=e.key.toLowerCase();
