@@ -1,0 +1,704 @@
+<title>Optics Bench</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: same shell as Logic Gate Designer and Phase Change Piston — header bar, 384px control rail, framed 2D bench viewport with floating glass overlays. Dark-only by design (laser light reads best on black). */
+:root{color-scheme:dark;
+--g950:#030712;--g900:#111827;--g800:#1f2937;--g700:#374151;--g600:#4b5563;--g500:#6b7280;--g400:#9ca3af;--g300:#d1d5db;--g200:#e5e7eb;--g100:#f3f4f6;
+--blue7:#1d4ed8;--blue6:#2563eb;--blue5:#3b82f6;--blue4:#60a5fa;--blue3:#93c5fd;
+--purple6:#9333ea;--purple4:#c084fc;--pink4:#f472b6;
+--emerald6:#059669;--emerald5:#10b981;--emerald4:#34d399;
+--amber3:#fcd34d;--amber4:#fbbf24;--rose4:#fb7185;--rose6:#e11d48;
+--f-sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+--f-mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--g950);color:var(--g100);font-family:var(--f-sans);font-size:14px;display:flex;flex-direction:column;overflow:hidden}
+*,*:before,*:after{box-sizing:border-box}
+button,select,output,input{font:inherit;color:inherit}
+button:focus-visible,input:focus-visible{outline:2px solid var(--blue5);outline-offset:2px}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:var(--g900)}::-webkit-scrollbar-thumb{background:var(--g700);border-radius:3px}
+svg.i{width:14px;height:14px;flex:none}
+header{background:var(--g900);border-bottom:1px solid var(--g800);padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;flex:none}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{background:linear-gradient(to top right,var(--blue6),var(--purple6));padding:8px;border-radius:8px;box-shadow:0 10px 15px -3px #0006;display:grid;place-items:center}
+.logo svg{width:20px;height:20px;color:#fff}
+h1{margin:0;font-size:18px;font-weight:700;line-height:1.4;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+h1 .grad{background:linear-gradient(to right,var(--blue4),var(--purple4),var(--pink4));-webkit-background-clip:text;background-clip:text;color:transparent}
+.badge-v{font-size:12px;font-weight:600;padding:2px 8px;border-radius:4px;background:#1e3a8a99;color:var(--blue3);border:1px solid var(--blue7)}
+.hctl{display:flex;align-items:center;flex-wrap:wrap;justify-content:flex-end;gap:12px}
+.seg{display:flex;align-items:center;background:var(--g800);border:1px solid var(--g700);border-radius:8px;padding:4px;font-size:12px;flex-wrap:wrap}
+.seg .lbl{color:var(--g400);padding:0 8px;font-weight:500}
+.seg button{background:transparent;border:0;padding:4px 10px;border-radius:4px;color:var(--g300);cursor:pointer;transition:color .15s,background .15s}
+.seg button:hover{color:#fff}
+.seg button[aria-pressed=true]{background:var(--blue6);color:#fff;font-weight:600;box-shadow:0 1px 3px #0006}
+.seg.wide{display:grid;grid-auto-flow:column;grid-auto-columns:1fr}
+.btn-clear{background:var(--g700);color:var(--g100);border:0;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;cursor:pointer;transition:background .15s}
+.btn-clear:hover{background:var(--g600)}
+.btn-clear.arm{background:var(--rose6);color:#fff}
+.row{flex:1;display:flex;overflow:hidden;min-height:0;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+aside{width:384px;background:var(--g900);border-right:1px solid var(--g800);overflow-y:auto;flex:none}
+.stack{padding:16px;display:flex;flex-direction:column;gap:14px}
+.card{background:#1f293799;padding:14px;border-radius:12px;border:1px solid rgba(55,65,81,.6);display:flex;flex-direction:column;gap:12px}
+.card-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card-h .t{font-size:12px;font-weight:700;color:var(--g200);text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:8px}
+.pill{font-size:10px;background:var(--g700);color:var(--g300);padding:2px 8px;border-radius:999px;font-family:var(--f-mono);white-space:nowrap}
+.c-blue{color:var(--blue4)}.c-purple{color:var(--purple4)}.c-emerald{color:var(--emerald4)}.c-amber{color:var(--amber3)}.c-pink{color:var(--pink4)}
+.grp{font:600 10px var(--f-mono);color:var(--g500);text-transform:uppercase;letter-spacing:.08em;margin:0 0 -4px}
+.parts{display:grid;gap:6px}
+.parts.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.parts.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.part{display:flex;flex-direction:column;align-items:center;gap:5px;padding:9px 4px 7px;background:var(--g800);border:1px solid var(--g700);border-radius:8px;color:var(--g200);font-size:10.5px;font-weight:600;cursor:grab;touch-action:pan-y;transition:border-color .15s,background .15s;user-select:none;-webkit-user-select:none;text-align:center;line-height:1.2}
+.part:hover{border-color:var(--blue5);background:#1e293b}
+.part svg{width:40px;height:24px;color:var(--g300)}
+.part:hover svg{color:var(--blue3)}
+.muted{color:var(--g500);font-size:11px;margin:0;line-height:1.5}
+.selname{font-size:20px;font-weight:700;color:#fff;margin:0;line-height:1.2}
+.desc{font-size:12px;color:var(--g300);margin:-6px 0 0;line-height:1.5}
+.ctl{display:grid;grid-template-columns:78px minmax(0,1fr) 58px;align-items:center;gap:10px;font-size:12px;color:var(--g300)}
+.ctl output{font:12px var(--f-mono);color:var(--blue3);text-align:right;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--blue5);margin:0}
+.btns2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.btn{font-size:11.5px;background:var(--g700);color:var(--g100);border:0;padding:7px 6px;border-radius:8px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .15s}
+.btn:hover{background:var(--g600)}
+.btn.danger{background:#e11d4826;color:#fecdd3;border:1px solid #e11d4866}
+.btn.danger:hover{background:#e11d4840}
+.lawbox{background:var(--g950);border:1px solid var(--g800);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.lawbox .big{font:700 20px var(--f-mono);color:#fff;font-variant-numeric:tabular-nums;line-height:1.15}
+.lawbox .big small{font-size:11px;color:var(--g400);font-weight:500;margin-left:6px}
+.lawrow{display:flex;justify-content:space-between;gap:10px;font:11.5px var(--f-mono);color:var(--g400)}
+.lawrow b{color:var(--emerald4);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font-size:11.5px;font-weight:600;background:var(--g800);color:var(--g300);border:1px solid var(--g700);border-radius:999px;padding:4px 10px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.chip:hover{border-color:var(--g600)}
+.chip[aria-pressed=true]{background:#9333ea40;border-color:var(--purple4);color:#f3e8ff}
+.chip i{width:9px;height:9px;border-radius:50%;flex:none;box-shadow:0 0 6px currentColor}
+.chip small{font:500 10px var(--f-mono);color:var(--g500)}
+.chip[aria-pressed=true] small{color:#d8b4fe}
+.toggles{display:flex;flex-direction:column;gap:9px;font-size:12px}
+.tog{display:flex;align-items:center;justify-content:space-between;gap:10px;color:var(--g300);cursor:pointer}
+.tog input{width:16px;height:16px;accent-color:var(--emerald5);cursor:pointer;margin:0}
+ol.path{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:11.5px}
+ol.path li{display:grid;grid-template-columns:20px minmax(0,1fr);gap:8px;align-items:start;padding:6px 8px;background:var(--g950);border:1px solid var(--g800);border-radius:6px}
+ol.path .ix{font:700 10px var(--f-mono);color:var(--g500);padding-top:1px}
+ol.path .k{font-weight:700;color:var(--g100)}
+ol.path .k.rf{color:var(--blue3)}ol.path .k.rl{color:var(--amber3)}ol.path .k.tir{color:var(--pink4)}ol.path .k.ab{color:var(--g400)}
+ol.path .m{font:11px var(--f-mono);color:var(--g400);display:block;margin-top:2px;overflow-wrap:anywhere}
+ol.path .m b{color:var(--g100);font-weight:600}
+.keys{font:10px/1.7 var(--f-mono);color:var(--g500);padding:0 4px;margin-top:-6px}
+main{flex:1;display:flex;min-width:0;background:#11182780;padding:8px}
+.vp{flex:1;position:relative;background:radial-gradient(ellipse at 50% 45%,#0b1424 0%,var(--g950) 70%);border:1px solid var(--g800);border-radius:12px;overflow:hidden;min-height:0}
+#cv{position:absolute;inset:0;display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+#cv.dragging{cursor:grabbing}
+.float{position:absolute;z-index:2;background:#111827e6;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid var(--g700);border-radius:8px;box-shadow:0 10px 15px -3px #00000080}
+.vp-title{top:12px;left:12px;padding:6px 12px;font-size:12px;display:flex;align-items:center;gap:8px;pointer-events:none;max-width:calc(100% - 24px)}
+.vp-title b{color:var(--g200)}
+.vp-title span{color:var(--g400)}
+.dot{width:10px;height:10px;border-radius:50%;background:#fff;flex:none;box-shadow:0 0 8px currentColor}
+.vp-tool{top:50px;left:12px;padding:4px 10px;font:11px var(--f-mono);color:var(--g400);pointer-events:none;max-width:calc(100% - 24px)}
+.vp-tool b{color:var(--blue3);font-weight:600}
+.toast{top:12px;right:12px;padding:6px 12px;font-size:12px;color:var(--amber3);opacity:0;transform:translateY(-4px);transition:opacity .2s,transform .2s;max-width:45%;pointer-events:none}
+.toast.show{opacity:1;transform:none}
+.zoom{left:12px;bottom:12px;display:flex;align-items:center;gap:2px;padding:4px}
+.zoom button{width:28px;height:28px;border-radius:6px;border:0;background:transparent;color:var(--g300);cursor:pointer;font:600 15px var(--f-mono);display:grid;place-items:center}
+.zoom button:hover{background:var(--g700);color:#fff}
+.zoom span{font:10px var(--f-mono);color:var(--g500);padding:0 6px;min-width:44px;text-align:center}
+.insp{right:12px;bottom:12px;padding:9px 11px;width:200px;display:flex;flex-direction:column;gap:6px;font-size:11px;color:var(--g300);pointer-events:none}
+.insp .ot{font-size:10px;font-weight:700;color:var(--g400);text-transform:uppercase;letter-spacing:.05em}
+.sbar{height:7px;border-radius:4px;background:linear-gradient(90deg,#7a00c8,#2e00ff,#00a5ff,#00ff8c,#b4ff00,#ffe600,#ff7a00,#ff0000)}
+.ticks{display:flex;justify-content:space-between;font:10px var(--f-mono);color:var(--g500)}
+.lg{display:flex;align-items:center;gap:8px}
+.lg i{width:18px;height:0;border-top:1.5px dashed var(--g300);flex:none}
+.lg i.f{width:8px;height:8px;border:0;border-radius:50%;background:var(--amber4);margin:0 5px}
+.ghost{position:fixed;z-index:50;pointer-events:none;padding:5px 10px;font:600 12px var(--f-mono);border-radius:6px;background:var(--blue6);color:#fff;box-shadow:0 8px 20px #0008;transform:translate(-50%,-130%)}
+@media (max-width:820px){
+ html,body{height:auto}
+ body{overflow:auto}
+ .row{flex-direction:column;overflow:visible}
+ main{order:-1;flex:none;height:62vh;min-height:360px}
+ aside{width:100%;border-right:0;border-top:1px solid var(--g800);overflow:visible}
+ .vp-tool{display:none}
+ .insp{width:160px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header>
+  <div class="brand">
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4l6 13H4z"/><path d="M1 12h6.5"/><path d="M14 11l9-3M14.5 12.5l8.5 0.5M15 14l7 4"/></svg></div>
+    <div><h1><span class="grad">Optics Bench</span> <span class="badge-v">v1.0</span></h1></div>
+  </div>
+  <div class="hctl">
+    <div class="seg" role="group" aria-label="Rotation snap"><span class="lbl">Snap</span><button id="snap0" data-snap="0" aria-pressed="false">Off</button><button id="snap5" data-snap="5" aria-pressed="true">5°</button><button id="snap15" data-snap="15" aria-pressed="false">15°</button></div>
+    <button class="btn-clear" id="clearBtn"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg><span id="clearTxt">Clear bench</span></button>
+  </div>
+</header>
+
+<div class="row">
+  <aside>
+    <div class="stack">
+      <section class="card" id="laserCard">
+        <div class="card-h"><span class="t"><svg class="i c-amber" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="9" width="10" height="6" rx="1.5"/><path d="M12 12h10M18 8l3-2M18 16l3 2"/></svg>Laser</span><span class="pill" id="lzPill">white</span></div>
+        <div class="seg wide" role="group" aria-label="Beam pattern"><button id="mSingle" data-mode="single" aria-pressed="true">Single beam</button><button id="mParallel" data-mode="parallel" aria-pressed="false">Parallel</button><button id="mFan" data-mode="fan" aria-pressed="false">Fan</button></div>
+        <div class="chips" id="colChips" role="group" aria-label="Laser color"></div>
+        <div class="ctl" id="rowCount"><label for="lzCount">Beams</label><input type="range" id="lzCount" min="2" max="11" step="1"><output id="oCount"></output></div>
+        <div class="ctl" id="rowSpacing"><label for="lzSpacing">Spacing</label><input type="range" id="lzSpacing" min="0.5" max="4" step="0.25"><output id="oSpacing"></output></div>
+        <div class="ctl" id="rowSpread"><label for="lzSpread">Spread</label><input type="range" id="lzSpread" min="4" max="60" step="1"><output id="oSpread"></output></div>
+        <div class="ctl"><label for="lzAng">Aim</label><input type="range" id="lzAng" min="-90" max="90" step="0.5"><output id="oAng"></output></div>
+        <p class="muted">Drag the laser on the bench to move it. Its round handle rotates it.</p>
+      </section>
+
+      <section class="card">
+        <div class="card-h"><span class="t"><svg class="i c-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Parts</span><span class="pill">tap or drag in</span></div>
+        <p class="grp">Lenses &amp; mirrors</p>
+        <div class="parts g4">
+          <button class="part" data-type="convex" id="pConvex"><svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 2q7 10 0 20q-7-10 0-20z"/></svg>Convex lens</button>
+          <button class="part" data-type="concave" id="pConcave"><svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M15 2h10q-5 10 0 20h-10q5-10 0-20z"/></svg>Concave lens</button>
+          <button class="part" data-type="mirror" id="pMirror"><svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M20 2v20" stroke-width="2.6"/></svg>Flat mirror</button>
+          <button class="part" data-type="screen" id="pScreen"><svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="18" y="2" width="4" height="20" rx="1"/><circle cx="15" cy="8" r="1.2" fill="#f87171" stroke="none"/><circle cx="15" cy="12" r="1.2" fill="#4ade80" stroke="none"/><circle cx="15" cy="16" r="1.2" fill="#60a5fa" stroke="none"/></svg>Screen</button>
+          <button class="part" data-type="cmirror" id="pCmirror"><svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M17 2q9 10 0 20" stroke-width="2.6"/><path d="M23 6l3 2M25 11l3 1M25 15l3 0M23 19l3-1" stroke-width="1"/></svg>Concave mirror</button>
+          <button class="part" data-type="vmirror" id="pVmirror"><svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M23 2q-9 10 0 20" stroke-width="2.6"/><path d="M25 4l3 2M21 10l3 1M21 14l3 0M25 20l3-1" stroke-width="1"/></svg>Convex mirror</button>
+        </div>
+        <p class="grp">Glass</p>
+        <div class="parts g4">
+          <button class="part" data-type="prism" id="pPrism"><svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M20 3l10 18h-20z"/></svg>Prism</button>
+          <button class="part" data-type="rprism" id="pRprism"><svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 3v18h18z"/></svg>Right prism</button>
+          <button class="part" data-type="block" id="pBlock"><svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="10" y="6" width="20" height="12" rx="1"/></svg>Glass block</button>
+          <button class="part" data-type="halfdisc" id="pHalfdisc"><svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M24 2a10 10 0 0 0 0 20z"/></svg>Half-disc</button>
+        </div>
+      </section>
+
+      <section class="card" id="selCard">
+        <div class="card-h"><span class="t"><svg class="i c-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3l14 9-6 1.5L10 20z"/></svg>Selected</span><span class="pill" id="selPill">none</span></div>
+        <div id="selBody" style="display:flex;flex-direction:column;gap:12px"></div>
+      </section>
+
+      <section class="card">
+        <div class="card-h"><span class="t"><svg class="i c-pink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18l6-8 5 4 7-9"/><circle cx="9" cy="10" r="1.5"/><circle cx="14" cy="14" r="1.5"/></svg>Ray path</span><span class="pill" id="pathPill">center ray</span></div>
+        <ol class="path" id="pathList"></ol>
+        <div class="lawrow" id="devRow"></div>
+      </section>
+
+      <section class="card">
+        <div class="card-h"><span class="t"><svg class="i c-emerald" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>View</span></div>
+        <div class="toggles">
+          <label class="tog" for="tNormals">Normals &amp; angles on center ray<input type="checkbox" id="tNormals" checked></label>
+          <label class="tog" for="tFocal">Optical axes, F and C points<input type="checkbox" id="tFocal" checked></label>
+          <label class="tog" for="tVirtual">Virtual rays (traced backward)<input type="checkbox" id="tVirtual"></label>
+          <label class="tog" for="tGrid">Centimeter grid<input type="checkbox" id="tGrid" checked></label>
+        </div>
+        <div class="ctl"><label for="boost">Dispersion</label><input type="range" id="boost" min="1" max="10" step="0.5"><output id="oBoost"></output></div>
+        <p class="muted">Real glass separates colors only slightly. Raise dispersion to exaggerate it. The index at 550&nbsp;nm stays fixed, so green light bends the same either way.</p>
+      </section>
+
+      <section class="card">
+        <div class="card-h"><span class="t"><svg class="i c-amber" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6l-5 10a1.5 1.5 0 0 0 1.3 2h11.4a1.5 1.5 0 0 0 1.3-2l-5-10V3"/></svg>Experiments</span><span class="pill">load a setup</span></div>
+        <div class="chips" id="presetChips"></div>
+      </section>
+      <p class="keys">Del remove · R / ⇧R rotate · [ ] fine rotate · D duplicate · arrows nudge · Esc deselect · scroll to zoom · drag empty space to pan</p>
+    </div>
+  </aside>
+
+  <main>
+    <div class="vp" id="vp">
+      <canvas id="cv" aria-label="Optics bench. Laser on the left; place lenses, mirrors and prisms to bend the light."></canvas>
+      <div class="float vp-title"><span class="dot" id="dot"></span><b id="vtB">White light</b><span id="vtS"></span></div>
+      <div class="float vp-tool" id="vpTool">Drag parts to move · drag <b>↻</b> to rotate</div>
+      <div class="float toast" id="toast"></div>
+      <div class="float zoom"><button id="zOut" title="Zoom out" aria-label="Zoom out">−</button><span id="zLbl">100%</span><button id="zIn" title="Zoom in" aria-label="Zoom in">+</button><button id="zFit" title="Fit everything in view" aria-label="Fit view">⤢</button></div>
+      <div class="float insp">
+        <span class="ot">Visible spectrum</span>
+        <div class="sbar"></div>
+        <div class="ticks"><span>400</span><span>500</span><span>600</span><span>700 nm</span></div>
+        <div class="lg"><i></i><span>Surface normal</span></div>
+        <div class="lg"><i class="f"></i><span>Focal point F</span></div>
+      </div>
+    </div>
+  </main>
+</div>
+<div class="ghost" id="ghost" hidden></div>
+
+<script>
+//#PHYS-START
+const EPS=1e-7,FAR=3000,MAXB=90;
+const V=(x,y)=>({x,y});
+const add=(a,b)=>V(a.x+b.x,a.y+b.y),sub=(a,b)=>V(a.x-b.x,a.y-b.y),mul=(a,k)=>V(a.x*k,a.y*k);
+const dot=(a,b)=>a.x*b.x+a.y*b.y,crs=(a,b)=>a.x*b.y-a.y*b.x;
+const nrm=a=>{const l=Math.hypot(a.x,a.y)||1;return V(a.x/l,a.y/l)};
+const rad=d=>d*Math.PI/180,deg=r=>r*180/Math.PI;
+const rot=(p,a)=>{const c=Math.cos(a),s=Math.sin(a);return V(p.x*c-p.y*s,p.x*s+p.y*c)};
+const dirOf=d=>V(Math.cos(rad(d)),Math.sin(rad(d)));
+const reflect=(d,n)=>sub(d,mul(n,2*dot(d,n)));
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+// Cauchy coefficients n = A + B/λ² (λ in µm)
+const MATS={
+ crown:{name:'Crown glass',A:1.5046,B:0.00420,tint:'147,197,253'},
+ flint:{name:'Dense flint',A:1.7280,B:0.01342,tint:'196,181,253'},
+ acrylic:{name:'Acrylic',A:1.4767,B:0.00450,tint:'203,213,225'},
+ water:{name:'Water',A:1.3242,B:0.00309,tint:'103,232,249'},
+ diamond:{name:'Diamond',A:2.3818,B:0.01210,tint:'240,249,255'}
+};
+function nOf(m,lam,boost){const M=MATS[m],l=lam/1000;return M.A+M.B/0.3025+boost*M.B*(1/(l*l)-1/0.3025)}
+function lensScale(lam,boost){return (nOf('crown',550,1)-1)/(nOf('crown',lam,boost)-1)}
+const GLASS={prism:1,rprism:1,block:1,halfdisc:1};
+
+function lensBulge(el){return clamp(el.h*el.h/(8*Math.abs(el.f)),0.3,el.h*0.42)}
+function arcSag(el){const h=Math.min(el.len/2,el.R*0.97);return el.R-Math.sqrt(el.R*el.R-h*h)}
+function localPoly(el){
+ switch(el.type){
+  case 'prism':{const A=rad(el.apex)/2,s=el.s,hg=s*Math.cos(A),hw=s*Math.sin(A),cy=hg/3;return [V(-hw,-cy),V(hw,-cy),V(0,hg-cy)]}
+  case 'rprism':{const s=el.s,c=s/3;return [V(-c,-c),V(s-c,-c),V(-c,s-c)]}
+  case 'block':{const w=el.w/2,h=el.h/2;return [V(-w,-h),V(w,-h),V(w,h),V(-w,h)]}
+  case 'halfdisc':{const r=el.r,p=[],N=96;for(let i=0;i<=N;i++){const a=Math.PI/2+Math.PI*i/N;p.push(V(r*Math.cos(a),r*Math.sin(a)))}return p}
+ }
+ return []
+}
+function area(P){let s=0;for(let i=0;i<P.length;i++){const a=P[i],b=P[(i+1)%P.length];s+=a.x*b.y-b.x*a.y}return s/2}
+
+function buildSurfaces(els){
+ const out=[];
+ for(const el of els){
+  const C=V(el.x,el.y),a=rad(el.ang),W=p=>add(C,rot(p,a)),ax=dirOf(el.ang),u=V(-ax.y,ax.x);
+  switch(el.type){
+   case 'convex':case 'concave':out.push({k:'seg',role:'lens',el,a:W(V(0,-el.h/2)),b:W(V(0,el.h/2)),c:C,ax,u,f:el.type==='convex'?el.f:-el.f});break;
+   case 'mirror':out.push({k:'seg',role:'mirror',el,a:W(V(0,-el.len/2)),b:W(V(0,el.len/2)),n:ax});break;
+   case 'screen':out.push({k:'seg',role:'screen',el,a:W(V(0,-el.len/2)),b:W(V(0,el.len/2)),n:ax});break;
+   case 'cmirror':case 'vmirror':{const cc=el.type==='cmirror',R=el.R,h=Math.min(el.len/2,R*0.97);
+    out.push({k:'arc',role:'cmirror',el,c:add(C,mul(ax,cc?R:-R)),r:R,ref:cc?mul(ax,-1):ax,cosMax:Math.sqrt(1-(h/R)*(h/R)),concave:cc});break}
+   default:{let P=localPoly(el).map(W);if(area(P)<0)P.reverse();
+    for(let i=0;i<P.length;i++){const A=P[i],B=P[(i+1)%P.length],e=sub(B,A);out.push({k:'seg',role:'glass',el,a:A,b:B,n:nrm(V(e.y,-e.x)),mat:el.mat})}}
+  }
+ }
+ return out;
+}
+function segT(p,d,a,b){const e=sub(b,a),den=crs(d,e);if(Math.abs(den)<1e-12)return Infinity;const w=sub(a,p),t=crs(w,e)/den,u=crs(w,d)/den;return(t>EPS&&u>=-1e-9&&u<=1+1e-9)?t:Infinity}
+function arcT(p,d,s){const f=sub(p,s.c),b=dot(f,d),c=dot(f,f)-s.r*s.r,D=b*b-c;if(D<0)return Infinity;const q=Math.sqrt(D);
+ for(const t of[-b-q,-b+q]){if(t>EPS){const v=mul(sub(add(p,mul(d,t)),s.c),1/s.r);if(dot(v,s.ref)>=s.cosMax)return t}}return Infinity}
+
+function traceRay(surfs,p,d,lam,boost,log){
+ const pts=[p],ev=log?[]:null,virt=[];let end=null;
+ for(let k=0;k<MAXB;k++){
+  let bt=Infinity,bs=null;
+  for(const s of surfs){const t=s.k==='seg'?segT(p,d,s.a,s.b):arcT(p,d,s);if(t<bt){bt=t;bs=s}}
+  if(!bs){pts.push(add(p,mul(d,FAR)));break}
+  const q=add(p,mul(d,bt));pts.push(q);
+  let nd;const r=bs.role;
+  if(r==='lens'){
+   const da=dot(d,bs.ax),du=dot(d,bs.u);
+   if(Math.abs(da)<1e-9)nd=d;
+   else{const h=dot(sub(q,bs.c),bs.u),f=bs.f*lensScale(lam,boost),m=du/Math.abs(da)-h/f;nd=nrm(add(mul(bs.ax,Math.sign(da)),mul(bs.u,m)));if(f<0)virt.push({q,d:nd,f:-f})}
+   ev&&ev.push({k:'lens',el:bs.el,q,dev:deg(Math.acos(clamp(dot(d,nd),-1,1)))});
+  }else if(r==='mirror'){
+   const N=dot(d,bs.n)<0?bs.n:mul(bs.n,-1),ci=-dot(d,N);nd=reflect(d,N);
+   ev&&ev.push({k:'reflect',el:bs.el,q,N,ti:deg(Math.acos(Math.min(1,ci)))});
+  }else if(r==='cmirror'){
+   const v=mul(sub(q,bs.c),1/bs.r),N=bs.concave?mul(v,-1):v,ci=-dot(d,N);
+   if(ci<=0){ev&&ev.push({k:'absorb',el:bs.el,q});end={absorb:bs.el,q};break}
+   nd=reflect(d,N);if(!bs.concave)virt.push({q,d:nd,f:bs.r/2});
+   ev&&ev.push({k:'reflect',el:bs.el,q,N,ti:deg(Math.acos(Math.min(1,ci)))});
+  }else if(r==='screen'){
+   end={screen:bs.el,q};ev&&ev.push({k:'screen',el:bs.el,q});break;
+  }else{
+   const n=nOf(bs.mat,lam,boost),ent=dot(d,bs.n)<0,N=ent?bs.n:mul(bs.n,-1),n1=ent?1:n,n2=ent?n:1,eta=n1/n2;
+   const ci=Math.min(1,-dot(d,N)),k2=1-eta*eta*(1-ci*ci),ti=deg(Math.acos(ci));
+   if(k2<0){nd=add(d,mul(N,2*ci));ev&&ev.push({k:'tir',el:bs.el,q,N,ti,crit:deg(Math.asin(n2/n1)),n1,n2})}
+   else{nd=nrm(add(mul(d,eta),mul(N,eta*ci-Math.sqrt(k2))));ev&&ev.push({k:'refract',el:bs.el,q,N,ti,tt:deg(Math.acos(Math.sqrt(k2))),n1,n2,ent})}
+  }
+  d=nd;p=add(q,mul(d,1e-5));
+ }
+ return {pts,ev,virt,end,d};
+}
+function beamsOf(L){
+ const d=dirOf(L.ang),u=V(-d.y,d.x),o=V(L.x,L.y),out=[],n=L.mode==='single'?1:L.count;
+ for(let i=0;i<n;i++){const s=n>1?i/(n-1)-0.5:0;
+  if(L.mode==='parallel')out.push({p:add(o,mul(u,s*(n-1)*L.spacing)),d});
+  else if(L.mode==='fan')out.push({p:o,d:dirOf(L.ang+s*L.spread)});
+  else out.push({p:o,d});}
+ return {list:out,main:Math.floor((n-1)/2)};
+}
+const LASER0={x:0,y:0,ang:0,mode:'single',color:'white',count:7,spacing:2,spread:24};
+const PRESETS=[
+ {id:'spectrum',name:'Prism spectrum',boost:2.5,laser:{y:-20,ang:34,mode:'single',color:'white'},els:[{type:'prism',x:38,y:2,ang:0,s:18,apex:60,mat:'flint'},{type:'screen',x:78,y:-24,ang:180,len:28}]},
+ {id:'converge',name:'Converging lens',boost:1,laser:{mode:'parallel',count:7,spacing:2,color:'red'},els:[{type:'convex',x:35,y:0,ang:0,f:22,h:18}]},
+ {id:'diverge',name:'Diverging lens',boost:1,show:{virtual:true},laser:{mode:'parallel',count:7,spacing:2,color:'green'},els:[{type:'concave',x:40,y:0,ang:0,f:20,h:18}]},
+ {id:'telescope',name:'Kepler telescope',boost:1,laser:{mode:'parallel',count:5,spacing:2.5,color:'blue'},els:[{type:'convex',x:25,y:0,ang:0,f:24,h:18},{type:'convex',x:57,y:0,ang:0,f:8,h:10}]},
+ {id:'cmirror',name:'Concave mirror',boost:1,laser:{mode:'parallel',count:7,spacing:2.5,color:'yellow'},els:[{type:'cmirror',x:72,y:0,ang:180,R:50,len:24}]},
+ {id:'vmirror',name:'Convex mirror',boost:1,show:{virtual:true},laser:{mode:'parallel',count:5,spacing:2.5,color:'orange',y:-2,ang:0},els:[{type:'vmirror',x:60,y:0,ang:160,R:30,len:22}]},
+ {id:'periscope',name:'Periscope',boost:1,laser:{y:-14,ang:0,mode:'single',color:'green'},els:[{type:'mirror',x:40,y:-14,ang:135,len:10},{type:'mirror',x:40,y:16,ang:-45,len:10},{type:'screen',x:80,y:16,ang:180,len:14}]},
+ {id:'tir',name:'Total internal reflection',boost:1,laser:{mode:'single',color:'red'},els:[{type:'halfdisc',x:45,y:0,ang:48,r:14,mat:'acrylic'}]},
+ {id:'retro',name:'Retroreflecting prism',boost:1,laser:{y:-3,mode:'single',color:'violet'},els:[{type:'rprism',x:48,y:0,ang:135,s:18,mat:'crown'}]},
+ {id:'block',name:'Glass block',boost:1,laser:{mode:'single',color:'green'},els:[{type:'block',x:42,y:0,ang:25,w:22,h:12,mat:'crown'}]},
+ {id:'chroma',name:'Chromatic aberration',boost:8,laser:{mode:'parallel',count:7,spacing:2,color:'white'},els:[{type:'convex',x:30,y:0,ang:0,f:30,h:18}]}
+];
+//#PHYS-END
+
+const $=id=>document.getElementById(id);
+const DEF={
+ convex:{name:'Convex lens',short:'Convex',desc:'A converging lens. Rays parallel to the axis meet at the focal point F on the far side.',make:()=>({f:20,h:16}),ang:0},
+ concave:{name:'Concave lens',short:'Concave',desc:'A diverging lens. Parallel rays spread out as if they came from the focal point F on the near side.',make:()=>({f:20,h:16}),ang:0},
+ mirror:{name:'Flat mirror',short:'Mirror',desc:'The angle of reflection equals the angle of incidence, both measured from the normal. Both faces reflect.',make:()=>({len:16}),ang:135},
+ cmirror:{name:'Concave mirror',short:'Concave mirror',desc:'Curves inward. Parallel rays reflect through F, halfway between the mirror and its center of curvature C. The hatched back absorbs light.',make:()=>({len:20,R:40}),ang:180},
+ vmirror:{name:'Convex mirror',short:'Convex mirror',desc:'Curves outward. Reflected rays spread as if they came from a virtual focus F behind the mirror.',make:()=>({len:20,R:40}),ang:180},
+ prism:{name:'Prism',short:'Prism',desc:'Light refracts at both faces and bends toward the base. Shorter wavelengths bend more, so white light fans into a spectrum.',make:()=>({s:16,apex:60,mat:'flint'}),ang:0},
+ rprism:{name:'Right-angle prism',short:'Right prism',desc:'A 45-45-90 prism. Light that meets an inside face at 45° exceeds the critical angle of most glass and reflects totally.',make:()=>({s:14,mat:'crown'}),ang:135},
+ block:{name:'Glass block',short:'Block',desc:'Parallel faces. The ray leaves in its original direction, shifted sideways by an amount that grows with the angle of incidence.',make:()=>({w:20,h:12,mat:'crown'}),ang:0},
+ halfdisc:{name:'Half-disc',short:'Half-disc',desc:'Aim at the center of the flat face and the ray crosses the curved face without bending. Rotate it to find the critical angle.',make:()=>({r:12,mat:'acrylic'}),ang:0},
+ screen:{name:'Screen',short:'Screen',desc:'Stops the light and marks where each color lands.',make:()=>({len:24}),ang:180}
+};
+const PARAMS={
+ convex:[['f','Focal length',4,80,1,'cm'],['h','Height',4,36,1,'cm']],
+ concave:[['f','Focal length',4,80,1,'cm'],['h','Height',4,36,1,'cm']],
+ mirror:[['len','Length',4,50,1,'cm']],
+ cmirror:[['R','Radius',10,120,1,'cm'],['len','Aperture',4,50,1,'cm']],
+ vmirror:[['R','Radius',10,120,1,'cm'],['len','Aperture',4,50,1,'cm']],
+ prism:[['s','Side',6,34,1,'cm'],['apex','Apex angle',20,110,1,'°']],
+ rprism:[['s','Leg',6,34,1,'cm']],
+ block:[['w','Width',4,44,1,'cm'],['h','Height',3,34,1,'cm']],
+ halfdisc:[['r','Radius',4,22,1,'cm']],
+ screen:[['len','Length',6,70,1,'cm']]
+};
+const COLORS=[{id:'red',nm:'Red',lam:650},{id:'orange',nm:'Orange',lam:605},{id:'yellow',nm:'Yellow',lam:580},{id:'green',nm:'Green',lam:532},{id:'blue',nm:'Blue',lam:470},{id:'violet',nm:'Violet',lam:415},{id:'white',nm:'White',lam:0}];
+
+function wl2rgb(l){let r=0,g=0,b=0;
+ if(l<440){r=-(l-440)/60;b=1}else if(l<490){g=(l-440)/50;b=1}else if(l<510){g=1;b=-(l-510)/20}else if(l<580){r=(l-510)/70;g=1}else if(l<645){r=1;g=-(l-645)/65}else r=1;
+ let f=1;if(l<420)f=.3+.7*(l-380)/40;else if(l>700)f=.3+.7*(780-l)/80;
+ return [Math.pow(r*f,.8),Math.pow(g*f,.8),Math.pow(b*f,.8)]}
+const css=(c,a=1)=>`rgba(${Math.round(c[0]*255)},${Math.round(c[1]*255)},${Math.round(c[2]*255)},${a})`;
+
+const S={laser:{...LASER0},els:[],sel:null,snap:5,boost:3,show:{normals:true,focal:true,virtual:false,grid:true},nid:1};
+const view={cx:48,cy:0,sc:8,fit:8};
+const cv=$('cv'),ctx=cv.getContext('2d');let W=0,H=0,DPR=1,dirty=true,lastTrace=null;
+
+/* ---------- coordinates ---------- */
+const ts=p=>V((p.x-view.cx)*view.sc+W/2,-(p.y-view.cy)*view.sc+H/2);
+const tw=(x,y)=>V((x-W/2)/view.sc+view.cx,-(y-H/2)/view.sc+view.cy);
+function localBox(el){
+ switch(el.type){
+  case 'convex':{const b=lensBulge(el);return{x0:-b,x1:b,y0:-el.h/2,y1:el.h/2}}
+  case 'concave':{const b=lensBulge(el)+0.3;return{x0:-b,x1:b,y0:-el.h/2,y1:el.h/2}}
+  case 'mirror':return{x0:-.4,x1:.4,y0:-el.len/2,y1:el.len/2};
+  case 'screen':return{x0:-.5,x1:.5,y0:-el.len/2,y1:el.len/2};
+  case 'cmirror':{const s=arcSag(el),h=Math.min(el.len/2,el.R*.97);return{x0:-1.2,x1:s+.3,y0:-h,y1:h}}
+  case 'vmirror':{const s=arcSag(el),h=Math.min(el.len/2,el.R*.97);return{x0:-s-1.2,x1:.3,y0:-h,y1:h}}
+  default:{const P=localPoly(el);let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;for(const p of P){x0=Math.min(x0,p.x);x1=Math.max(x1,p.x);y0=Math.min(y0,p.y);y1=Math.max(y1,p.y)}return{x0,x1,y0,y1}}
+ }
+}
+function laserHH(){const L=S.laser;return L.mode==='parallel'?Math.max(1.3,(L.count-1)*L.spacing/2+0.9):1.3}
+function handleOf(o){
+ if(o==='laser'){const L=S.laser,hh=laserHH();const loc=V(-3.5,hh+2.4);return{h:add(V(L.x,L.y),rot(loc,rad(L.ang))),anchor:add(V(L.x,L.y),rot(V(-3.5,hh),rad(L.ang))),off:Math.atan2(loc.y,loc.x)}}
+ const b=localBox(o),loc=V(0,Math.max(Math.abs(b.y0),Math.abs(b.y1))+2.6),C=V(o.x,o.y);
+ return{h:add(C,rot(loc,rad(o.ang))),anchor:C,off:Math.PI/2}
+}
+function hitTest(P){
+ const pad=7/view.sc;
+ const inEl=el=>{const l=rot(sub(P,V(el.x,el.y)),-rad(el.ang)),b=localBox(el);return l.x>=b.x0-pad&&l.x<=b.x1+pad&&l.y>=b.y0-pad&&l.y<=b.y1+pad};
+ const L=S.laser,ll=rot(sub(P,V(L.x,L.y)),-rad(L.ang)),hh=laserHH();
+ if(S.sel&&S.sel!=='laser'&&inEl(S.sel))return S.sel;
+ if(ll.x>=-7-pad&&ll.x<=pad&&Math.abs(ll.y)<=hh+pad)return'laser';
+ for(let i=S.els.length-1;i>=0;i--)if(inEl(S.els[i]))return S.els[i];
+ return null;
+}
+
+/* ---------- light ---------- */
+function samples(){
+ const L=S.laser;
+ if(L.color!=='white'){const lam=COLORS.find(c=>c.id===L.color).lam,c=wl2rgb(lam),m=Math.max(...c);return{list:[{lam,col:c.map(v=>v/m)}],ref:0,white:false}}
+ const N=(L.mode==='single'||L.count<=5)?15:9,raw=[],sum=[0,0,0];
+ for(let i=0;i<N;i++){const lam=400+300*i/(N-1),c=wl2rgb(lam);raw.push({lam,c});c.forEach((v,j)=>sum[j]+=v)}
+ const g=N/3.2;let ref=0,bd=1e9;
+ const list=raw.map((r,i)=>{if(Math.abs(r.lam-550)<bd){bd=Math.abs(r.lam-550);ref=i}return{lam:r.lam,col:r.c.map((v,j)=>Math.min(1,v/sum[j]*g))}});
+ return{list,ref,white:true};
+}
+
+/* ---------- render ---------- */
+function resize(){const r=$('vp').getBoundingClientRect();DPR=Math.min(2,window.devicePixelRatio||1);W=Math.max(1,r.width);H=Math.max(1,r.height);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);dirty=true}
+function drawGrid(){
+ if(!S.show.grid)return;
+ const a=tw(0,0),b=tw(W,H);let step=view.sc<4?10:5;
+ ctx.lineWidth=1;
+ for(let x=Math.floor(a.x/step)*step;x<=b.x;x+=step){const sx=ts(V(x,0)).x;ctx.strokeStyle=x%10===0?'rgba(229,231,235,.07)':'rgba(229,231,235,.035)';ctx.beginPath();ctx.moveTo(sx+.5,0);ctx.lineTo(sx+.5,H);ctx.stroke()}
+ for(let y=Math.floor(b.y/step)*step;y<=a.y;y+=step){const sy=ts(V(0,y)).y;ctx.strokeStyle=y%10===0?'rgba(229,231,235,.07)':'rgba(229,231,235,.035)';ctx.beginPath();ctx.moveTo(0,sy+.5);ctx.lineTo(W,sy+.5);ctx.stroke()}
+ ctx.fillStyle='rgba(156,163,175,.45)';ctx.font='10px ui-monospace,Menlo,monospace';ctx.textAlign='left';ctx.textBaseline='top';
+ for(let x=Math.ceil(a.x/20)*20;x<=b.x;x+=20){const s=ts(V(x,0));ctx.fillText(x+' cm',s.x+3,H-46)}
+}
+function withLocal(o,fn){const C=ts(V(o.x,o.y));ctx.save();ctx.translate(C.x,C.y);ctx.rotate(-rad(o.ang));ctx.scale(view.sc,-view.sc);fn(1/view.sc);ctx.restore()}
+function drawEl(el,phase){
+ const sel=S.sel===el;
+ withLocal(el,px=>{
+  ctx.lineJoin='round';ctx.lineCap='round';
+  const T=el.type;
+  if(T==='convex'||T==='concave'){
+   const h=el.h/2,b=lensBulge(el);ctx.beginPath();
+   if(T==='convex'){ctx.moveTo(0,h);ctx.quadraticCurveTo(2*b,0,0,-h);ctx.quadraticCurveTo(-2*b,0,0,h)}
+   else{const w=b+.3;ctx.moveTo(-w,h);ctx.lineTo(w,h);ctx.quadraticCurveTo(.3-w,0,w,-h);ctx.lineTo(-w,-h);ctx.quadraticCurveTo(w-.3,0,-w,h)}
+   ctx.closePath();
+   if(phase===0){ctx.fillStyle='rgba(147,197,253,.13)';ctx.fill()}
+   else{ctx.strokeStyle=sel?'#60a5fa':'rgba(191,219,254,.7)';ctx.lineWidth=(sel?2.2:1.3)*px;ctx.stroke();ctx.setLineDash([2*px,3*px]);ctx.strokeStyle='rgba(191,219,254,.25)';ctx.lineWidth=px;ctx.beginPath();ctx.moveTo(0,-h);ctx.lineTo(0,h);ctx.stroke();ctx.setLineDash([])}
+  }else if(T==='mirror'){
+   if(phase===1){ctx.strokeStyle=sel?'#93c5fd':'#dbe4ef';ctx.lineWidth=Math.max(3.2*px,.3);ctx.beginPath();ctx.moveTo(0,-el.len/2);ctx.lineTo(0,el.len/2);ctx.stroke()}
+  }else if(T==='cmirror'||T==='vmirror'){
+   if(phase===1){const R=el.R,h=Math.min(el.len/2,R*.97),fm=Math.asin(h/R),cc=T==='cmirror';
+    ctx.strokeStyle='rgba(107,114,128,.9)';ctx.lineWidth=px;ctx.beginPath();
+    for(let i=0;i<=12;i++){const f=-fm+2*fm*i/12,p=cc?V(R-R*Math.cos(f),R*Math.sin(f)):V(-R+R*Math.cos(f),R*Math.sin(f));ctx.moveTo(p.x,p.y);ctx.lineTo(p.x-.9,p.y-.6)}ctx.stroke();
+    ctx.strokeStyle=sel?'#93c5fd':'#dbe4ef';ctx.lineWidth=Math.max(3.2*px,.3);ctx.beginPath();
+    if(cc)ctx.arc(R,0,R,Math.PI-fm,Math.PI+fm);else ctx.arc(-R,0,R,-fm,fm);ctx.stroke()}
+  }else if(T==='screen'){
+   if(phase===1){const h=el.len/2;ctx.fillStyle='#1f2937';ctx.fillRect(-.45,-h,.9,2*h);ctx.strokeStyle=sel?'#60a5fa':'#6b7280';ctx.lineWidth=(sel?2:1)*px;ctx.strokeRect(-.45,-h,.9,2*h);ctx.strokeStyle='#e5e7eb';ctx.lineWidth=1.5*px;ctx.beginPath();ctx.moveTo(.45,-h);ctx.lineTo(.45,h);ctx.stroke()}
+  }else{
+   const P=localPoly(el),tint=MATS[el.mat].tint;ctx.beginPath();P.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();
+   if(phase===0){ctx.fillStyle=`rgba(${tint},.13)`;ctx.fill()}
+   else{ctx.strokeStyle=sel?'#60a5fa':`rgba(${tint},.75)`;ctx.lineWidth=(sel?2.2:1.3)*px;ctx.stroke()}
+  }
+ });
+}
+function drawLaser(){
+ const L=S.laser,hh=laserHH(),sel=S.sel==='laser',sm=samples(),c=sm.white?[1,1,1]:sm.list[0].col;
+ withLocal(L,px=>{
+  const g=ctx.createLinearGradient(0,hh,0,-hh);g.addColorStop(0,'#4b5563');g.addColorStop(.5,'#1f2937');g.addColorStop(1,'#111827');
+  ctx.fillStyle=g;rr(-7,-hh,7,2*hh,.6);ctx.fill();ctx.strokeStyle=sel?'#60a5fa':'#6b7280';ctx.lineWidth=(sel?2:1)*px;ctx.stroke();
+  ctx.fillStyle='#fbbf24';ctx.fillRect(-5.6,-hh+.35,1.1,.32);ctx.fillRect(-5.6,hh-.67,1.1,.32);
+  ctx.fillStyle=css(c,.95);ctx.shadowColor=css(c,1);ctx.shadowBlur=12;ctx.fillRect(-.45,-hh+.4,.45,2*hh-.8);ctx.shadowBlur=0;
+ });
+ const s=ts(V(L.x,L.y)),bk=ts(add(V(L.x,L.y),rot(V(-3.5,0),rad(L.ang))));
+ if(view.sc>4.5){ctx.save();ctx.translate(bk.x,bk.y);let a=-rad(L.ang);if(Math.cos(a)<0)a+=Math.PI;ctx.rotate(a);ctx.fillStyle='#9ca3af';ctx.font='700 9px ui-monospace,Menlo,monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('LASER',0,0);ctx.restore()}
+}
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath()}
+function poly(pts){ctx.beginPath();for(let i=0;i<pts.length;i++){const s=ts(pts[i]);i?ctx.lineTo(s.x,s.y):ctx.moveTo(s.x,s.y)}}
+function mark(p,label,col,a){const s=ts(p);ctx.globalAlpha=a;ctx.fillStyle=col;ctx.beginPath();ctx.arc(s.x,s.y,3.5,0,7);ctx.fill();ctx.font='600 10px ui-monospace,Menlo,monospace';ctx.textAlign='center';ctx.textBaseline='top';ctx.fillText(label,s.x,s.y+6);ctx.globalAlpha=1}
+function drawAxes(){
+ if(!S.show.focal)return;
+ for(const el of S.els){
+  const T=el.type;if(!['convex','concave','cmirror','vmirror'].includes(T))continue;
+  const sel=S.sel===el,a=sel?.95:.45,C=V(el.x,el.y),ax=dirOf(el.ang);
+  let pts=[],ext;
+  if(T==='convex'||T==='concave'){const f=el.f;ext=2*f+6;pts=[[f,'F'],[-f,'F'],[2*f,'2F'],[-2*f,'2F']]}
+  else{const R=el.R,cc=T==='cmirror',sg=cc?1:-1;ext=R+6;pts=[[sg*R/2,'F'],[sg*R,'C']]}
+  ctx.setLineDash([6,5]);ctx.strokeStyle=`rgba(156,163,175,${sel?.5:.22})`;ctx.lineWidth=1;
+  const e1=T.includes('mirror')?(T==='cmirror'?add(C,mul(ax,ext)):add(C,mul(ax,-ext))):add(C,mul(ax,-ext)),e2=T.includes('mirror')?add(C,mul(ax,T==='cmirror'?-4:4)):add(C,mul(ax,ext));
+  poly([e1,e2]);ctx.stroke();ctx.setLineDash([]);
+  for(const[d,l]of pts)mark(add(C,mul(ax,d)),l,l==='C'?'#c084fc':'#fbbf24',a);
+ }
+}
+function render(){
+ dirty=false;
+ ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clearRect(0,0,W,H);
+ drawGrid();
+ for(const el of S.els)drawEl(el,0);
+ drawAxes();
+ // rays
+ const surfs=buildSurfaces(S.els),B=beamsOf(S.laser),sm=samples(),hits=[];let main=null;
+ ctx.globalCompositeOperation='lighter';ctx.lineJoin='round';ctx.lineCap='round';
+ const glowA=sm.white?.16*3.2/sm.list.length:.16;
+ const virtLines=[];
+ B.list.forEach((bm,bi)=>{
+  sm.list.forEach((s,si)=>{
+   const isMain=bi===B.main&&si===sm.ref,res=traceRay(surfs,bm.p,bm.d,s.lam,S.boost,isMain);
+   if(isMain)main={res,lam:s.lam};
+   if(res.end&&res.end.screen)hits.push({q:res.end.q,col:s.col});
+   if(si===sm.ref&&S.show.virtual)for(const v of res.virt)virtLines.push({v,col:sm.white?[1,1,1]:s.col});
+   poly(res.pts);ctx.strokeStyle=css(s.col,glowA);ctx.lineWidth=7;ctx.stroke();
+   ctx.strokeStyle=css(s.col,sm.white?1:.95);ctx.lineWidth=1.7;ctx.stroke();
+  });
+ });
+ for(const h of hits){const s=ts(h.q),g=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,9);g.addColorStop(0,css(h.col,.9));g.addColorStop(1,css(h.col,0));ctx.fillStyle=g;ctx.beginPath();ctx.arc(s.x,s.y,9,0,7);ctx.fill()}
+ ctx.globalCompositeOperation='source-over';
+ if(virtLines.length){ctx.setLineDash([4,4]);ctx.lineWidth=1.2;for(const{v,col}of virtLines){poly([v.q,add(v.q,mul(v.d,-Math.min(80,v.f*2.4)))]);ctx.strokeStyle=css(col,.5);ctx.stroke()}ctx.setLineDash([])}
+ for(const el of S.els)drawEl(el,1);
+ if(main&&S.show.normals)drawNormals(main.res.ev);
+ drawLaser();
+ if(S.sel){const H2=handleOf(S.sel),a=ts(H2.anchor),h=ts(H2.h);ctx.strokeStyle='rgba(96,165,250,.6)';ctx.lineWidth=1;ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(h.x,h.y);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='#111827';ctx.strokeStyle='#60a5fa';ctx.lineWidth=1.8;ctx.beginPath();ctx.arc(h.x,h.y,8,0,7);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.arc(h.x,h.y,3.6,-2.6,1.6);ctx.stroke();ctx.beginPath();ctx.moveTo(h.x+3.6*Math.cos(1.6)-2.6,h.y+3.6*Math.sin(1.6));ctx.lineTo(h.x+3.6*Math.cos(1.6),h.y+3.6*Math.sin(1.6));ctx.lineTo(h.x+3.6*Math.cos(1.6)+.3,h.y+3.6*Math.sin(1.6)-2.6);ctx.stroke()}
+ lastTrace=main;updatePath(main,B,sm);updateTitle();
+}
+function drawNormals(ev){
+ let n=0;ctx.font='600 10px ui-monospace,Menlo,monospace';ctx.textBaseline='middle';
+ for(const e of ev){
+  if(!e.N||n>=8)continue;n++;
+  const a=add(e.q,mul(e.N,3.2)),b=add(e.q,mul(e.N,-3.2));
+  ctx.setLineDash([3,3]);ctx.strokeStyle='rgba(209,213,219,.7)';ctx.lineWidth=1;poly([a,b]);ctx.stroke();ctx.setLineDash([]);
+  const s=ts(e.q);let txt=e.k==='refract'?`${e.ti.toFixed(1)}° → ${e.tt.toFixed(1)}°`:e.k==='tir'?`${e.ti.toFixed(1)}° TIR`:`${e.ti.toFixed(1)}°`;
+  const w=ctx.measureText(txt).width+10,x=s.x+10,y=s.y-14;
+  ctx.fillStyle='rgba(17,24,39,.85)';rr(x,y-8,w,16,4);ctx.fill();ctx.fillStyle=e.k==='tir'?'#f472b6':e.k==='reflect'?'#fcd34d':'#93c5fd';ctx.textAlign='left';ctx.fillText(txt,x+5,y);
+ }
+}
+
+/* ---------- side panels ---------- */
+const f1=v=>v.toFixed(1),f3=v=>v.toFixed(3);
+function elLabel(el){const same=S.els.filter(e=>e.type===el.type);return DEF[el.type].name+(same.length>1?' '+(same.indexOf(el)+1):'')}
+function updatePath(main,B,sm){
+ const ol=$('pathList');
+ $('pathPill').textContent=`center ray · ${Math.round(main?main.lam:550)} nm`;
+ if(!main){ol.innerHTML='';return}
+ const ev=main.res.ev;
+ if(!ev.length){ol.innerHTML='<li><span class="ix">—</span><span><span class="k ab">No contact</span><span class="m">The center ray misses every part. Drag a part into its path.</span></span></li>';$('devRow').innerHTML='';return}
+ ol.innerHTML=ev.slice(0,10).map((e,i)=>{
+  const nm=elLabel(e.el);let k,m;
+  if(e.k==='refract'){k=`<span class="k rf">Refract</span> · ${nm}`;m=`n <b>${f3(e.n1)}</b> → <b>${f3(e.n2)}</b> · θ₁ <b>${f1(e.ti)}°</b> θ₂ <b>${f1(e.tt)}°</b>`}
+  else if(e.k==='tir'){k=`<span class="k tir">Total internal reflection</span> · ${nm}`;m=`θ <b>${f1(e.ti)}°</b> &gt; critical <b>${f1(e.crit)}°</b>`}
+  else if(e.k==='reflect'){k=`<span class="k rl">Reflect</span> · ${nm}`;m=`θᵢ = θᵣ = <b>${f1(e.ti)}°</b>`}
+  else if(e.k==='lens'){k=`<span class="k rf">Bend</span> · ${nm}`;m=`turned <b>${f1(e.dev)}°</b>`}
+  else if(e.k==='absorb'){k=`<span class="k ab">Absorbed</span> · back of ${nm}`;m=''}
+  else{k=`<span class="k ab">Lands</span> · ${nm}`;m=''}
+  return `<li><span class="ix">${i+1}</span><span>${k}${m?`<span class="m">${m}</span>`:''}</span></li>`}).join('')+(ev.length>10?`<li><span class="ix">…</span><span class="m">${ev.length-10} more events</span></li>`:'');
+ const d0=B.list[B.main].d,d1=main.res.d;let dv=deg(Math.atan2(crs(d0,d1),dot(d0,d1)));
+ $('devRow').innerHTML=main.res.end?`<span>Ray ends</span><b>${main.res.end.screen?'on screen':'absorbed'}</b>`:`<span>Total deviation</span><b>${f1(Math.abs(dv))}° ${Math.abs(dv)<.05?'':dv>0?'(turned left)':'(turned right)'}</b>`;
+}
+function updateTitle(){
+ const L=S.laser,c=COLORS.find(c=>c.id===L.color),dot=$('dot');
+ $('vtB').textContent=L.color==='white'?'White light':`${c.nm} · ${c.lam} nm`;
+ const mode=L.mode==='single'?'single beam':L.mode==='parallel'?`${L.count} parallel beams`:`fan of ${L.count}`;
+ $('vtS').textContent=`· ${mode} · ${S.els.length} part${S.els.length===1?'':'s'}`;
+ const col=L.color==='white'?'#fff':css((()=>{const r=wl2rgb(c.lam),m=Math.max(...r);return r.map(v=>v/m)})());
+ dot.style.background=col;dot.style.color=col;
+ $('lzPill').textContent=L.color==='white'?'white · 400–700 nm':`${c.lam} nm`;
+ $('zLbl').textContent=Math.round(view.sc/view.fit*100)+'%';
+}
+
+/* ---------- selected card ---------- */
+function selHTML(){
+ const o=S.sel;
+ if(!o){$('selPill').textContent='none';return '<p class="muted">Tap a part on the bench to select it. Drag to move it, or drag its round handle to rotate it.</p>'}
+ if(o==='laser'){$('selPill').textContent='laser';return `<p class="selname">Laser</p><p class="desc">Color and beam pattern are in the Laser card above.</p>
+  <div class="ctl"><label for="sAng">Aim</label><input type="range" id="sAng" min="-180" max="180" step="0.5"><output id="oSAng"></output></div>
+  <div class="lawbox"><div class="lawrow"><span>Position</span><b id="sPos"></b></div></div>`}
+ const D=DEF[o.type];$('selPill').textContent=D.short.toLowerCase();
+ let h=`<p class="selname">${elLabel(o)}</p><p class="desc">${D.desc}</p>`;
+ for(const[k,lb,mn,mx,st,u]of PARAMS[o.type])h+=`<div class="ctl"><label for="p_${k}">${lb}</label><input type="range" id="p_${k}" data-k="${k}" data-u="${u}" min="${mn}" max="${mx}" step="${st}"><output id="o_${k}"></output></div>`;
+ h+=`<div class="ctl"><label for="sAng">Angle</label><input type="range" id="sAng" min="-180" max="180" step="0.5"><output id="oSAng"></output></div>`;
+ if(GLASS[o.type])h+=`<div class="chips" id="matChips">${Object.entries(MATS).map(([k,m])=>`<button class="chip" data-mat="${k}" aria-pressed="${o.mat===k}">${m.name}</button>`).join('')}</div>`;
+ h+=`<div class="lawbox" id="sInfo"></div>`;
+ h+=`<div class="btns2"><button class="btn" id="bRotL">↺ 15°</button><button class="btn" id="bRotR">↻ 15°</button><button class="btn" id="bDup">Duplicate</button><button class="btn danger" id="bDel">Delete</button></div>`;
+ return h;
+}
+function buildSel(){
+ $('selBody').innerHTML=selHTML();const o=S.sel;if(!o)return;
+ const ang=$('sAng');ang.oninput=()=>{(o==='laser'?S.laser:o).ang=+ang.value;syncSel();syncLaser();dirty=true};
+ if(o==='laser'){syncSel();return}
+ $('selBody').querySelectorAll('input[data-k]').forEach(inp=>inp.oninput=()=>{o[inp.dataset.k]=+inp.value;syncSel();dirty=true});
+ const mc=$('matChips');if(mc)mc.onclick=e=>{const b=e.target.closest('[data-mat]');if(!b)return;o.mat=b.dataset.mat;mc.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',c===b));syncSel();dirty=true};
+ $('bRotL').onclick=()=>{o.ang=normA(o.ang+15);syncSel();dirty=true};
+ $('bRotR').onclick=()=>{o.ang=normA(o.ang-15);syncSel();dirty=true};
+ $('bDup').onclick=dup;$('bDel').onclick=del;
+ syncSel();
+}
+function syncSel(){
+ const o=S.sel;if(!o)return;
+ const tgt=o==='laser'?S.laser:o,ang=$('sAng');if(!ang)return;
+ if(document.activeElement!==ang)ang.value=tgt.ang;$('oSAng').textContent=f1(tgt.ang)+'°';
+ if(o==='laser'){$('sPos').textContent=`x ${f1(S.laser.x)}  y ${f1(S.laser.y)} cm`;return}
+ for(const[k]of PARAMS[o.type]){const i=$('p_'+k);if(!i)continue;if(document.activeElement!==i)i.value=o[k];$('o_'+k).textContent=o[k]+i.dataset.u}
+ const T=o.type,box=$('sInfo');let h='';
+ if(T==='convex'||T==='concave'){const f=T==='convex'?o.f:-o.f;h=`<div class="big">${f>0?'+':''}${f1(f)} cm<small>focal length</small></div><div class="lawrow"><span>Power P = 1/f</span><b>${f>0?'+':''}${(100/f).toFixed(2)} D</b></div><div class="lawrow"><span>Image of a parallel beam</span><b>${f>0?'real, at F':'virtual, at F'}</b></div>`}
+ else if(T==='cmirror'||T==='vmirror'){const f=o.R/2*(T==='cmirror'?1:-1);h=`<div class="big">${f>0?'+':''}${f1(f)} cm<small>f = R / 2</small></div><div class="lawrow"><span>Center of curvature C</span><b>${f1(o.R)} cm ${T==='cmirror'?'in front':'behind'}</b></div>`}
+ else if(T==='mirror'){h=`<div class="lawrow"><span>Law of reflection</span><b>θᵢ = θᵣ</b></div><div class="lawrow"><span>Length</span><b>${o.len} cm</b></div>`}
+ else if(T==='screen'){h=`<div class="lawrow"><span>Absorbs all light</span><b>${o.len} cm</b></div>`}
+ else{const n=l=>nOf(o.mat,l,S.boost),nd=n(589),crit=deg(Math.asin(1/nd));
+  h=`<div class="big">n = ${f3(nd)}<small>at 589 nm</small></div><div class="lawrow"><span>Violet 415 / red 650 nm</span><b>${f3(n(415))} / ${f3(n(650))}</b></div><div class="lawrow"><span>Critical angle θc</span><b>${f1(crit)}°</b></div>`;
+  if(T==='prism'){const A=rad(o.apex),x=nd*Math.sin(A/2);h+=`<div class="lawrow"><span>Minimum deviation δ</span><b>${x<1?f1(deg(2*Math.asin(x)-A))+'°':'none (TIR)'}</b></div>`}
+  if(S.boost>1)h+=`<div class="lawrow"><span>Dispersion</span><b style="color:var(--amber3)">exaggerated ×${S.boost}</b></div>`}
+ box.innerHTML=h;
+}
+
+/* ---------- laser card ---------- */
+function syncLaser(){
+ const L=S.laser;
+ ['Single','Parallel','Fan'].forEach(m=>$('m'+m).setAttribute('aria-pressed',L.mode===m.toLowerCase()));
+ $('colChips').querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',c.dataset.col===L.color));
+ $('rowCount').hidden=L.mode==='single';$('rowSpacing').hidden=L.mode!=='parallel';$('rowSpread').hidden=L.mode!=='fan';
+ const set=(id,v,o,t)=>{if(document.activeElement!==$(id))$(id).value=v;$(o).textContent=t};
+ set('lzCount',L.count,'oCount',L.count);set('lzSpacing',L.spacing,'oSpacing',L.spacing+' cm');set('lzSpread',L.spread,'oSpread',L.spread+'°');set('lzAng',clamp(L.ang,-90,90),'oAng',f1(L.ang)+'°');
+ set('boost',S.boost,'oBoost','×'+S.boost);
+}
+$('colChips').innerHTML=COLORS.map(c=>{const col=c.lam?css((()=>{const r=wl2rgb(c.lam),m=Math.max(...r);return r.map(v=>v/m)})()):'#fff';
+ return `<button class="chip" data-col="${c.id}" aria-pressed="false"><i style="background:${c.lam?col:'linear-gradient(90deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f)'};color:${col}"></i>${c.nm}${c.lam?` <small>${c.lam}</small>`:''}</button>`}).join('');
+$('colChips').onclick=e=>{const b=e.target.closest('[data-col]');if(!b)return;S.laser.color=b.dataset.col;syncLaser();dirty=true};
+document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{S.laser.mode=b.dataset.mode;syncLaser();dirty=true});
+[['lzCount','count'],['lzSpacing','spacing'],['lzSpread','spread'],['lzAng','ang']].forEach(([id,k])=>$(id).oninput=()=>{S.laser[k]=+$(id).value;syncLaser();if(S.sel==='laser')syncSel();dirty=true});
+$('boost').oninput=()=>{S.boost=+$('boost').value;syncLaser();syncSel();dirty=true};
+[['tNormals','normals'],['tFocal','focal'],['tVirtual','virtual'],['tGrid','grid']].forEach(([id,k])=>$(id).onchange=()=>{S.show[k]=$(id).checked;dirty=true});
+function syncShow(){$('tNormals').checked=S.show.normals;$('tFocal').checked=S.show.focal;$('tVirtual').checked=S.show.virtual;$('tGrid').checked=S.show.grid}
+
+/* ---------- actions ---------- */
+const normA=a=>{a=((a+180)%360+360)%360-180;return Math.round(a*100)/100};
+function select(o){if(S.sel!==o){S.sel=o;buildSel()}dirty=true}
+function addEl(type,x,y){const el={id:S.nid++,type,x,y,ang:DEF[type].ang,...DEF[type].make()};S.els.push(el);select(el);toast(`Added ${DEF[type].name.toLowerCase()}`)}
+function dup(){const o=S.sel;if(!o||o==='laser')return;const c={...o,id:S.nid++,x:o.x+4,y:o.y-4};S.els.push(c);select(c)}
+function del(){const o=S.sel;if(!o||o==='laser'){if(o==='laser')toast('The laser stays on the bench');return}S.els=S.els.filter(e=>e!==o);select(null)}
+let tt;function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),1800)}
+function fitView(){
+ const L=S.laser;let x0=L.x-9,x1=L.x+40,y0=L.y-12,y1=L.y+12;
+ for(const el of S.els){const b=localBox(el),r=Math.max(Math.abs(b.x0),Math.abs(b.x1),Math.abs(b.y0),Math.abs(b.y1));x0=Math.min(x0,el.x-r);x1=Math.max(x1,el.x+r);y0=Math.min(y0,el.y-r);y1=Math.max(y1,el.y+r)}
+ x1+=10;y0-=6;y1+=6;
+ const sc=Math.min(W/(x1-x0),H/(y1-y0))*0.94;view.sc=view.fit=clamp(sc,1.5,40);view.cx=(x0+x1)/2;view.cy=(y0+y1)/2;dirty=true;
+}
+function loadPreset(p){
+ S.laser={...LASER0,...p.laser};S.els=p.els.map(e=>({id:S.nid++,...e}));S.boost=p.boost||1;
+ S.show={normals:true,focal:true,virtual:false,grid:S.show.grid,...(p.show||{})};
+ S.sel=null;buildSel();syncLaser();syncShow();fitView();
+ $('presetChips').querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',c.dataset.p===p.id));
+}
+$('presetChips').innerHTML=PRESETS.map(p=>`<button class="chip" data-p="${p.id}" aria-pressed="false">${p.name}</button>`).join('');
+$('presetChips').onclick=e=>{const b=e.target.closest('[data-p]');if(b)loadPreset(PRESETS.find(p=>p.id===b.dataset.p))};
+document.querySelectorAll('[data-snap]').forEach(b=>b.onclick=()=>{S.snap=+b.dataset.snap;document.querySelectorAll('[data-snap]').forEach(x=>x.setAttribute('aria-pressed',x===b))});
+let armT;$('clearBtn').onclick=()=>{const b=$('clearBtn');if(b.classList.contains('arm')){clearTimeout(armT);b.classList.remove('arm');$('clearTxt').textContent='Clear bench';S.els=[];select(null);$('presetChips').querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed','false'));toast('Bench cleared')}else{b.classList.add('arm');$('clearTxt').textContent='Click again to clear';armT=setTimeout(()=>{b.classList.remove('arm');$('clearTxt').textContent='Clear bench'},2500)}};
+
+/* ---------- pointer ---------- */
+let drag=null;
+const ptr=e=>{const r=cv.getBoundingClientRect();return V(e.clientX-r.left,e.clientY-r.top)};
+function snapA(a,shift){const st=shift?15:S.snap;return normA(st?Math.round(a/st)*st:Math.round(a*2)/2)}
+cv.addEventListener('pointerdown',e=>{
+ const s=ptr(e),P=tw(s.x,s.y);cv.setPointerCapture(e.pointerId);
+ if(S.sel){const h=ts(handleOf(S.sel).h);if(Math.hypot(h.x-s.x,h.y-s.y)<13){drag={mode:'rot',o:S.sel};cv.classList.add('dragging');return}}
+ const hit=hitTest(P);
+ if(hit){select(hit);const t=hit==='laser'?S.laser:hit;drag={mode:'move',o:t,off:sub(P,V(t.x,t.y))};cv.classList.add('dragging')}
+ else drag={mode:'pan',s,c:V(view.cx,view.cy),moved:false};
+});
+cv.addEventListener('pointermove',e=>{
+ if(!drag){const s=ptr(e),P=tw(s.x,s.y);let over=!!hitTest(P);if(S.sel){const h=ts(handleOf(S.sel).h);if(Math.hypot(h.x-s.x,h.y-s.y)<13)over=true}cv.style.cursor=over?'pointer':'grab';return}
+ const s=ptr(e),P=tw(s.x,s.y);
+ if(drag.mode==='move'){drag.o.x=Math.round((P.x-drag.off.x)*10)/10;drag.o.y=Math.round((P.y-drag.off.y)*10)/10;syncSel()}
+ else if(drag.mode==='rot'){const H2=handleOf(drag.o),t=drag.o==='laser'?S.laser:drag.o,c=drag.o==='laser'?H2.anchor:V(t.x,t.y);
+  if(drag.o==='laser'){const L=S.laser;t.ang=snapA(deg(Math.atan2(P.y-L.y,P.x-L.x)-H2.off),e.shiftKey)}
+  else t.ang=snapA(deg(Math.atan2(P.y-c.y,P.x-c.x)-H2.off),e.shiftKey);
+  syncSel();syncLaser()}
+ else{const dx=s.x-drag.s.x,dy=s.y-drag.s.y;if(Math.abs(dx)+Math.abs(dy)>3)drag.moved=true;view.cx=drag.c.x-dx/view.sc;view.cy=drag.c.y+dy/view.sc}
+ dirty=true;
+});
+const endDrag=()=>{if(drag&&drag.mode==='pan'&&!drag.moved)select(null);drag=null;cv.classList.remove('dragging')};
+cv.addEventListener('pointerup',endDrag);cv.addEventListener('pointercancel',endDrag);
+cv.addEventListener('wheel',e=>{e.preventDefault();const s=ptr(e),P=tw(s.x,s.y);view.sc=clamp(view.sc*Math.exp(-e.deltaY*.0015),1.2,60);const Q=tw(s.x,s.y);view.cx+=P.x-Q.x;view.cy+=P.y-Q.y;dirty=true},{passive:false});
+function zoomBy(k){view.sc=clamp(view.sc*k,1.2,60);dirty=true}
+$('zIn').onclick=()=>zoomBy(1.25);$('zOut').onclick=()=>zoomBy(.8);$('zFit').onclick=fitView;
+
+// palette: tap to add, or drag onto the bench
+document.querySelectorAll('.part').forEach(b=>{
+ b.addEventListener('pointerdown',e=>{
+  const type=b.dataset.type,st=V(e.clientX,e.clientY);let moved=false;const g=$('ghost');b.setPointerCapture(e.pointerId);
+  const mv=ev=>{if(!moved&&Math.hypot(ev.clientX-st.x,ev.clientY-st.y)>6){moved=true;g.textContent=DEF[type].name;g.hidden=false}if(moved){g.style.left=ev.clientX+'px';g.style.top=ev.clientY+'px'}};
+  const up=ev=>{b.removeEventListener('pointermove',mv);b.removeEventListener('pointerup',up);b.removeEventListener('pointercancel',up);g.hidden=true;
+   if(moved){const r=cv.getBoundingClientRect();if(ev.clientX>=r.left&&ev.clientX<=r.right&&ev.clientY>=r.top&&ev.clientY<=r.bottom){const P=tw(ev.clientX-r.left,ev.clientY-r.top);addEl(type,Math.round(P.x),Math.round(P.y))}}
+   else if(ev.type==='pointerup'){const c=tw(W*0.58,H/2),j=(S.els.length%5)*3-6;addEl(type,Math.round(c.x+j),Math.round(c.y-j))}};
+  b.addEventListener('pointermove',mv);b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);
+ });
+});
+
+window.addEventListener('keydown',e=>{
+ const inField=e.target.tagName==='INPUT';const o=S.sel;
+ if(e.key==='Escape'){select(null);return}
+ if(!o)return;const t=o==='laser'?S.laser:o;
+ if((e.key==='Delete'||e.key==='Backspace')&&!inField){e.preventDefault();del();return}
+ if((e.key==='r'||e.key==='R')&&!inField){const st=S.snap||1;t.ang=normA(t.ang+(e.shiftKey?-st:st))}
+ else if(e.key==='['&&!inField)t.ang=normA(t.ang+.5);
+ else if(e.key===']'&&!inField)t.ang=normA(t.ang-.5);
+ else if((e.key==='d'||e.key==='D')&&!inField&&!e.metaKey&&!e.ctrlKey){dup();return}
+ else if(e.key.startsWith('Arrow')&&!inField){e.preventDefault();const st=e.shiftKey?2:.5;if(e.key==='ArrowLeft')t.x-=st;if(e.key==='ArrowRight')t.x+=st;if(e.key==='ArrowUp')t.y+=st;if(e.key==='ArrowDown')t.y-=st;t.x=Math.round(t.x*10)/10;t.y=Math.round(t.y*10)/10}
+ else return;
+ syncSel();syncLaser();dirty=true;
+});
+
+/* ---------- boot ---------- */
+new ResizeObserver(()=>{const first=W<=1;resize();if(first)fitView()}).observe($('vp'));
+resize();loadPreset(PRESETS[0]);
+(function loop(){if(dirty)render();requestAnimationFrame(loop)})();
+</script>

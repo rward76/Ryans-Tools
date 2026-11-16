@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Solutions Calculator</title>
+<style>
+/* Same shell as the other teaching tools (gradient header, dark grid stage). Every page is one row of editable cards that scales to stay on one line. Dark-only by design. */
+:root{color-scheme:dark;
+--g950:#030712;--g900:#111827;--g800:#1f2937;--g700:#374151;--g600:#4b5563;--g500:#6b7280;--g400:#9ca3af;--g300:#d1d5db;--g200:#e5e7eb;--g100:#f3f4f6;
+--blue7:#1d4ed8;--blue6:#2563eb;--blue5:#3b82f6;--blue4:#60a5fa;--blue3:#93c5fd;
+--purple6:#9333ea;--purple4:#c084fc;--pink4:#f472b6;
+--emerald6:#059669;--emerald5:#10b981;--emerald4:#34d399;
+--amber3:#fcd34d;--amber4:#fbbf24;--rose4:#fb7185;
+--f-sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+--f-mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0}
+body{background:var(--g950);color:var(--g100);font-family:var(--f-sans);font-size:14px;display:flex;flex-direction:column;overflow:hidden;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box}
+*,*:before,*:after{box-sizing:border-box}
+button,select,output,input{font:inherit;color:inherit}
+button:focus-visible,input:focus-visible,canvas:focus-visible,select:focus-visible{outline:2px solid var(--blue5);outline-offset:2px}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:var(--g900)}::-webkit-scrollbar-thumb{background:var(--g700);border-radius:3px}
+svg.i{width:14px;height:14px;flex:none}
+header{background:var(--g900);border-bottom:1px solid var(--g800);padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;flex:none}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{background:linear-gradient(to top right,var(--blue6),var(--purple6));padding:8px;border-radius:8px;box-shadow:0 10px 15px -3px #0006;display:grid;place-items:center}
+.logo svg{width:20px;height:20px;color:#fff}
+h1{margin:0;font-size:18px;font-weight:700;line-height:1.4;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+h1 .grad{background:linear-gradient(to right,var(--blue4),var(--purple4),var(--pink4));-webkit-background-clip:text;background-clip:text;color:transparent}
+.badge-v{font-size:12px;font-weight:600;padding:2px 8px;border-radius:4px;background:#1e3a8a99;color:var(--blue3);border:1px solid var(--blue7)}
+.hctl{display:flex;align-items:center;flex-wrap:wrap;justify-content:flex-end;gap:12px}
+.seg{display:flex;align-items:center;background:var(--g800);border:1px solid var(--g700);border-radius:8px;padding:4px;font-size:12px;flex-wrap:wrap}
+.seg .lbl{color:var(--g400);padding:0 8px;font-weight:500}
+.seg button{background:transparent;border:0;padding:4px 10px;border-radius:4px;color:var(--g300);cursor:pointer;transition:color .15s,background .15s}
+.seg button:hover{color:#fff}
+.seg button[aria-pressed=true]{background:var(--blue6);color:#fff;font-weight:600;box-shadow:0 1px 3px #0006}
+.seg.full{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:2px}
+.seg.full button{padding:5px 4px}
+main{flex:1;display:flex;min-height:0;padding:8px;padding-left:max(8px,env(safe-area-inset-left,0px));padding-right:max(8px,env(safe-area-inset-right,0px));background:#11182780}
+.ws{flex:1;min-width:0;display:flex;flex-direction:column;border:1px solid var(--g800);border-radius:12px;background:radial-gradient(ellipse at 50% 45%,#0b1424 0%,var(--g950) 75%);position:relative;overflow:hidden}
+.ws:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(229,231,235,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(229,231,235,.04) 1px,transparent 1px);background-size:32px 32px;pointer-events:none}
+.terms{position:relative;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:16px;font-size:24px}
+.trow{display:inline-flex;flex-wrap:nowrap;align-items:center;gap:.55em;flex:none}
+.term{position:relative;display:flex;flex-direction:column;align-items:center;gap:.15em;background:var(--g950);border:1px solid var(--g700);border-radius:.7em;padding:1.45em .55em .45em;min-width:6.5em;transition:border-color .15s,box-shadow .15s;flex:none}
+.term:hover,.term:focus-within{border-color:var(--blue6);box-shadow:0 0 0 .18em #2563eb22}
+.term.given{border-color:#059669aa}
+.tbar{position:absolute;top:.2em;left:0;right:0;display:flex;justify-content:center;gap:.05em;opacity:.45;transition:opacity .15s}
+.term:hover .tbar,.term:focus-within .tbar{opacity:1}
+.tbar button{width:1.45em;height:1.15em;border:0;border-radius:.3em;background:transparent;color:var(--g400);cursor:pointer;font:600 .8em var(--f-mono);display:grid;place-items:center;padding:0}
+.tbar button:hover{background:var(--g700);color:#fff}
+.tbar button.del:hover{background:#fb71853a;color:var(--rose4)}
+.tside{display:flex;align-items:center;gap:.1em}
+.tv,.tu{background:transparent;border:1px solid transparent;border-radius:.35em;padding:.15em .2em;font:600 1em var(--f-mono);color:#fff;text-align:right;font-variant-numeric:tabular-nums}
+.tu{text-align:left;color:var(--blue3)}
+.tu::-webkit-calendar-picker-indicator{display:none!important;width:0;margin:0}
+.tu::-webkit-list-button{display:none!important}
+.tv:hover,.tu:hover{border-color:var(--g700)}
+.tv:focus,.tu:focus{border-color:var(--blue5);background:var(--g900);outline:none}
+.tv::placeholder,.tu::placeholder{color:var(--g600);font-weight:500}
+.tv.bad{border-color:var(--rose4);background:#fb71851a}
+.tline{align-self:stretch;height:.11em;min-height:1px;background:var(--g400);border-radius:1px;margin:.05em 0}
+.term.nod .tline{background:repeating-linear-gradient(90deg,var(--g700) 0 .3em,transparent .3em .55em)}
+.term.nod .tside.den{opacity:.4}
+.term.nod .tside.den:focus-within,.term.nod:hover .tside.den{opacity:.8}
+.uw{position:relative;display:inline-block}
+.uw:after{content:"";position:absolute;left:.05em;right:.05em;top:52%;height:.11em;min-height:1.5px;border-radius:1px;background:var(--xc,transparent);transform:rotate(-13deg) scaleX(0);transform-origin:left center;transition:transform .25s ease-out;pointer-events:none}
+.uw.x:after{transform:rotate(-13deg) scaleX(1)}
+.uw.x .tu{color:var(--g500)}
+.uw.px .tu{text-decoration:underline dotted var(--g500);text-underline-offset:.25em}
+.tst{font:700 .4em var(--f-sans);text-transform:uppercase;letter-spacing:.05em;color:var(--g500);max-width:16em;text-align:center;line-height:1.3;margin-top:.3em;white-space:nowrap}
+.tst.ok,.tst.given{color:var(--emerald4)}.tst.warn{color:var(--amber3)}.tst.bad{color:var(--rose4)}.tst.info{color:var(--g400)}
+.tx{color:var(--g500);font:600 1.1em var(--f-mono);flex:none}
+.addt{border:1.5px dashed var(--g600);background:transparent;color:var(--g400);border-radius:.6em;width:2.6em;height:2.6em;cursor:pointer;display:grid;place-items:center;font:500 1.1em var(--f-sans);line-height:1;flex:none;padding:0;transition:border-color .15s,background .15s,color .15s}
+.addt:hover{border-color:var(--blue5);color:#fff;background:#3b82f61a}
+.wsres{display:flex;align-items:baseline;gap:.3em;padding:.5em .7em;border-radius:.6em;background:#05966914;border:1px solid #05966977;flex:none;white-space:nowrap}
+.wsres .v{font:700 1.15em var(--f-mono);color:var(--emerald4)}
+.wsres .v sup{font-size:.6em}
+.wsres .ru{font:700 .95em var(--f-mono);color:#fff}
+/* shared cards for molarity / dilution / serial pages */
+.tsel{-webkit-appearance:none;appearance:none;background:transparent;border:1px solid transparent;border-radius:.35em;padding:.15em .25em;font:600 1em var(--f-mono);color:var(--blue3);cursor:pointer;width:auto}
+.tsel:hover{border-color:var(--g700)}
+.tsel:focus{border-color:var(--blue5);background:var(--g900);outline:none}
+.tsel option,.tsel optgroup{background:var(--g800);color:var(--g100);font-size:14px}
+.tout{font:700 1em var(--f-mono);color:var(--emerald4);padding:.15em .2em;white-space:nowrap}
+.tout sup,.tsub sup{font-size:.6em}
+.tunit{font:600 1em var(--f-mono);color:var(--g400);padding:.15em .1em}
+.tf{background:transparent;border:1px solid transparent;border-radius:.35em;padding:.15em .2em;font:700 1em var(--f-mono);color:#fff;text-align:center}
+.tf::-webkit-calendar-picker-indicator{display:none!important;width:0;margin:0}
+.tf::-webkit-list-button{display:none!important}
+.tf:hover{border-color:var(--g700)}.tf:focus{border-color:var(--blue5);background:var(--g900);outline:none}
+.tf.bad{border-color:var(--rose4);background:#fb71851a}
+.tmm{font:700 .85em var(--f-mono);color:var(--amber3);white-space:nowrap;padding:.1em 0}
+.tsub{font:500 .4em var(--f-mono);color:var(--g400);text-align:center;line-height:1.55;white-space:nowrap;margin-top:.25em}
+.tsub b{color:var(--g200);font-weight:600}
+.tsub .w{color:var(--amber3)}
+.term.out{border-color:var(--emerald6);background:#05966914}
+.term.out:hover,.term.out:focus-within{border-color:var(--emerald5);box-shadow:0 0 0 .18em #05966922}
+.term.out .tsel{color:#fff}
+.term.dim{opacity:.4}
+.term.err{border-color:var(--rose4)}
+.tbar .sv{width:auto;padding:0 .5em;font:700 .62em var(--f-sans);letter-spacing:.05em;text-transform:uppercase}
+.tbar .ans{font:700 .62em var(--f-sans);letter-spacing:.05em;text-transform:uppercase;color:var(--emerald4);height:1.85em;display:grid;place-items:center}
+.tx.dim{opacity:.35}
+.tbar .sv.on{background:var(--blue6);color:#fff}
+.term.mmc{min-width:10em}
+.tbar .sv{white-space:nowrap}
+.term.mmc .tbar{opacity:.85}
+.term.mmc .tside.src{margin:.15em 0 .3em}
+.tst sub{font-size:.85em}
+@media (max-width:820px){body{height:100vh;height:100dvh}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+</style></head><body>
+<header>
+  <div class="brand">
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6.2L4.6 18.4A1.7 1.7 0 0 0 6.1 21h11.8a1.7 1.7 0 0 0 1.5-2.6L14 9.2V3"/><path d="M7.5 14h9"/></svg></div>
+    <h1><span class="grad">Solutions Calculator</span> <span class="badge-v">v2.1</span></h1>
+  </div>
+  <div class="hctl">
+    <div class="seg" role="group" aria-label="Calculator" data-seg="mode"><button data-v="da">Dimensional analysis</button><button data-v="mol">Molarity</button><button data-v="dil">Dilution</button></div>
+    <div class="seg" role="group" aria-label="Significant figures" data-seg="sig"><span class="lbl">Sig figs</span><button data-v="1">On</button><button data-v="0">Off</button></div>
+    <button class="btn hreset" id="resetBtn" style="font-size:12px;background:var(--g700);color:var(--g100);border:0;padding:6px 14px;border-radius:8px;font-weight:600;cursor:pointer">Reset</button>
+  </div>
+</header>
+<main><section class="ws" aria-label="Calculator workspace"><div class="terms" id="terms"></div></section></main>
+<datalist id="unitList"></datalist><datalist id="fList"></datalist>
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const rnd=Math.random,clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+/* ---------- Atomic weights ---------- */
+const AM={};
+('H 1.008 He 4.0026 Li 6.94 Be 9.0122 B 10.81 C 12.011 N 14.007 O 15.999 F 18.998 Ne 20.180 Na 22.990 Mg 24.305 Al 26.982 Si 28.085 P 30.974 S 32.06 Cl 35.45 Ar 39.948 K 39.098 Ca 40.078 Sc 44.956 Ti 47.867 V 50.942 Cr 51.996 Mn 54.938 Fe 55.845 Co 58.933 Ni 58.693 Cu 63.546 Zn 65.38 Ga 69.723 Ge 72.630 As 74.922 Se 78.971 Br 79.904 Kr 83.798 Rb 85.468 Sr 87.62 Y 88.906 Zr 91.224 Nb 92.906 Mo 95.95 Tc 98 Ru 101.07 Rh 102.91 Pd 106.42 Ag 107.87 Cd 112.41 In 114.82 Sn 118.71 Sb 121.76 Te 127.60 I 126.90 Xe 131.29 Cs 132.91 Ba 137.33 La 138.91 Ce 140.12 Pr 140.91 Nd 144.24 Pm 145 Sm 150.36 Eu 151.96 Gd 157.25 Tb 158.93 Dy 162.50 Ho 164.93 Er 167.26 Tm 168.93 Yb 173.05 Lu 174.97 Hf 178.49 Ta 180.95 W 183.84 Re 186.21 Os 190.23 Ir 192.22 Pt 195.08 Au 196.97 Hg 200.59 Tl 204.38 Pb 207.2 Bi 208.98 Po 209 At 210 Rn 222 Fr 223 Ra 226 Ac 227 Th 232.04 Pa 231.04 U 238.03')
+ .split(' ').forEach((t,i,a)=>{if(i%2===0)AM[t]=+a[i+1]});
+
+/* ---------- Preset substances ---------- */
+const CAT='#60a5fa',ANI='#fbbf24';
+const PRE=[
+ ['Sodium chloride','NaCl',{ions:[['Na⁺',1],['Cl⁻',1]]}],
+ ['Potassium chloride','KCl',{ions:[['K⁺',1],['Cl⁻',1]]}],
+ ['Calcium chloride','CaCl2',{ions:[['Ca²⁺',1],['Cl⁻',2]]}],
+ ['Magnesium sulfate','MgSO4',{ions:[['Mg²⁺',1],['SO₄²⁻',1]]}],
+ ['Sodium hydroxide','NaOH',{ions:[['Na⁺',1],['OH⁻',1]]}],
+ ['Hydrochloric acid','HCl',{ions:[['H⁺',1],['Cl⁻',1]]}],
+ ['Sulfuric acid','H2SO4',{ions:[['H⁺',2],['SO₄²⁻',1]],d:1.83,liq:1}],
+ ['Sodium bicarbonate','NaHCO3',{ions:[['Na⁺',1],['HCO₃⁻',1]]}],
+ ['Sodium carbonate','Na2CO3',{ions:[['Na⁺',2],['CO₃²⁻',1]]}],
+ ['Potassium nitrate','KNO3',{ions:[['K⁺',1],['NO₃⁻',1]]}],
+ ['Silver nitrate','AgNO3',{ions:[['Ag⁺',1],['NO₃⁻',1]]}],
+ ['Ammonium chloride','NH4Cl',{ions:[['NH₄⁺',1],['Cl⁻',1]]}],
+ ['Aluminum sulfate','Al2(SO4)3',{ions:[['Al³⁺',2],['SO₄²⁻',3]]}],
+ ['Sodium phosphate','Na3PO4',{ions:[['Na⁺',3],['PO₄³⁻',1]]}],
+ ['Potassium permanganate','KMnO4',{ions:[['K⁺',1],['MnO₄⁻',1]],col:'#c026d3'}],
+ ['Copper(II) sulfate pentahydrate','CuSO4·5H2O',{ions:[['Cu²⁺',1],['SO₄²⁻',1]],col:'#38bdf8'}],
+ ['Nickel(II) chloride hexahydrate','NiCl2·6H2O',{ions:[['Ni²⁺',1],['Cl⁻',2]],col:'#4ade80'}],
+ ['Glucose','C6H12O6',{}],
+ ['Sucrose','C12H22O11',{}],
+ ['Urea','CO(NH2)2',{}],
+ ['Tris base','C4H11NO3',{}],
+ ['Ethanol','C2H5OH',{d:0.789,liq:1}],
+ ['Glycerol','C3H8O3',{d:1.26,liq:1}],
+ ['Water','H2O',{d:1.00,liq:1}],
+ ['Carbon dioxide','CO2',{gas:1}],
+ ['Oxygen','O2',{gas:1}],
+ ['Methane','CH4',{gas:1}],
+ ['Ammonia','NH3',{gas:1}],
+ ['Iron(III) oxide','Fe2O3',{d:5.24}],
+ ['Gold','Au',{d:19.3}],
+];
+
+/* ---------- Units ---------- */
+const UL={ug:'µg',umol:'µmol',uL:'µL',cm3:'cm³',m3:'m³',floz:'fl oz',A:'Å',um:'µm',uM:'µM','%':'% w/v',ugmL:'µg/mL',particles:'particles'};
+const CATU={mass:'ng ug mg g kg oz lb',amount:'pmol nmol umol mmol mol kmol',particles:'particles',volume:'uL mL dL L cm3 m3 floz pt qt gal',length:'nm A um mm cm m km in ft yd mi',time:'ms s min h day yr',energy:'J kJ cal kcal',pressure:'Pa kPa bar atm mmHg torr psi'};
+const CATN={mass:'Mass',amount:'Amount',particles:'Particles',volume:'Volume',length:'Length',time:'Time',energy:'Energy',pressure:'Pressure'};
+const U={};for(const c in CATU)CATU[c].split(' ').forEach(id=>U[id]={id,l:UL[id]||id,cat:c});
+const ul=u=>U[u]?U[u].l:(UL[u]||u);
+const catOf=u=>U[u]?U[u].cat:null;
+const REL='kg 1000 g,g 1000 mg,mg 1000 ug,ug 1000 ng,lb 453.592 g,lb 16 oz,kmol 1000 mol,mol 1000 mmol,mmol 1000 umol,umol 1000 nmol,nmol 1000 pmol,L 1000 mL,mL 1000 uL,L 10 dL,mL 1 cm3,m3 1000 L,gal 4 qt,qt 2 pt,pt 16 floz,qt 0.946353 L,km 1000 m,m 100 cm,cm 10 mm,mm 1000 um,um 1000 nm,nm 10 A,in 2.54 cm,ft 12 in,yd 3 ft,mi 5280 ft,s 1000 ms,min 60 s,h 60 min,day 24 h,yr 365.25 day,kJ 1000 J,cal 4.184 J,kcal 1000 cal,kPa 1000 Pa,bar 100 kPa,atm 101.325 kPa,atm 760 mmHg,torr 1 mmHg,atm 14.696 psi'
+ .split(',').map(t=>{const[a,n,b]=t.split(' ');return{a,n:+n,ns:n,b,k:'defined'}});
+const CONC={M:'mol',mM:'mmol',uM:'umol',nM:'nmol',pM:'pmol'};
+const AVO={a:'mol',n:6.022e23,vs:'6.022e23',ns:'6.022 × 10<sup>23</sup>',b:'particles',k:'Avogadro',br:1};
+const STP={a:'mol',n:22.4,ns:'22.4',b:'L',k:'gas at STP',br:1};
+/* dilution concentration units: [group, factor to group base] */
+const CG={M:['mol',1],mM:['mol',1e-3],uM:['mol',1e-6],nM:['mol',1e-9],pM:['mol',1e-12],'%':['mv',10],'g/L':['mv',1],'mg/mL':['mv',1],'mg/L':['mv',1e-3],ugmL:['mv',1e-3],X:['x',1]};
+const VB={L:1,dL:.1,mL:1e-3,uL:1e-6};
+const OPTS={
+ all:()=>Object.keys(CATU).map(c=>[CATN[c],CATU[c].split(' ')]),
+ amt:()=>[['Mass',['ng','ug','mg','g','kg']],['Amount',['pmol','nmol','umol','mmol','mol']]],
+ vol:()=>[['Volume',['uL','mL','dL','L']]],
+ conc:()=>[['Molarity',['M','mM','uM','nM','pM']]],
+ dconc:()=>[['Molar',['M','mM','uM','nM','pM']],['Mass / volume',['%','g/L','mg/mL','mg/L','ugmL']],['Relative strength',['X']]],
+};
+
+/* ---------- Numbers ---------- */
+function pnum(s){
+  s=String(s==null?'':s).trim().replace(/,/g,'').replace(/−/g,'-').replace(/\s*[x×*]\s*10([⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+)$/,(m,e)=>'e'+e.replace('⁻','-').replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹]/g,c=>SUPD.indexOf(c))).replace(/\s*[x×*]\s*10\s*\^\s*/i,'e');
+  if(!s||!/^[+-]?(\d+\.?\d*|\.\d+)(e[+-]?\d+)?$/i.test(s))return NaN;return +s}
+function sigFigs(s){
+  s=String(s).trim().replace(/^[+-]/,'').replace(/,/g,'');let m=s.split(/e|x|×/i)[0];
+  if(!/\d/.test(m))return 0;const dot=m.includes('.');let d=m.replace('.','').replace(/^0+/,'');
+  if(!dot)d=d.replace(/0+$/,'');return Math.max(d.length,1)}
+const SUPD='⁰¹²³⁴⁵⁶⁷⁸⁹';
+function sciH(x,sf){let e=Math.floor(Math.log10(Math.abs(x)));const ms=()=>{const m=x/10**e;return sf?m.toPrecision(sf):String(+m.toPrecision(4))};let s=ms();if(Math.abs(+s)>=10){e++;s=ms()}return s+' × 10<sup>'+e+'</sup>'}
+function fmtH(x,sf){
+  if(x==null||!isFinite(x))return '—';if(x===0)return '0';const a=Math.abs(x);
+  if(a>=1e6||a<1e-3)return sciH(x,sf);
+  if(sf){const s=x.toPrecision(sf);return s.includes('e')?sciH(x,sf):s}
+  return String(+x.toPrecision(6))}
+const toTxt=h=>h.replace(/<sup>(-?\d+)<\/sup>/,(m,e)=>e.replace('-','⁻').replace(/\d/g,d=>SUPD[d]));
+const fmtT=(x,sf)=>toTxt(fmtH(x,sf));
+const r3=(a,b)=>{const x=a+rnd()*(b-a),dec=Math.max(0,2-Math.floor(Math.log10(x)));return x.toFixed(dec)};
+const pick=a=>a[Math.floor(rnd()*a.length)];
+
+/* ---------- Formulas ---------- */
+const FC={};
+function parseFormula(f){
+  let s=String(f).replace(/\s+/g,'').replace(/[₀-₉]/g,c=>String.fromCharCode(c.charCodeAt(0)-8272)).replace(/[⁺⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+$/,'').replace(/[+-]\d*$/,'');
+  if(!s)throw 'Enter a formula.';
+  const total={};const parts=s.split(/[·.*•]/);
+  parts.forEach((p,pi)=>{let coef=1;const m=p.match(/^(\d+)(.*)$/);if(m){coef=+m[1];p=m[2]}
+    if(!p)throw 'Something is missing after “·”.';
+    let i=0;const rd=()=>{let n='';while(i<p.length&&/\d/.test(p[i]))n+=p[i++];return n?+n:1};
+    const grp=()=>{const c={};while(i<p.length){const ch=p[i];
+      if(ch==='('||ch==='['){i++;const g=grp();if(p[i]!==')'&&p[i]!==']')throw 'A “(” is never closed.';i++;const n=rd();for(const k in g)c[k]=(c[k]||0)+g[k]*n}
+      else if(ch===')'||ch===']')return c;
+      else if(/[A-Z]/.test(ch)){let el=ch;i++;while(i<p.length&&/[a-z]/.test(p[i]))el+=p[i++];if(!(el in AM))throw `“${el}” is not an element symbol.`;const n=rd();c[el]=(c[el]||0)+n}
+      else if(/[a-z]/.test(ch))throw `Element symbols start with a capital letter (check “${ch}”).`;
+      else throw `Unexpected “${ch}”.`}return c};
+    const g=grp();if(i<p.length)throw 'There is a “)” with no matching “(”.';
+    for(const k in g)total[k]=(total[k]||0)+g[k]*coef});
+  return total}
+function mmOf(f){
+  if(FC[f])return FC[f];let r;
+  try{const c=parseFormula(f);let v=0;const comp=[];for(const el in c){const m=AM[el]*c[el];v+=m;comp.push([el,c[el],AM[el],m])}
+    r={ok:v>0,v,s:v.toFixed(2),comp}}catch(e){r={ok:false,err:String(e)}}
+  return FC[f]=r}
+const fH=f=>esc(String(f).replace(/[.*•]/g,'·')).replace(/([A-Za-z\)\]])(\d+)/g,'$1<sub>$2</sub>');
+const preOf=f=>PRE.find(p=>p[1].replace(/[.*•]/g,'·')===String(f).replace(/\s+/g,'').replace(/[.*•]/g,'·'));
+
+/* ---------- Factor-label engine ---------- */
+function bfs(edges,from,to){
+  if(from===to)return [];const adj=new Map();
+  const add=(x,e,y)=>{if(!adj.has(x))adj.set(x,[]);adj.get(x).push([e,y])};
+  edges.forEach(e=>{add(e.a,e,e.b);add(e.b,e,e.a)});
+  const prev=new Map([[from,null]]),q=[from];
+  while(q.length){const x=q.shift();for(const [e,y] of adj.get(x)||[]){if(prev.has(y))continue;prev.set(y,{x,e});
+    if(y===to){const path=[];let c=to;while(c!==from){const p=prev.get(c);path.unshift({from:p.x,to:c,e:p.e});c=p.x}return path}q.push(y)}}
+  return null}
+function buildChain(st,tn,td,extra){
+  const edges=REL.concat(extra||[]);
+  const pn=bfs(edges,st.nu,tn);if(!pn)return {err:{type:'num',from:st.nu,to:tn}};
+  let pd=[];if(st.du){pd=bfs(REL,st.du,td);if(!pd)return {err:{type:'den',from:st.du,to:td}}}
+  const terms=[{n:[{h:st.nvs,u:st.nu}],d:st.du?[{h:st.dvs,u:st.du}]:[],cap:'given',cls:'given'}];
+  let val=st.nv/(st.du?st.dv:1);
+  const f=(s,inv)=>{const e=s.e;let top,bot;
+    if(s.from===e.a){top={h:e.ns,u:e.b,v:e.n};bot={h:'1',u:e.a,v:1}}else{top={h:'1',u:e.a,v:1};bot={h:e.ns,u:e.b,v:e.n}}
+    if(inv)[top,bot]=[bot,top];val*=top.v/bot.v;
+    terms.push({n:[top],d:[bot],cap:e.k,cls:e.user?'user':(e.br?'bridge':''),e})};
+  pn.forEach(s=>f(s,false));pd.forEach(s=>f(s,true));
+  markCancel(terms);
+  return {terms,val,pn,pd}}
+function conv(v,a,b,ex){if(a===b)return v;const r=buildChain({nv:v,nvs:'',nu:a},b,null,ex);return r.err?NaN:r.val}
+function markCancel(terms){
+  const nums=[];terms.forEach((t,i)=>t.n.forEach(x=>{x.c=0;nums.push(x)}));terms.forEach(t=>t.d.forEach(x=>x.c=0));
+  let ci=0;terms.forEach(t=>t.d.forEach(x=>{const m=nums.find(o=>!o.c&&o.u===x.u);if(m){m.c=x.c=++ci}}))}
+const XC=['#60a5fa','#f472b6','#34d399','#fbbf24','#c084fc','#fb923c','#22d3ee','#a3e635'];
+function chainHTML(terms,resH,resU,tail){
+  const base=terms.length*0.12;
+  const tok=x=>`${x.h} <span class="u${x.c?' x':''}"${x.c?` style="--xc:${XC[(x.c-1)%XC.length]};--xd:${(base+0.15+x.c*0.16).toFixed(2)}s"`:''}>${esc(ul(x.u))}</span>`;
+  let h='<div class="chain">';
+  terms.forEach((t,i)=>{if(i)h+='<span class="op">×</span>';
+    h+=`<span class="fr ${t.cls||''}${t.d.length?'':' solo'}" style="--fd:${(i*0.12).toFixed(2)}s"><span class="nu">${t.n.map(tok).join(' · ')}</span>${t.d.length?`<span class="de">${t.d.map(tok).join(' · ')}</span>`:''}<span class="cap">${esc(t.cap||'')}</span></span>`});
+  h+=`<span class="op">=</span><span class="fr res solo" style="--fd:${base.toFixed(2)}s"><span class="nu">${resH} <span class="u">${esc(resU)}</span></span><span class="cap">answer</span></span>`;
+  if(tail)h+=tail;
+  return h+'</div>'}
+const pairKey=(a,b)=>[a,b].sort().join('>');
+const HINT={'amount>mass':'Turn on <b>Molar mass</b> to link grams and moles.','amount>particles':'Turn on <b>Avogadro’s number</b> to link moles and particles.','mass>particles':'Turn on <b>Molar mass</b> and <b>Avogadro’s number</b>: grams → moles → particles.','mass>volume':'Link volume by <b>Density</b> (g ↔ mL).','amount>volume':'Link volume by <b>Molarity</b> (solution) or <b>Gas at STP</b>.','particles>volume':'Link volume by <b>Molarity</b> or <b>Gas at STP</b>, and turn on <b>Avogadro’s number</b>.'};
+
+
+/* ---------- State ---------- */
+const DEF=()=>({mode:'da',sig:'1',
+  da:{terms:[{nv:'2.50',nu:'lb',dv:'',du:''},{nv:'453.592',nu:'g',dv:'1',du:'lb'},{nv:'1',nu:'kg',dv:'1000',du:'g'}],goal:''},
+  mo:{solve:'c',mmk:'f',bp:'3000',amt:'5.84',amtU:'g',f:'NaCl',vol:'250.0',volU:'mL',c:'0.400',cU:'M'},
+  dl:{solve:'v1',c1:'2.00',c1U:'M',v1:'12.5',v1U:'mL',c2:'0.100',c2U:'M',v2:'250.0',v2U:'mL'}});
+let S=DEF(),CUR=null;
+const SF=()=>S.sig==='1';
+function minSf(list){let best=null;list.forEach(x=>{if(x&&x[0]>0&&(!best||x[0]<best[0]))best=x});return best}
+/* ---------- Factor-label workspace ---------- */
+const ALIAS={moles:'mol',mole:'mol',mols:'mol',gram:'g',grams:'g',kilogram:'kg',kilograms:'kg',milligram:'mg',milligrams:'mg',mcg:'ug',liter:'L',liters:'L',litre:'L',litres:'L',l:'L',ml:'mL',milliliter:'mL',milliliters:'mL',ul:'uL',dl:'dL',cc:'cm3',molecules:'particles',molecule:'particles',atoms:'particles',atom:'particles',formula_units:'particles',formula_unit:'particles',ions:'particles',particle:'particles',second:'s',seconds:'s',sec:'s',minute:'min',minutes:'min',mins:'min',hour:'h',hours:'h',hr:'h',hrs:'h',days:'day',year:'yr',years:'yr',yrs:'yr',meter:'m',meters:'m',metre:'m',metres:'m',kilometer:'km',kilometers:'km',centimeter:'cm',centimeters:'cm',millimeter:'mm',millimeters:'mm',inch:'in',inches:'in',foot:'ft',feet:'ft',yard:'yd',yards:'yd',mile:'mi',miles:'mi',pound:'lb',pounds:'lb',lbs:'lb',ounce:'oz',ounces:'oz',gallon:'gal',gallons:'gal',quart:'qt',quarts:'qt',pint:'pt',pints:'pt',joule:'J',joules:'J',calorie:'cal',calories:'cal',Cal:'kcal',Torr:'torr'};
+const LB={};for(const id in U){LB[id]=id;LB[U[id].l]=id}
+const MC={M:'mol',mM:'mmol',uM:'umol','µM':'umol',nM:'nmol',pM:'pmol'};
+const BASE={mass:'g',amount:'mol',volume:'L',particles:'particles'};
+const SUPU=n=>String(n).replace('-','⁻').replace(/\d/g,d=>SUPD[d]);
+function tokInfo(base,e,raw){
+  if(MC[base])return{raw,e,id:null,label:base==='uM'?'µM':base,parts:[[MC[base],e],['L',-e]]};
+  if((base==='cm'||base==='m')&&Math.abs(e)===3){base+='3';e=Math.sign(e)}
+  const id=LB[base]||ALIAS[base]||ALIAS[base.toLowerCase()]||null;
+  if(id)return{raw,e,id,label:ul(id),parts:[[id,e]]};
+  let k=base.toLowerCase();if(k.length>3&&k.endsWith('s'))k=k.slice(0,-1);
+  return{raw,e,id:null,label:base,parts:[['~'+k,e]]}}
+function parseUnits(str){
+  let s=String(str||'').trim();if(!s)return [];
+  s=s.replace(/fl\.?\s+oz/gi,'floz').replace(/formula\s+units?/gi,'formula_units').replace(/[·*•×]/g,' ');
+  const out=[];s.split('/').forEach((h,hi)=>h.trim().split(/\s+/).filter(Boolean).forEach(tok=>{
+    let base=tok,e=1;const m=tok.match(/^(.+?)(?:\^\(?(-?\d+)\)?|([²³]))$/);
+    if(m){base=m[1];e=m[2]!=null?+m[2]:(m[3]==='²'?2:3)}
+    if(hi>0)e=-e;if(e)out.push(tokInfo(base,e,tok))}));
+  return out}
+function unitStr(V,L){const num=[],den=[];
+  Object.keys(V).forEach(k=>{const e=V[k];if(!e)return;const s=L[k]+(Math.abs(e)>1?SUPU(Math.abs(e)):'');(e>0?num:den).push(s)});
+  if(!num.length&&!den.length)return '';
+  return (num.length?num.join('·'):'1')+(den.length?'/'+(den.length>1?'('+den.join('·')+')':den[0]):'')}
+function simpV(X){const p=[],n=[];for(const k in X){const e=X[k];if(!e)continue;if(Math.abs(e)!==1||k[0]==='~')return null;(e>0?p:n).push(k)}
+  return p.length<=1&&n.length<=1?{p:p[0]||null,n:n[0]||null}:null}
+function stepTerm(s,inv){const e=s.e,vs=String(e.vs||e.ns);let top,bot;
+  if(s.from===e.a){top=[vs,ul(e.b)];bot=['1',ul(e.a)]}else{top=['1',ul(e.a)];bot=[vs,ul(e.b)]}
+  if(inv)[top,bot]=[bot,top];return{nv:top[0],nu:top[1],dv:bot[0],du:bot[1]}}
+function termStatus(T,i,mm){
+  const top=`${T.t.nv} ${T.t.nu}`.trim(),bot=T.hasDen?`${String(T.t.dv).trim()||1} ${T.t.du}`.trim():'';
+  if(T.bad.length)return{c:'bad',t:'check the number',long:'A number in this term can’t be read.',lim:false};
+  if(i===0)return{c:'given',t:'given',long:`Start with the given quantity: ${top}${bot?' per '+bot:''}.`,lim:true};
+  if(!T.n.length&&!T.d.length)return{c:'info',t:'add units',long:'This term has no units yet.',lim:true};
+  const s1=x=>x.length===1&&x[0].id&&x[0].e===1?x[0].id:null,ua=s1(T.n),ub=s1(T.d);
+  if(ua&&ub){const ratio=T.nv/T.dv,ca=catOf(ua),cb=catOf(ub);
+    if(ua===ub)return{c:'warn',t:'same unit top & bottom',long:'The same unit on top and bottom cancels itself, so this term changes nothing about the units.',lim:true};
+    if(ca===cb){const ex=conv(1,ub,ua,[]),eq=ex>=1?`1 ${ul(ub)} = ${fmtT(ex,0)} ${ul(ua)}`:`1 ${ul(ua)} = ${fmtT(1/ex,0)} ${ul(ub)}`;
+      if(Math.abs(ratio/ex-1)<2e-3)return{c:'ok',t:'✓ exact · equals 1',long:`Exact conversion factor (${eq}). Top equals bottom, so the factor equals 1 and only the units change.`,lim:false};
+      if(Math.abs(ratio*ex-1)<2e-3)return{c:'warn',t:'numbers upside down?',long:`The numbers look swapped. ${eq}.`,lim:true};
+      return{c:'warn',t:`≠ 1 · ${eq}`,long:`Top and bottom aren’t equal, so this isn’t a conversion factor. The real relationship is ${eq}.`,lim:true}}
+    const k=pairKey(ca,cb),fm='';
+    const pb=num=>ca===num?ratio*conv(1,ua,BASE[ca])/conv(1,ub,BASE[cb]):conv(1,ub,BASE[cb])/(ratio*conv(1,ua,BASE[ca]));
+    if(k==='amount>mass'){const g=pb('mass');
+      if(S.mode==='da'){const hit=PRE.find(q=>{const m2=mmOf(q[1]);return m2.ok&&Math.abs(g/m2.v-1)<2e-3});
+        return hit?{c:'ok',t:`✓ molar mass of ${hit[1].replace(/\d/g,d=>'₀₁₂₃₄₅₆₇₈₉'[d])}`,long:`Matches the molar mass of ${hit[0]}.`,lim:false}:{c:'info',t:'molar mass',long:'A grams ↔ moles factor.',lim:false}}
+      if(mm.ok&&Math.abs(g/mm.v-1)<5e-3)return{c:'ok',t:`✓ molar mass of ${fm}`,long:`Molar mass of ${fm}: 1 mol = ${mm.s} g. Molar masses here don’t limit sig figs.`,lim:false};
+      return{c:'warn',t:mm.ok?`molar mass? ${fm} is ${mm.s} g/mol`:'molar mass',long:mm.ok?`This term says ${fmtT(g,4)} g per mol, but ${fm} is ${mm.s} g/mol. That’s fine if you meant a different substance.`:'A grams ↔ moles factor. Its value is the molar mass.',lim:true}}
+    if(k==='amount>particles'){const n=pb('particles');
+      if(Math.abs(n/6.022e23-1)<2e-3)return{c:'ok',t:'✓ Avogadro’s number',long:'Avogadro’s number: 1 mol = 6.022 × 10²³ particles.',lim:false};
+      return{c:'warn',t:'Avogadro: 6.022 × 10²³',long:'Moles ↔ particles always uses Avogadro’s number, 6.022 × 10²³ per mol.',lim:true}}
+    if(k==='mass>volume')return{c:'info',t:'density',long:`A density of ${fmtT(pb('mass')/1000,4)} g/mL. It’s a measured value, so it counts for sig figs.`,lim:true};
+    if(k==='amount>volume'){const Lm=pb('volume');
+      if(Math.abs(Lm/22.4-1)<3e-3)return{c:'ok',t:'✓ molar volume at STP',long:'At STP, 1 mol of an ideal gas fills 22.4 L.',lim:false};
+      return{c:'info',t:'molarity',long:`A concentration of ${fmtT(1/Lm,4)} mol/L. It’s a measured value, so it counts for sig figs.`,lim:true}}
+    return{c:'info',t:'ratio',long:`A ratio between ${CATN[ca].toLowerCase()} and ${CATN[cb].toLowerCase()}. It’s treated as measured.`,lim:true}}
+  if(!T.hasDen)return{c:'info',t:'multiplier',long:'Nothing on the bottom, so this multiplies straight in.',lim:true};
+  return{c:'info',t:'ratio',long:'A ratio. Its units cancel like any others, and it’s treated as measured.',lim:true}}
+function computeWS(){
+  const d=S.da,mm={ok:false},R={mode:'da',ws:true,bad:[],terms:[],mm};
+  let val=1,bad=false;const V={},LBK={},occ=[];
+  d.terms.forEach((t,i)=>{
+    const nvS=String(t.nv).trim(),dvS=String(t.dv).trim(),n=parseUnits(t.nu),dd=parseUnits(t.du);
+    const nv=pnum(nvS),dv=dvS===''?1:pnum(dvS);
+    const T={i,t,n,d:dd,nv,dv,bad:[],hasDen:dd.length>0||(dvS!==''&&dvS!=='1'),tok:{nu:[],du:[]}};
+    if(isNaN(nv))T.bad.push('nv');if(isNaN(dv)||dv===0)T.bad.push('dv');
+    if(T.bad.length)bad=true;else val*=nv/dv;
+    [[n,1,'nu'],[dd,-1,'du']].forEach(([list,sg,f])=>list.forEach(tk=>{
+      const o={tk,parts:tk.parts.map(([k,e])=>({k,amt:sg*e,rem:Math.abs(e)}))};occ.push(o);T.tok[f].push(o);
+      tk.parts.forEach(([k,e])=>{V[k]=(V[k]||0)+sg*e;if(!(k in LBK))LBK[k]=k[0]==='~'?tk.label:ul(k)})}));
+    R.terms.push(T)});
+  const col={};let ci=0;
+  Object.keys(LBK).forEach(k=>{const P=[],N=[];occ.forEach(o=>o.parts.forEach(q=>{if(q.k===k)(q.amt>0?P:N).push(q)}));
+    let a=0,b=0;while(a<P.length&&b<N.length){const m=Math.min(P[a].rem,N[b].rem);P[a].rem-=m;N[b].rem-=m;if(!P[a].rem)a++;if(!N[b].rem)b++}
+    if(P.length&&N.length)col[k]=XC[ci++%XC.length]});
+  occ.forEach(o=>{o.x=o.parts.every(q=>!q.rem);o.col=o.x?col[o.parts[0].k]:null});
+  R.terms.forEach(T=>{T.x={};['nu','du'].forEach(f=>{const L=T.tok[f];T.x[f]={all:L.length>0&&L.every(o=>o.x),some:L.some(o=>o.x),col:(L.find(o=>o.x)||{}).col}})});
+  R.V=V;R.LBK=LBK;R.unit=unitStr(V,LBK);
+  const lim=[];
+  R.terms.forEach((T,i)=>{T.st=termStatus(T,i,mm);
+    if(T.st.lim){const a=String(T.t.nv).trim(),b=String(T.t.dv).trim();
+      if(a&&a!=='1'&&!isNaN(T.nv))lim.push([sigFigs(a),`term ${i+1} (${a})`]);
+      if(b&&b!=='1'&&!isNaN(T.dv))lim.push([sigFigs(b),`term ${i+1} (${b})`])}});
+  R.lim=minSf(lim);R.sf=R.lim?R.lim[0]:0;
+  if(bad)R.err='Fix the highlighted number in the workspace.';
+  R.ans=R.val=val;
+  return R}
+function setW(el){const n=Math.max(el.value.length,el.value?0:(el.placeholder||'').length,el.classList.contains('tv')?2:3);el.style.width=(n+1.6)+'ch'}
+function buildWS(){
+  const T=S.da.terms,ia=' autocomplete="off" spellcheck="false" autocapitalize="off"';let h='';
+  T.forEach((t,i)=>{if(i)h+='<span class="tx">×</span>';
+    h+=`<div class="term" data-ti="${i}"><div class="tbar"><button data-act="left" title="Move left" aria-label="Move term left">‹</button><button data-act="flip" title="Flip top and bottom" aria-label="Flip term">⇅</button><button data-act="del" class="del" title="Remove term" aria-label="Remove term">×</button><button data-act="right" title="Move right" aria-label="Move term right">›</button></div>`+
+      `<div class="tside"><input class="tv" data-f="nv" value="${esc(t.nv)}" placeholder="#" inputmode="decimal" aria-label="Term ${i+1} top number"${ia}><span class="uw"><input class="tu" data-f="nu" value="${esc(t.nu)}" placeholder="unit" list="unitList" aria-label="Term ${i+1} top unit"${ia}></span></div>`+
+      `<div class="tline"></div>`+
+      `<div class="tside den"><input class="tv" data-f="dv" value="${esc(t.dv)}" placeholder="1" inputmode="decimal" aria-label="Term ${i+1} bottom number"${ia}><span class="uw"><input class="tu" data-f="du" value="${esc(t.du)}" placeholder="per…" list="unitList" aria-label="Term ${i+1} bottom unit"${ia}></span></div>`+
+      `<div class="tst"></div></div>`});
+  h+=`<button class="addt" data-act="add" title="Add a term" aria-label="Add a term">+</button><span class="tx">=</span><div class="wsres" id="wsRes"></div>`;
+  $('terms').innerHTML='<div class="trow" id="trow">'+h+'</div>';$('terms').querySelectorAll('.tv,.tu').forEach(setW)}
+
+function focusTerm(i,f){const el=$('terms').querySelector(`.term[data-ti="${i}"] [data-f="${f}"]`);if(el)el.focus()}
+function renderDA(R){
+  const cards=$('terms').querySelectorAll('.term'),sf=SF()&&R.sf?R.sf:0;
+  R.terms.forEach((T,i)=>{const c=cards[i];if(!c)return;
+    c.querySelector('[data-f="nv"]').classList.toggle('bad',T.bad.includes('nv'));
+    c.querySelector('[data-f="dv"]').classList.toggle('bad',T.bad.includes('dv'));
+    ['nu','du'].forEach(f=>{const w=c.querySelector(`[data-f="${f}"]`).parentElement,x=T.x[f];w.classList.toggle('x',x.all);w.classList.toggle('px',x.some&&!x.all);if(x.col)w.style.setProperty('--xc',x.col)});
+    c.classList.toggle('nod',!T.hasDen);c.classList.toggle('given',i===0);
+    const s=c.querySelector('.tst');s.className='tst '+T.st.c;s.textContent=T.st.t});
+  $('wsRes').innerHTML=`<span class="v">${R.err?'—':fmtH(R.val,sf)}</span><span class="ru">${esc(R.unit||'')}</span>`;
+  $('wsRes').title=R.err?R.err:(R.lim&&SF()?`Rounded to ${R.sf} sig fig${R.sf>1?'s':''}, set by ${R.lim[1]}. Unrounded: ${toTxt(fmtH(R.val,0))}`:'Unrounded');
+  fitTerms();
+}
+/* ---------- Molarity ---------- */
+function computeMol(m,f){
+  const R={mode:'mol',bad:[]};const dna=m.mmk==='dna',mm=dna?dnaMM(m.bp):mmOf(f);R.mm=mm;R.pre=dna?null:preOf(f);
+  const isMass=catOf(m.amtU)==='mass';
+  const mmE=mm.ok?[{a:'mol',n:mm.v,ns:mm.s,b:'g',k:'molar mass',br:1}]:[];
+  if(isMass&&!mm.ok){R.err=dna?'Enter the DNA length in base pairs.':'Enter a valid formula so the molar mass can link grams and moles.';return R}
+  const A=pnum(m.amt),V=pnum(m.vol),C=pnum(m.c);
+  const need={c:['amt','vol'],amt:['vol','c'],vol:['amt','c']}[m.solve];
+  const vals={amt:A,vol:V,c:C};
+  for(const k of need)if(!(vals[k]>0)){R.err={amt:'Enter a positive amount of solute.',vol:'Enter a positive volume.',c:'Enter a positive molarity.'}[k];R.bad.push('mo.'+k);return R}
+  const cBr={a:'L',n:C,ns:esc(String(m.c).trim()),b:CONC[m.cU],k:'molarity',user:1,sf:sigFigs(m.c)};
+  let r;
+  if(m.solve==='c')r=buildChain({nv:A,nvs:esc(String(m.amt).trim()),nu:m.amtU,dv:V,dvs:esc(String(m.vol).trim()),du:m.volU},CONC[m.cU],'L',mmE);
+  else if(m.solve==='amt')r=buildChain({nv:V,nvs:esc(String(m.vol).trim()),nu:m.volU},m.amtU,null,mmE.concat([cBr]));
+  else r=buildChain({nv:A,nvs:esc(String(m.amt).trim()),nu:m.amtU},m.volU,null,mmE.concat([cBr]));
+  if(r.err){R.err='Couldn’t connect those units.';return R}
+  Object.assign(R,r);R.ans=r.val;
+  const lim=need.map(k=>[sigFigs(m[k]),{amt:'the solute amount',vol:'the volume',c:'the molarity'}[k]+' ('+String(m[k]).trim()+')']);
+  R.lim=minSf(lim);R.sf=R.lim[0];
+  const amt=m.solve==='amt'?r.val:A,vol=m.solve==='vol'?r.val:V,c=m.solve==='c'?r.val:C;
+  R.mol=conv(amt,m.amtU,'mol',mmE);R.L=conv(vol,m.volU,'L');R.M=conv(c,CONC[m.cU],'mol',[]);
+  R.g=mm.ok?R.mol*mm.v:NaN;
+  R.unit=m.solve==='c'?{M:'M',mM:'mM',uM:'µM',nM:'nM',pM:'pM'}[m.cU]:ul(m.solve==='amt'?m.amtU:m.volU);
+  R.chainUnit=m.solve==='c'?ul(CONC[m.cU])+'/L':R.unit;
+  return R}
+
+/* ---------- Dilution ---------- */
+const DL={c1:'C₁',v1:'V₁',c2:'C₂',v2:'V₂'};
+const DLH={c1:'C<sub>1</sub>',v1:'V<sub>1</sub>',c2:'C<sub>2</sub>',v2:'V<sub>2</sub>'};
+const FORM={v1:['c2','v2','c1'],v2:['c1','v1','c2'],c1:['c2','v2','v1'],c2:['c1','v1','v2']};
+const isC=k=>k[0]==='c';
+const uOf=(dl,k)=>dl[k+'U'];
+const cv1=(v,from,to,isConc)=>isConc?v*CG[from][1]/CG[to][1]:v*VB[from]/VB[to];
+function computeDil(dl){
+  const R={mode:'dil',kind:dl.kind,bad:[]};
+  const s=dl.solve,known=['c1','v1','c2','v2'].filter(k=>k!==s);
+  if(CG[dl.c1U][0]!==CG[dl.c2U][0]){R.err='C₁ and C₂ need the same kind of unit (both molar, both mass/volume, or both X).';return R}
+  const val={};for(const k of known){val[k]=pnum(dl[k]);if(!(val[k]>0)){R.err=`Enter a positive value for ${DL[k]}.`;R.bad.push('dl.'+k);return R}}
+  const base={};for(const k of known)base[k]=isC(k)?val[k]*CG[dl[k+'U']][1]:val[k]*VB[dl[k+'U']];
+  let x;if(s==='v1')x=base.c2*base.v2/base.c1;else if(s==='v2')x=base.c1*base.v1/base.c2;else if(s==='c1')x=base.c2*base.v2/base.v1;else x=base.c1*base.v1/base.v2;
+  base[s]=x;
+  if(base.c2>base.c1*(1+1e-9)){R.err='C₂ can’t be higher than C₁: adding solvent only lowers the concentration.';R.bad.push('dl.'+(s==='c1'?'c2':s==='c2'?'c1':'c2'));R.base=base;return R}
+  if(base.v1>base.v2*(1+1e-9)){R.err='V₁ can’t be more than V₂: the final volume includes the stock you added.';R.bad.push('dl.'+(s==='v1'?'v2':'v1'));R.base=base;return R}
+  R.base=base;R.val=val;R.ans=isC(s)?x/CG[dl[s+'U']][1]:x/VB[dl[s+'U']];R.unit=ul(dl[s+'U']);
+  R.lim=minSf(known.map(k=>[sigFigs(dl[k]),DL[k]+' ('+String(dl[k]).trim()+')']));R.sf=R.lim[0];
+  /* algebra with units: X = (A·B)/C; the like pair cancels after converting to C's unit */
+  const [Ak,Bk,Ck]=FORM[s];const Pk=isC(Ck)?Ak:Bk,Rk=isC(Ck)?Bk:Ak;
+  const Cu=dl[Ck+'U'],Pu=dl[Pk+'U'];
+  R.convNote=null;let Pv=val[Pk],Ph=esc(String(dl[Pk]).trim());
+  if(Pu!==Cu){Pv=cv1(val[Pk],Pu,Cu,isC(Pk));Ph=fmtH(Pv,0);R.convNote=`${DLH[Pk]} = ${esc(String(dl[Pk]).trim())} ${esc(ul(Pu))} = ${Ph} ${esc(ul(Cu))}`}
+  const Ru=dl[Rk+'U'];
+  R.terms=[{n:[{h:Ph,u:Cu},{h:esc(String(dl[Rk]).trim()),u:Ru}],d:[{h:esc(String(dl[Ck]).trim()),u:Cu}],cap:`(${DL[Pk]} × ${DL[Rk]}) ÷ ${DL[Ck]}`,cls:'given'}];
+  markCancel(R.terms);
+  R.rawU=Ru;R.raw=Pv*val[Rk]/val[Ck];
+  R.factor=base.c1/base.c2;R.solvent=base.v2-base.v1;
+  return R}
+
+/* ---------- Card builders (molarity, dilution, serial) ---------- */
+const IA=' autocomplete="off" spellcheck="false" autocapitalize="off"';
+const selH=(f,opts,val)=>`<select class="tsel" data-f="${f}" aria-label="${f} unit">${OPTS[opts]().map(([lab,ids])=>`<optgroup label="${lab}">${ids.map(i=>`<option value="${esc(i)}"${i===val?' selected':''}>${esc(ul(i))}</option>`).join('')}</optgroup>`).join('')}</select>`;
+const inH=(f,val,lab)=>`<input class="tv" data-f="${f}" value="${esc(val)}" placeholder="#" inputmode="decimal" aria-label="${lab}"${IA}>`;
+function qCard(k,o){ // a single quantity card: value + unit; solved card shows an output
+  const solved=o.solved;
+  return `<div class="term${solved?' out':''}" data-k="${k}"><div class="tbar">${solved?'<span class="ans">answer</span>':`<button class="sv" data-act="solve" data-k="${k}" title="Solve for this">solve</button>`}</div>`+
+    `<div class="tside">${solved?`<output class="tout" data-o="${k}">—</output>`:inH(k,o.val,o.cap)}${selH(k+'U',o.opts,o.unit)}</div>`+
+    `<div class="tsub" data-sub="${k}"></div><div class="tst" data-st="${k}">${o.cap}</div></div>`}
+const op=(s,k)=>`<span class="tx"${k?` data-op="${k}"`:''}>${s}</span>`;
+function fitTerms(){const box=$('terms'),row=$('trow');if(!box||!row)return;
+  const cs=getComputedStyle(box),aw=box.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight),ah=box.clientHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom);
+  if(aw<=0||ah<=0)return;
+  let fs=Math.min(40,Math.max(14,ah/5));box.style.fontSize=fs+'px';
+  for(let k=0;k<4;k++){const r=row.getBoundingClientRect(),q=Math.min(aw/r.width,ah/r.height);if(q>=1)break;fs=Math.max(3.5,fs*q*0.985);box.style.fontSize=fs+'px'}}
+
+/* Molarity: inputs in the order they're combined, answer last */
+/* Molarity: molar mass first, then the quantities it combines with; answer last */
+const MO={c:['f','×','amt','÷','vol','=','c'],amt:['f','×','c','×','vol','=','amt'],vol:['f','×','amt','÷','c','=','vol']};
+const MOC={amt:{cap:'solute',opts:'amt'},vol:{cap:'solution volume',opts:'vol'},c:{cap:'molarity',opts:'conc'}};
+/* average dsDNA (sodium salt): MW = bp × 617.96 + 36.04 g/mol */
+function dnaMM(bp){const n=pnum(bp);if(!(n>0))return{ok:false,err:'Enter the length in base pairs.'};const v=n*617.96+36.04;return{ok:true,v,s:v.toFixed(2),dna:true,n}}
+function mmCard(m,inv){
+  const dna=m.mmk==='dna',one='<span class="tunit" style="color:#fff">1 mol</span>',mmS='<span class="tmm" data-o="mm">—</span>';
+  const src=dna?`<input class="tv" data-f="bp" value="${esc(m.bp)}" placeholder="bp" inputmode="numeric" aria-label="DNA length in base pairs"${IA}><span class="tunit">bp</span>`
+    :`<input class="tf" data-f="f" value="${esc(m.f)}" placeholder="formula" list="fList" aria-label="Solute formula"${IA}>`;
+  return `<div class="term mmc" data-k="f"><div class="tbar"><button class="sv${dna?'':' on'}" data-act="mmk" data-v="f" title="Molar mass from a chemical formula">formula</button><button class="sv${dna?' on':''}" data-act="mmk" data-v="dna" title="Molar mass of double-stranded DNA from its length">DNA bp</button></div>`+
+    `<div class="tside src">${src}</div><div class="tside">${inv?one:mmS}</div><div class="tline"></div><div class="tside">${inv?mmS:one}</div>`+
+    `<div class="tsub" data-sub="f"></div><div class="tst" data-st="f">molar mass</div></div>`}
+function buildMol(){const m=S.mo;let h='';
+  MO[m.solve].forEach(k=>{
+    if('÷×='.includes(k)){h+=op(k,k==='÷'||k==='×'?'x':'');return}
+    if(k==='f'){h+=mmCard(m,m.solve!=='amt');return}
+    h+=qCard(k,{solved:m.solve===k,val:m[k],unit:m[k+'U'],cap:MOC[k].cap,opts:MOC[k].opts})});
+  return h}
+function paintMol(){
+  const m=S.mo,R=computeMol(m,m.f),mm=R.mm,sf=SF()&&R.sf?R.sf:0,T=$('terms'),q=s=>T.querySelector(s),dna=m.mmk==='dna';
+  const fi=q(dna?'[data-f="bp"]':'[data-f="f"]');fi.classList.toggle('bad',!mm.ok);
+  q('[data-o="mm"]').innerHTML=mm.ok?`${mm.s} g`:'— g';
+  const pre=R.pre;
+  q('[data-sub="f"]').innerHTML=!mm.ok?`<span class="w">${esc(mm.err||'')}</span>`:dna?`${esc(String(m.bp).trim())} bp × 617.96 + 36.04<br><b>double-stranded DNA</b>`:mm.comp.map(([el,n,a])=>`${n>1?n+'×':''}${el} ${a}`).join(' + ')+(pre?`<br><b>${esc(pre[0])}</b>`:'');
+  const fCard=q('[data-k="f"]'),needMM=catOf(m.amtU)==='mass';
+  fCard.classList.toggle('dim',!needMM&&mm.ok);
+  q('[data-st="f"]').textContent=needMM?'molar mass':'molar mass · not needed for moles';
+  const xop=fCard.nextElementSibling;if(xop)xop.classList.toggle('dim',!needMM);
+  ['amt','vol','c'].forEach(k=>{const el=q(`input[data-f="${k}"]`);if(el)el.classList.toggle('bad',R.bad.includes('mo.'+k))});
+  const out=q(`[data-o="${m.solve}"]`),card=q(`.term[data-k="${m.solve}"]`),sub=q(`[data-sub="${m.solve}"]`);
+  card.classList.toggle('err',!!R.err);
+  if(R.err){out.innerHTML='—';sub.innerHTML=`<span class="w">${R.err}</span>`;CUR=R;fitTerms();return}
+  out.innerHTML=fmtH(R.ans,sf);
+  const lines=[`<b>${fmtH(R.mol,sf)} mol</b> in <b>${fmtH(R.L,sf)} L</b>`+(mm.ok?` · <b>${fmtH(R.g,sf)} g</b>`:'')];
+  if(m.solve!=='c')lines.push(`= <b>${fmtH(R.M,sf)} M</b>`);
+  if(dna&&mm.ok)lines.push(`${fmtT(R.mol*6.022e23,3)} DNA molecules`);
+  if(pre&&pre[2].ions)lines.push(pre[2].ions.map(([ion,n])=>`[${ion}] ${fmtH(n*R.M,sf)} M`).join(' · '));
+  if(R.lim&&SF())lines.push(`${R.sf} sig figs, from ${esc(R.lim[1])}`);
+  sub.innerHTML=lines.join('<br>');
+  ['amt','vol','c'].filter(k=>k!==m.solve).forEach(k=>{q(`[data-sub="${k}"]`).innerHTML=''});
+  CUR=R;fitTerms()}
+
+/* Dilution: always laid out as C1 × V1 = C2 × V2; the unknown is highlighted in place */
+const DOC={c1:'C<sub>1</sub> · stock',v1:'V<sub>1</sub> · stock used',c2:'C<sub>2</sub> · final',v2:'V<sub>2</sub> · final volume'};
+function buildDil(){const d=S.dl;let h='';
+  ['c1','×','v1','=','c2','×','v2'].forEach(k=>{if('÷×='.includes(k)){h+=op(k);return}
+    h+=qCard(k,{solved:d.solve===k,val:d[k],unit:d[k+'U'],cap:DOC[k],opts:k[0]==='c'?'dconc':'vol'})});
+  return h}
+function paintDil(){
+  const d=S.dl,R=computeDil(d),sf=SF()&&R.sf?R.sf:0,T=$('terms'),q=s=>T.querySelector(s);
+  ['c1','v1','c2','v2'].forEach(k=>{const el=q(`input[data-f="${k}"]`);if(el)el.classList.toggle('bad',R.bad.includes('dl.'+k))});
+  const out=q(`[data-o="${d.solve}"]`),card=q(`.term[data-k="${d.solve}"]`),sub=q(`[data-sub="${d.solve}"]`);
+  card.classList.toggle('err',!!R.err);
+  if(R.err){out.innerHTML='—';sub.innerHTML=`<span class="w">${R.err}</span>`;CUR=R;fitTerms();return}
+  out.innerHTML=fmtH(R.ans,sf);
+  const b=R.base,vu=d.v2U;
+  const lines=[`take <b>${fmtH(b.v1/VB[vu],sf)} ${esc(ul(vu))}</b> stock + <b>${fmtH((b.v2-b.v1)/VB[vu],sf)} ${esc(ul(vu))}</b> solvent`,`1 : ${fmtH(R.factor,3)} dilution`];
+  if(R.convNote)lines.push(`units matched: ${R.convNote}`);
+  if(R.lim&&SF())lines.push(`${R.sf} sig figs, from ${esc(R.lim[1])}`);
+  sub.innerHTML=lines.join('<br>');CUR=R;fitTerms()}
+
+/* ---------- Page build / paint ---------- */
+function build(){
+  let h;if(S.mode==='da'){buildWS();return}
+  h=S.mode==='mol'?buildMol():buildDil();
+  $('terms').innerHTML='<div class="trow" id="trow">'+h+'</div>';
+  $('terms').querySelectorAll('.tv,.tf').forEach(setW)}
+function paint(){
+  if(S.mode==='da'){if($('terms').querySelectorAll('.term[data-ti]').length!==S.da.terms.length)buildWS();CUR=computeWS();renderDA(CUR)}
+  else if(S.mode==='mol')paintMol();else paintDil()}
+function rebuild(){build();paint()}
+const update=paint;
+function syncHeader(){document.querySelectorAll('[data-seg]').forEach(g=>{const v=String(S[g.dataset.seg]);g.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v))});document.body.dataset.m=S.mode}
+
+/* When a term has two units of the same kind (g over kg, cm over in), fill in the numbers that make it equal 1. */
+function autoFill(i){if(i===0)return;const t=S.da.terms[i];
+  const one=x=>{const p=parseUnits(x);return p.length===1&&p[0].id&&p[0].e===1?p[0].id:null},a=one(t.nu),b=one(t.du);
+  if(!a||!b||a===b||catOf(a)!==catOf(b))return;
+  const ex=conv(1,b,a,[]);if(!(ex>0)||!isFinite(ex))return;
+  const nice=x=>String(+x.toPrecision(10)),A=nice(ex),B=nice(1/ex);
+  if(A.length<=B.length){t.nv=A;t.dv='1'}else{t.nv='1';t.dv=B}
+  const c=$('terms').querySelector(`.term[data-ti="${i}"]`);if(!c)return;
+  ['nv','dv'].forEach(k=>{const el=c.querySelector(`[data-f="${k}"]`);el.value=t[k];setW(el)})}
+
+/* ---------- Events ---------- */
+document.addEventListener('click',e=>{const b=e.target.closest('[data-seg] button');if(!b)return;S[b.parentElement.dataset.seg]=b.dataset.v;syncHeader();rebuild()});
+$('resetBtn').addEventListener('click',()=>{const d=DEF(),m=S.mode;if(m==='da')S.da={terms:[{nv:'',nu:'',dv:'',du:''}],goal:''};else S[{mol:'mo',dil:'dl'}[m]]=d[{mol:'mo',dil:'dl'}[m]];rebuild();if(m==='da')focusTerm(0,'nv')});
+$('terms').addEventListener('input',e=>{const el=e.target,f=el.dataset.f;if(!f)return;
+  if(S.mode==='da'){const i=+el.closest('.term').dataset.ti;S.da.terms[i][f]=el.value;if(f==='nu'||f==='du')autoFill(i)}
+  else if(S.mode==='mol')S.mo[f]=el.value;
+  else S.dl[f]=el.value;
+  if(el.tagName==='INPUT')setW(el);paint()});
+$('terms').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const act=b.dataset.act;
+  if(act==='solve'){const st=S.mode==='mol'?S.mo:S.dl;
+    if(CUR&&!CUR.err&&CUR.ans!=null&&isFinite(CUR.ans))st[st.solve]=CUR.sf?CUR.ans.toPrecision(CUR.sf):String(+CUR.ans.toPrecision(6));
+    st.solve=b.dataset.k;rebuild();return}
+  if(act==='mmk'){S.mo.mmk=b.dataset.v;rebuild();return}
+  if(S.mode!=='da')return;const T=S.da.terms;
+  if(act==='add'){T.push({nv:'1',nu:'',dv:'1',du:''});rebuild();focusTerm(T.length-1,'nu');return}
+  const i=+b.closest('.term').dataset.ti;
+  if(act==='flip'){const t=T[i];T[i]={nv:String(t.dv).trim()||'1',nu:t.du,dv:t.nv,du:t.nu}}
+  else if(act==='del')T.splice(i,1);
+  else if(act==='left'&&i>0)[T[i-1],T[i]]=[T[i],T[i-1]];
+  else if(act==='right'&&i<T.length-1)[T[i+1],T[i]]=[T[i],T[i+1]];
+  if(!T.length)T.push({nv:'',nu:'',dv:'',du:''});
+  rebuild();const nb=$('terms').querySelector(`.term[data-ti="${Math.min(i,T.length-1)}"] [data-act="${act}"]`);if(nb&&act!=='del')nb.focus()});
+new ResizeObserver(()=>fitTerms()).observe($('terms'));
+$('unitList').innerHTML=[...new Set(Object.keys(U).map(ul).concat(['M','mM','µM','molecules','atoms','formula units']))].map(x=>`<option value="${esc(x)}"></option>`).join('');
+$('fList').innerHTML=PRE.map(p=>`<option value="${esc(p[1])}">${esc(p[0])}</option>`).join('');
+syncHeader();rebuild();
+window.__S=()=>S;window.__R=()=>CUR;
+
+})();
+</script>
+</body></html>

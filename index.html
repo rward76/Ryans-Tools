@@ -169,7 +169,7 @@ const ABOUT = {
   ]
 };
 // Categories appear on the page in this order. Each tool uses one of these names.
-const CATEGORIES = ["Biology", "Chemistry", "Physics", "Math", "Computing & Simulation", "Arts"];
+const CATEGORIES = ["Biology", "Chemistry", "Physics", "Engineering", "Math", "Computing & Simulation", "Arts"];
 // Card icons, copied from each app's own header logo. To use an image file instead, set a tool's icon to its path, e.g. icon: "cell_tour_icon.svg"
 const ICONS = {
   cell: "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"><ellipse cx=\"12\" cy=\"12\" rx=\"10\" ry=\"8\"/><circle cx=\"10\" cy=\"11\" r=\"3.2\"/><path d=\"M16 8.5c1.2.4 1.8 1.3 1.6 2.4M15.5 15.5h2\"/></svg>",
@@ -194,62 +194,75 @@ const ICONS = {
   graph: "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M10 4.5C8 4 7 5 6.6 7.5L5 19c-.4 2-1.6 2.5-3 2\"/><path d=\"M4 10h5\"/><path d=\"M13 9c-1.2 2-1.2 6 0 8M21 9c1.2 2 1.2 6 0 8\"/><path d=\"M15 10.5l4 5M19 10.5l-4 5\"/></svg>",
   world: "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M3.5 9.5c3 1 4.5-1 7-0.5s2 3.5 4.5 3.5 3-2 5.5-1.5\"/><path d=\"M6 17c2-1 3.5 0 5 1.5\"/><path d=\"M14 5c1 1.5 3 1.5 4 1\"/></svg>",
   color: "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"><circle cx=\"12\" cy=\"8.5\" r=\"5.5\"/><circle cx=\"8.5\" cy=\"14.5\" r=\"5.5\"/><circle cx=\"15.5\" cy=\"14.5\" r=\"5.5\"/></svg>",
+  bridge: "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M2 16h20\"/><path d=\"M3 16l3-6 3 6 3-6 3 6 3-6 3 6\"/><path d=\"M6 10h12\"/><path d=\"M4 20v-4M20 20v-4\"/></svg>",
+  machines: "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M2 13L22 8\"/><path d=\"M12 10.5l-4 9h8z\"/><path d=\"M4 19.5h16\"/><rect x=\"2.5\" y=\"7\" width=\"4\" height=\"4\" rx=\".6\"/></svg>",
+  flask: "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M9 3h6M10 3v6.2L4.6 18.4A1.7 1.7 0 0 0 6.1 21h11.8a1.7 1.7 0 0 0 1.5-2.6L14 9.2V3\"/><path d=\"M7.5 14h9\"/></svg>",
+  protein: "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3.5 20.5h3.4V9.4h2.1L5.2 3.6 1.4 9.4h2.1z\" fill=\"currentColor\" stroke-width=\"1\"/><path d=\"M10.3 3.5h3.4v11.1h2.1l-3.8 5.8-3.8-5.8h2.1z\" fill=\"currentColor\" stroke-width=\"1\" opacity=\".8\"/><path d=\"M17.1 20.5h3.4V9.4h2.1l-3.8-5.8-3.8 5.8h2.1z\" fill=\"currentColor\" stroke-width=\"1\"/></svg>",
   music: "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M9 18V5l12-2v13\"/><circle cx=\"6\" cy=\"18\" r=\"3\"/><circle cx=\"18\" cy=\"16\" r=\"3\"/></svg>"
 };
 // Ribbons a tool can carry through its status field. status: "default" isn't listed here, so it shows no ribbon. To add another, add a line here and a matching .ribbon-<key> style.
 const RIBBONS = { "new": "New", "half-baked": "Half-baked" };
 const TOOLS = [
   // ---- Biology ----
-  { title: "Cell Tour", icon: ICONS.cell, version: "v3.0", category: "Biology", href: "cell_tour_v3.0.html", status: "default",
+  { title: "Cell Tour", icon: ICONS.cell, version: "v4.0", category: "Biology", href: "cell_tour.html", status: "default",
     desc: "Take a guided tour of a cell and its organelles." },
-  { title: "Human Cell Tour", icon: ICONS.humancell, version: "v1.7", category: "Biology", href: "human_cell_tour_v1.7.html", status: "default",
+  { title: "Human Cell Tour", icon: ICONS.humancell, version: "v1.7", category: "Biology", href: "human_cell_tour.html", status: "default",
     desc: "Take a guided tour of different types of human cells." },
-  { title: "Anatomy Tour", icon: ICONS.anatomy, version: "v2.5", category: "Biology", href: "anatomy_tour_v2.5.html", status: "default",
+  { title: "Anatomy Tour", icon: ICONS.anatomy, version: "v2.5", category: "Biology", href: "anatomy_tour.html", status: "default",
     desc: "Explore the organ systems of the human body layer by layer." },
-  { title: "Cloning Workbench", icon: ICONS.cloning, version: "v3.1", category: "Biology", href: "cloning_workbench_v3.1.html", status: "default",
+  { title: "Cloning Workbench", icon: ICONS.cloning, version: "v3.1", category: "Biology", href: "cloning_workbench.html", status: "default",
     desc: "Walk through molecular cloning: digest, react, assemble, transform." },
+  { title: "Protein Structure Viewer", icon: ICONS.protein, version: "v1.7", category: "Biology", href: "protein_structure_viewer.html", status: "default",
+    desc: "Explore the chemical structure of proteins." },
   // ---- Chemistry ----
-  { title: "Molecular Modeling Kit", icon: ICONS.molecule, version: "v4.3", category: "Chemistry", href: "molecular_modeling_kit_v4.3.html", status: "default",
+  { title: "Molecular Modeling Kit", icon: ICONS.molecule, version: "v4.3", category: "Chemistry", href: "molecular_modeling_kit.html", status: "default",
     desc: "Build, analyze, and react molecule in 3D." },
-  { title: "Atomic Orbital Builder", icon: ICONS.orbital, version: "v2.1", category: "Chemistry", href: "atomic_orbital_builder_v2.1.html", status: "default",
+  { title: "Atomic Orbital Builder", icon: ICONS.orbital, version: "v2.1", category: "Chemistry", href: "atomic_orbital_builder.html", status: "default",
     desc: "See how spherical harmonics leads to the shapes of atomic orbitals." },
-  { title: "Reaction Vessel", icon: ICONS.equilibrium, version: "v1.6", category: "Chemistry", href: "reaction_vessel_v1.6.html", status: "default",
+  { title: "Reaction Vessel", icon: ICONS.equilibrium, version: "v1.6", category: "Chemistry", href: "reaction_vessel.html", status: "default",
     desc: "Simulate dynamic chemical equilibrium in reversible reactions." },
+  { title: "Solutions Calculator", icon: ICONS.flask, version: "v2.1", category: "Chemistry", href: "solutions_calculator.html", status: "default",
+    desc: "Work through dimensional analysis, molarity, and dilution." },
   // ---- Physics ----
-  { title: "Phase Change Piston", icon: ICONS.piston, version: "v2.1", category: "Physics", href: "phase_change_piston_v2.1.html", status: "default",
+  { title: "Phase Change Piston", icon: ICONS.piston, version: "v2.1", category: "Physics", href: "phase_change_piston.html", status: "default",
     desc: "Heat, cool, and compress a gas in a piston to change phases." },
-  { title: "Optics Bench", icon: ICONS.optics, version: "v1.0", category: "Physics", href: "optics_bench_v1.0.html", status: "half-baked",
+  { title: "Optics Bench", icon: ICONS.optics, version: "v1.0", category: "Physics", href: "optics_bench.html", status: "half-baked",
     desc: "Trace light rays through lenses and mirrors." },
-  { title: "Orbits Lab", icon: ICONS.orbits, version: "v1.2", category: "Physics", href: "orbit_lab_v1.2.html", status: "half-baked",
+  { title: "Solar System Builder", icon: ICONS.orbits, version: "v2.0", category: "Physics", href: "solar_system_builder.html", status: "default",
     desc: "Explore the solar system or make your own." },
-  { title: "Gear Train Lab", icon: ICONS.gears, version: "v1.1", category: "Physics", href: "gear_train_lab_v1.1.html", status: "half-baked",
+  // ---- Engineering ----
+  { title: "Bridge & Tower Lab", icon: ICONS.bridge, version: "v1.4", category: "Engineering", href: "bridge_tower_lab.html", status: "half-baked",
+    desc: "Build bridges and towers from beams and cables, load them with weights, and see where they fail." },
+  { title: "Simple Machines Lab", icon: ICONS.machines, version: "v1.0", category: "Engineering", href: "simple_machines_lab.html", status: "half-baked",
+    desc: "Explore levers, pulleys, wedges, screws and inclined planes, and measure their mechanical advantage." },
+  { title: "Gear Train", icon: ICONS.gears, version: "v2.0", category: "Engineering", href: "gear_train.html", status: "default",
     desc: "Build simple gear trains." },
   // ---- Math ----
-  { title: "Graphing Calculator", icon: ICONS.graph, version: "v2.0", category: "Math", href: "graphing_calculator_v2.0.html", status: "default",
+  { title: "Graphing Calculator", icon: ICONS.graph, version: "v2.7", category: "Math", href: "graphing_calculator.html", status: "default",
     desc: "Plot and explore equations and functions in 2D." },
-  { title: "Fourier Transform Playground", icon: ICONS.fourier, version: "v3.1", category: "Math", href: "fourier_transform_playground_v3.1.html", status: "default",
+  { title: "Fourier Transform Playground", icon: ICONS.fourier, version: "v3.1", category: "Math", href: "fourier_transform_playground.html", status: "default",
     desc: "Analyze signals with fourier transforms up to 3 dimensions." },
-  { title: "Complex Plane Grapher", icon: ICONS.complex, version: "v1.3", category: "Math", href: "complex_plane_grapher_v1.3.html", status: "half-baked",
+  { title: "Complex Plane Grapher", icon: ICONS.complex, version: "v1.3", category: "Math", href: "complex_plane_grapher.html", status: "half-baked",
     desc: "Graph functions of a complex variable." },
-  { title: "Fractal Garden", icon: ICONS.fractal, version: "v1.0", category: "Math", href: "fractal_garden_v1.0.html", status: "half-baked",
+  { title: "Fractal Garden", icon: ICONS.fractal, version: "v1.0", category: "Math", href: "fractal_garden.html", status: "half-baked",
     desc: "Make pretty shapes." },
-  { title: "Ruler and Compass", icon: ICONS.compass, version: "v1.3", category: "Math", href: "ruler_compass_v1.3.html", status: "default",
+  { title: "Ruler and Compass", icon: ICONS.compass, version: "v1.3", category: "Math", href: "ruler_compass.html", status: "default",
     desc: "Make classical Euclidean constructions with only a straightedge and a compass." },
-  { title: "Magnet Tiles", icon: ICONS.magnet, version: "v2.1", category: "Math", href: "magnet_tiles_v2.1.html", status: "default",
+  { title: "Magnet Tiles", icon: ICONS.magnet, version: "v2.1", category: "Math", href: "magnet_tiles.html", status: "default",
     desc: "Shapes! and colors!!" },
   // ---- Computing & Simulation ----
-  { title: "Logic Gate Designer", icon: ICONS.logic, version: "v1.7", category: "Computing & Simulation", href: "logic_gate_designer_v1.7.html", status: "half-baked",
+  { title: "Logic Gate Designer", icon: ICONS.logic, version: "v1.7", category: "Computing & Simulation", href: "logic_gate_designer.html", status: "half-baked",
     desc: "Wire up logic gates to build and test digital circuits." },
-  { title: "Conway’s Multiverse", icon: ICONS.life, version: "v1.1", category: "Computing & Simulation", href: "conways_multiverse_v1.1.html", status: "default",
+  { title: "Conway’s Multiverse", icon: ICONS.life, version: "v1.1", category: "Computing & Simulation", href: "conways_multiverse.html", status: "default",
     desc: "Run Conway's Game of Life, or change the rules." },
-  { title: "Particle Life", icon: ICONS.particles, version: "v1.1", category: "Computing & Simulation", href: "particle_life_v1.1.html", status: "default",
+  { title: "Particle Life", icon: ICONS.particles, version: "v1.1", category: "Computing & Simulation", href: "particle_life.html", status: "default",
     desc: "Set attraction rules between particle types and watch lifelike patterns self-organize." },
-  { title: "World Builder", icon: ICONS.world, version: "v1.0", category: "Computing & Simulation", href: "world_builder_v1.0.html", status: "half-baked",
+  { title: "World Builder", icon: ICONS.world, version: "v1.0", category: "Computing & Simulation", href: "world_builder.html", status: "half-baked",
     desc: "Build a planet: sculpt continents, pick its star, tilt and atmosphere, and see plates, currents and climate zones." },
   // ---- Arts ----
-  { title: "Music Theory Composer", icon: ICONS.music, version: "v3.2", category: "Arts", href: "music_theory_lab_v3.2.html", status: "half-baked",
+  { title: "Music Theory Composer", icon: ICONS.music, version: "v3.5", category: "Arts", href: "music_theory_lab.html", status: "half-baked",
     desc: "Make harmonies and rhythms" },
-  { title: "Color Theory Palette", icon: ICONS.color, version: "v1.0", category: "Arts", href: "color_theory_palette_v1.0.html", status: "half-baked",
+  { title: "Color Theory Palette", icon: ICONS.color, version: "v1.9", category: "Arts", href: "color_theory_palette.html", status: "half-baked",
     desc: "Mix light and paint, build palettes on the color wheel, and check them in colorblind and black-and-white views." }
   // Add a tool by copying a line above: title, version (optional), category, href (path to the HTML file), desc
   // status: "default" (no ribbon), "new" or "half-baked" (ribbon on the corner of the tile)

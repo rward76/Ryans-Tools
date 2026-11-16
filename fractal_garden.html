@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Fractal Garden</title>
+<style>
+/* Layout: same shell as the rest of the suite — header bar, 384px control rail, framed canvas viewport with floating glass overlays. Dark-only by design. */
+:root{color-scheme:dark;
+--g950:#030712;--g900:#111827;--g800:#1f2937;--g700:#374151;--g600:#4b5563;--g500:#6b7280;--g400:#9ca3af;--g300:#d1d5db;--g200:#e5e7eb;--g100:#f3f4f6;
+--blue7:#1d4ed8;--blue6:#2563eb;--blue5:#3b82f6;--blue4:#60a5fa;--blue3:#93c5fd;
+--purple6:#9333ea;--purple4:#c084fc;--pink4:#f472b6;
+--emerald6:#059669;--emerald5:#10b981;--emerald4:#34d399;
+--amber3:#fcd34d;--amber4:#fbbf24;--rose4:#fb7185;--rose6:#e11d48;
+--f-sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+--f-mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0}
+body{background:var(--g950);color:var(--g100);font-family:var(--f-sans);font-size:14px;display:flex;flex-direction:column;overflow:hidden}
+*,*:before,*:after{box-sizing:border-box}
+button,select,output,input{font:inherit;color:inherit}
+button:focus-visible,input:focus-visible{outline:2px solid var(--blue5);outline-offset:2px}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:var(--g900)}::-webkit-scrollbar-thumb{background:var(--g700);border-radius:3px}
+svg.i{width:14px;height:14px;flex:none}
+header{background:var(--g900);border-bottom:1px solid var(--g800);padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;flex:none}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{background:linear-gradient(to top right,var(--blue6),var(--purple6));padding:8px;border-radius:8px;box-shadow:0 10px 15px -3px #0006;display:grid;place-items:center}
+.logo svg{width:20px;height:20px;color:#fff}
+h1{margin:0;font-size:18px;font-weight:700;line-height:1.4;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+h1 .grad{background:linear-gradient(to right,var(--blue4),var(--purple4),var(--pink4));-webkit-background-clip:text;background-clip:text;color:transparent}
+.badge-v{font-size:12px;font-weight:600;padding:2px 8px;border-radius:4px;background:#1e3a8a99;color:var(--blue3);border:1px solid var(--blue7)}
+.hctl{display:flex;align-items:center;flex-wrap:wrap;justify-content:flex-end;gap:12px}
+.seg{display:flex;align-items:center;background:var(--g800);border:1px solid var(--g700);border-radius:8px;padding:4px;font-size:12px;flex-wrap:wrap}
+.seg .lbl{color:var(--g400);padding:0 8px;font-weight:500}
+.seg button{background:transparent;border:0;padding:4px 10px;border-radius:4px;color:var(--g300);cursor:pointer;transition:color .15s,background .15s;display:flex;align-items:center;gap:6px}
+.seg button:hover{color:#fff}
+.seg button[aria-pressed=true]{background:var(--blue6);color:#fff;font-weight:600;box-shadow:0 1px 3px #0006}
+.seg.wide{display:grid;grid-auto-flow:column;grid-auto-columns:1fr}
+.seg.wide button{justify-content:center}
+.btn-h{background:var(--g700);color:var(--g100);border:0;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;cursor:pointer;transition:background .15s}
+.btn-h:hover{background:var(--g600)}
+.btn-h.arm{background:var(--rose6);color:#fff}
+.row{flex:1;display:flex;overflow:hidden;min-height:0;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+aside{width:384px;background:var(--g900);border-right:1px solid var(--g800);overflow-y:auto;flex:none}
+.stack{padding:16px;display:flex;flex-direction:column;gap:14px}
+.card{background:#1f293799;padding:14px;border-radius:12px;border:1px solid rgba(55,65,81,.6);display:flex;flex-direction:column;gap:12px}
+.card-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card-h .t{font-size:12px;font-weight:700;color:var(--g200);text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:8px}
+.pill{font-size:10px;background:var(--g700);color:var(--g300);padding:2px 8px;border-radius:999px;font-family:var(--f-mono);white-space:nowrap}
+.pill.ok{background:#10b98126;color:var(--emerald4);border:1px solid #10b98166}
+.pill.warn{background:#f59e0b1f;color:var(--amber3);border:1px solid #f59e0b66}
+.c-blue{color:var(--blue4)}.c-purple{color:var(--purple4)}.c-emerald{color:var(--emerald4)}.c-amber{color:var(--amber4)}.c-pink{color:var(--pink4)}
+.grp{font:600 10px var(--f-mono);color:var(--g500);text-transform:uppercase;letter-spacing:.08em;margin:0 0 -6px}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font-size:11.5px;font-weight:600;background:var(--g800);color:var(--g300);border:1px solid var(--g700);border-radius:999px;padding:4px 11px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.chip:hover{border-color:var(--g500);color:#fff}
+.chip[aria-pressed=true]{background:#9333ea40;border-color:var(--purple4);color:#f3e8ff}
+.chip .x{color:var(--g500);font-size:12px;line-height:1}
+.chip .x:hover{color:var(--rose4)}
+.fx{display:flex;align-items:center;background:var(--g950);border:1px solid var(--g700);border-radius:8px;overflow:hidden}
+.fx:focus-within{border-color:var(--blue5);box-shadow:0 0 0 1px var(--blue5)}
+.fx label{padding:0 10px;font:600 12px var(--f-sans);color:var(--purple4);white-space:nowrap;border-right:1px solid var(--g800);align-self:stretch;display:flex;align-items:center;background:var(--g900);text-transform:uppercase;letter-spacing:.05em}
+.fx input{flex:1;min-width:0;background:transparent;border:0;outline:0;padding:9px 10px;font:600 14px var(--f-mono);color:#fff}
+.rules{display:flex;flex-direction:column;gap:6px}
+.rule{display:grid;grid-template-columns:44px 16px minmax(0,1fr) 28px;gap:6px;align-items:center}
+.rule input{background:var(--g950);border:1px solid var(--g700);border-radius:6px;padding:7px 8px;font:600 13px var(--f-mono);color:#fff;width:100%;outline:0}
+.rule input:focus{border-color:var(--blue5);box-shadow:0 0 0 1px var(--blue5)}
+.rule input.p{text-align:center;color:var(--purple4)}
+.rule .arrow{color:var(--g500);text-align:center;font-family:var(--f-mono)}
+.xbtn{width:28px;height:28px;border-radius:6px;border:1px solid var(--g700);background:var(--g800);color:var(--g400);cursor:pointer;display:grid;place-items:center}
+.xbtn:hover{color:var(--rose4);border-color:#fb718566}
+.syms{display:flex;flex-wrap:wrap;gap:4px}
+.sym{font:700 12px var(--f-mono);min-width:30px;height:26px;padding:0 6px;border-radius:6px;border:1px solid var(--g700);background:var(--g800);cursor:pointer}
+.sym:hover{border-color:var(--blue5);color:#fff}
+.sym.d{color:var(--emerald4)}.sym.t{color:var(--amber3)}.sym.b{color:var(--purple4)}.sym.v{color:var(--blue3)}.sym.m{color:var(--g400)}
+.status{background:var(--g950);padding:8px 10px;border-radius:8px;border:1px solid var(--g800);font:11px var(--f-mono);color:var(--g400);margin:0}
+.status.err{color:var(--rose4);border-color:#fb718555}
+.status.ok{color:var(--emerald4)}
+.ctl{display:flex;flex-direction:column;gap:6px}
+.ctl-l{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:var(--g300);gap:8px}
+.ctl-l output{font:11.5px var(--f-mono);color:var(--blue3);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--blue5);margin:0}
+.sub-l{font-size:11px;color:var(--g400);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:-4px}
+.tog{display:flex;align-items:center;justify-content:space-between;gap:10px;color:var(--g300);cursor:pointer;font-size:12px}
+.tog input{width:16px;height:16px;accent-color:var(--emerald5);cursor:pointer;margin:0}
+.muted{color:var(--g500);font-size:11px;margin:0;line-height:1.55}
+.muted code,.muted b{font-family:var(--f-mono);color:var(--g400);font-weight:600}
+.about p{margin:0;font-size:12.5px;line-height:1.6;color:var(--g300)}
+.about b{color:#fff}
+.btnrow{display:flex;gap:8px}
+.btnrow .btn{flex:1}
+.btn{font-size:11.5px;background:var(--g700);color:var(--g100);border:0;padding:7px 10px;border-radius:8px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .15s}
+.btn:hover{background:var(--g600)}
+.btn.imp{background:var(--blue6);color:#fff}.btn.imp:hover{background:var(--blue5)}
+.btn.grn{background:var(--emerald6);color:#fff}.btn.grn:hover{background:var(--emerald5)}
+.btn.danger{background:#e11d4826;color:#fecdd3;border:1px solid #e11d4866}
+.btn.danger:hover{background:#e11d4840}
+.btn svg{width:12px;height:12px}
+.save{display:flex;gap:6px}
+.save input{flex:1;min-width:0;background:var(--g950);border:1px solid var(--g700);border-radius:8px;padding:6px 9px;font-size:12px;color:#fff;outline:0}
+.save input:focus{border-color:var(--blue5)}
+.pals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.palb{display:flex;flex-direction:column;gap:5px;padding:7px;border-radius:8px;border:1px solid var(--g700);background:var(--g800);cursor:pointer;font-size:11px;font-weight:600;color:var(--g300);text-align:left}
+.palb:hover{border-color:var(--g500)}
+.palb[aria-pressed=true]{border-color:var(--purple4);background:#9333ea33;color:#f3e8ff}
+.palb i{display:block;height:8px;border-radius:4px}
+.deriv{font:11px/1.6 var(--f-mono);background:var(--g950);border:1px solid var(--g800);border-radius:8px;padding:8px 10px;max-height:230px;overflow:auto;display:flex;flex-direction:column;gap:6px}
+.deriv .ln{overflow-wrap:anywhere}
+.deriv .n{color:var(--g500);font-size:10px;display:block}
+.s-d{color:var(--emerald4)}.s-t{color:var(--amber3)}.s-b{color:var(--purple4)}.s-v{color:var(--blue3)}.s-m{color:var(--g500)}.s-x{color:var(--g500)}
+dl.stats{display:grid;grid-template-columns:1fr auto;margin:0;font-size:12px}
+dl.stats dt,dl.stats dd{padding:6px 0;border-top:1px solid rgba(55,65,81,.6);margin:0}
+dl.stats dt{color:var(--g400)}
+dl.stats dd{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right;color:var(--g200);font-size:11.5px}
+dd.hl{color:var(--emerald4)!important;font-weight:700}
+.plotwrap{background:var(--g950);border:1px solid var(--g800);border-radius:8px;padding:6px}
+#bcv{display:block;width:100%;height:140px}
+.keys{font:10px/1.7 var(--f-mono);color:var(--g500);padding:0 4px;margin-top:-4px}
+main{flex:1;display:flex;min-width:0;background:#11182780;padding:8px}
+.vp{flex:1;position:relative;background:radial-gradient(ellipse at 50% 45%,#0b1424 0%,var(--g950) 70%);border:1px solid var(--g800);border-radius:12px;overflow:hidden;min-height:0}
+.vp:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(229,231,235,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(229,231,235,.035) 1px,transparent 1px);background-size:32px 32px;pointer-events:none}
+#cv{position:absolute;inset:0;display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+#cv.dragging{cursor:grabbing}
+#cv.plant{cursor:crosshair}
+.float{position:absolute;z-index:2;background:#111827e6;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid var(--g700);border-radius:8px;box-shadow:0 10px 15px -3px #00000080}
+.vp-title{top:12px;left:12px;padding:6px 12px;font-size:12px;display:flex;align-items:center;gap:8px;pointer-events:none;max-width:calc(100% - 24px)}
+.vp-title b{color:var(--g200);white-space:nowrap}
+.vp-title span{color:var(--g400);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--f-mono);font-size:11px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--emerald4);flex:none;transition:background .3s}
+.dot.grow{background:var(--amber4);box-shadow:0 0 8px var(--amber4)}
+.toast{top:12px;right:12px;padding:6px 12px;font-size:12px;color:var(--amber3);opacity:0;transform:translateY(-4px);transition:opacity .2s,transform .2s;max-width:45%;pointer-events:none}
+.toast.show{opacity:1;transform:none}
+.zoom{left:12px;bottom:12px;display:flex;align-items:center;gap:2px;padding:4px}
+.zoom button{width:28px;height:28px;border-radius:6px;border:0;background:transparent;color:var(--g300);cursor:pointer;font:600 15px var(--f-mono);display:grid;place-items:center}
+.zoom button:hover{background:var(--g700);color:#fff}
+.zoom span{font:10px var(--f-mono);color:var(--g500);padding:0 6px;min-width:48px;text-align:center}
+.legend{right:12px;bottom:12px;padding:9px 11px;display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--g300);pointer-events:none}
+.legend .ot{font-size:10px;font-weight:700;color:var(--g400);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.legend .r{display:grid;grid-template-columns:34px 1fr;gap:6px}
+.legend .r b{font-family:var(--f-mono)}
+.hint{left:50%;bottom:12px;transform:translateX(-50%);padding:6px 12px;font-size:12px;color:var(--g300);pointer-events:none;white-space:nowrap}
+.hint b{color:var(--emerald4)}
+@media (max-width:820px){
+ html,body{height:auto}
+ body{overflow:auto}
+ .row{flex-direction:column;overflow:visible}
+ main{order:-1;flex:none;height:62vh;min-height:380px}
+ aside{width:100%;border-right:0;border-top:1px solid var(--g800);overflow:visible}
+ .legend{display:none}
+ .hint{bottom:56px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-8"/><path d="M12 14l-5-5M12 14l5-5"/><path d="M7 9L4.5 6.5M7 9l.8-3.6M17 9l2.5-2.5M17 9l-.8-3.6"/><circle cx="4" cy="6" r=".9" fill="currentColor"/><circle cx="20" cy="6" r=".9" fill="currentColor"/><circle cx="8" cy="4.6" r=".9" fill="currentColor"/><circle cx="16" cy="4.6" r=".9" fill="currentColor"/></svg></div>
+    <div><h1><span class="grad">Fractal Garden</span> <span class="badge-v">v1.0</span></h1></div>
+  </div>
+  <div class="hctl">
+    <div class="seg" id="modeSeg" role="group" aria-label="Mode">
+      <span class="lbl">Mode</span>
+      <button data-v="study" aria-pressed="true">Study one seed</button>
+      <button data-v="garden" aria-pressed="false">Garden</button>
+    </div>
+    <button class="btn-h" id="pngBtn" title="Save the view as a PNG image"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>PNG</button>
+    <button class="btn-h" id="clearBtn" hidden><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg><span id="clearTxt">Clear garden</span></button>
+  </div>
+</header>
+
+<div class="row">
+<aside><div class="stack">
+
+  <section class="card">
+    <div class="card-h"><span class="t"><svg class="i c-emerald" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 21v-8M12 13c0-4 3-7 8-7 0 5-3 7-8 7zM12 13c0-3-2-5-6-5 0 4 2 5 6 5z"/></svg>Seed packets</span><span class="pill">pick a rule set</span></div>
+    <p class="grp">Plants (branching)</p>
+    <div class="chips" id="chipsPlant"></div>
+    <p class="grp">Curves (no branching)</p>
+    <div class="chips" id="chipsCurve"></div>
+    <p class="grp" id="mineLbl" hidden>My seeds</p>
+    <div class="chips" id="chipsMine"></div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><span class="t"><svg class="i c-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h7M4 12h11M4 17h6M15 15l3 3 4-6"/></svg>Rules</span><span class="pill" id="namePill">Fractal plant</span></div>
+    <div class="fx"><label for="axiom">Axiom</label><input id="axiom" spellcheck="false" autocomplete="off" autocapitalize="off"></div>
+    <div class="sub-l">Production rules · each step, every symbol is replaced</div>
+    <div class="rules" id="rules"></div>
+    <div class="btnrow"><button class="btn" id="addRule"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add rule</button></div>
+    <div class="sub-l">Insert symbol</div>
+    <div class="syms" id="syms"></div>
+    <p class="status" id="status">ready</p>
+    <p class="muted"><b>F G A B</b> draw a line forward · <b>f</b> moves without drawing · <b>+</b> turn left · <b>−</b> turn right · <b>|</b> turn around · <b>[</b> save position (start a branch) · <b>]</b> return to it · other letters like <b>X Y</b> draw nothing but steer growth. Two rules for the same symbol = random choice each time.</p>
+    <div class="save"><input id="saveName" placeholder="Name this seed…" maxlength="28"><button class="btn" id="saveBtn">Save seed</button></div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><span class="t"><svg class="i c-amber" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>Growth</span><span class="pill" id="iterPill">n = 6</span></div>
+    <div class="ctl"><div class="ctl-l"><span>Iterations <i>n</i></span><output id="nOut"></output></div><input type="range" id="nR" min="0" max="14" step="1"></div>
+    <div class="ctl"><div class="ctl-l"><span>Turn angle δ</span><output id="aOut"></output></div><input type="range" id="aR" min="1" max="180" step="0.1"></div>
+    <div class="ctl"><div class="ctl-l"><span>Starting heading</span><output id="hOut"></output></div><input type="range" id="hR" min="-180" max="180" step="1"></div>
+    <div class="ctl"><div class="ctl-l"><span>Branch length factor (per <b>[</b>)</span><output id="shOut"></output></div><input type="range" id="shR" min="0.4" max="1" step="0.01"></div>
+    <div class="sub-l">Natural variation</div>
+    <div class="ctl"><div class="ctl-l"><span>Angle jitter</span><output id="jaOut"></output></div><input type="range" id="jaR" min="0" max="50" step="1"></div>
+    <div class="ctl"><div class="ctl-l"><span>Length jitter</span><output id="jlOut"></output></div><input type="range" id="jlR" min="0" max="50" step="1"></div>
+    <div class="ctl"><div class="ctl-l"><span>Growth shown</span><output id="gOut"></output></div><input type="range" id="gR" min="0" max="100" step="0.1" value="100"></div>
+    <div class="btnrow">
+      <button class="btn grn" id="growBtn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4l13 8-13 8z"/></svg>Grow</button>
+      <button class="btn" id="stepDn">n − 1</button>
+      <button class="btn" id="stepUp">n + 1</button>
+      <button class="btn" id="reseed" title="New random seed for jitter and random rules">Reseed</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><span class="t"><svg class="i c-pink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="8.5" cy="10" r="1.3" fill="currentColor"/><circle cx="12" cy="7.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="10" r="1.3" fill="currentColor"/></svg>Look</span><span class="pill" id="palPill"></span></div>
+    <div class="pals" id="pals"></div>
+    <div class="sub-l">Color by</div>
+    <div class="seg wide" id="cmSeg"><button data-v="depth">Branch depth</button><button data-v="path">Drawing order</button><button data-v="solid">Solid</button></div>
+    <div class="ctl"><div class="ctl-l"><span>Line width</span><output id="wOut"></output></div><input type="range" id="wR" min="0.4" max="8" step="0.1"></div>
+    <div class="ctl"><div class="ctl-l"><span>Taper per branch level</span><output id="tpOut"></output></div><input type="range" id="tpR" min="0.4" max="1" step="0.01"></div>
+    <label class="tog">Blossoms at branch tips<input type="checkbox" id="lvT"></label>
+  </section>
+
+  <section class="card" id="gardenCard" hidden>
+    <div class="card-h"><span class="t"><svg class="i c-emerald" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 20h18M7 20v-5M12 20V9M17 20v-7M7 15l-2-2M12 9l-3-3M12 9l3-3M17 13l2-2"/></svg>Garden bed</span><span class="pill" id="plantPill">0 plants</span></div>
+    <div class="ctl"><div class="ctl-l"><span>Plant size</span><output id="szOut"></output></div><input type="range" id="szR" min="60" max="600" step="5" value="240"></div>
+    <div class="btnrow"><button class="btn" id="undoPlant">Undo last plant</button><button class="btn" id="fitGarden">Reset view</button></div>
+    <p class="muted">Click in the garden to plant the current seed — plants root in the soil below your click; curves hang where you click. With jitter or random rules on, every plant comes out a little different — just like real seeds from one packet.</p>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><span class="t"><svg class="i c-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5h16M4 10h12M4 15h8M4 20h4"/></svg>Derivation</span><span class="pill" id="derPill"></span></div>
+    <div class="deriv" id="deriv"></div>
+    <p class="muted">Watch the string grow: each line is the previous one with every rule applied at once. Only the start of long strings is shown.</p>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><span class="t"><svg class="i c-amber" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V4M4 20h16M7 16l4-4 3 3 6-7"/></svg>Measurements</span><span class="pill ok">live</span></div>
+    <dl class="stats">
+      <dt>Symbols in string</dt><dd id="stSym">—</dd>
+      <dt>Line segments drawn</dt><dd id="stSeg">—</dd>
+      <dt>Growth per step</dt><dd id="stRatio">—</dd>
+      <dt>Deepest branch level</dt><dd id="stDepth">—</dd>
+      <dt>Branch tips</dt><dd id="stTips">—</dd>
+      <dt>Box-counting dimension</dt><dd id="stD" class="hl">—</dd>
+      <dt>Theoretical dimension (n → ∞)</dt><dd id="stTh">—</dd>
+    </dl>
+    <div class="plotwrap"><canvas id="bcv"></canvas></div>
+    <p class="muted">Box counting: cover the drawing with grids of boxes of size ε, count the boxes N(ε) that touch it. The slope of log N against log(1/ε) estimates the fractal dimension — 1 for a smooth line, 2 for something that fills an area. Finite iterations always come out a bit low.</p>
+  </section>
+
+  <section class="card about">
+    <div class="card-h"><span class="t"><svg class="i c-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5" stroke-linecap="round"/></svg>About L-systems</span></div>
+    <p>In 1968 biologist <b>Aristid Lindenmayer</b> described plant growth with a rewriting game: start with a short string (the <b>axiom</b>) and, every generation, replace each symbol using the <b>rules</b>. A tiny rule set, repeated, builds enormous self-similar structure.</p>
+    <p>The string is then read by a <b>turtle</b> that walks, turns, and remembers branch points. Brackets make branches; without them you get a single winding curve such as the Koch snowflake or dragon curve.</p>
+  </section>
+
+  <div class="keys">KEYS · − / = iterations · G grow · F fit view · R reseed · M switch mode</div>
+</div></aside>
+
+<main>
+  <div class="vp" id="vp">
+    <canvas id="cv"></canvas>
+    <div class="float vp-title"><span class="dot" id="dot"></span><b id="vtName">Fractal plant</b><span id="vtInfo"></span></div>
+    <div class="float toast" id="toast"></div>
+    <div class="float zoom">
+      <button id="zOut" title="Zoom out">−</button><span id="zPct">100%</span><button id="zIn" title="Zoom in">+</button>
+      <button id="zFit" title="Fit view"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+    </div>
+    <div class="float legend">
+      <div class="ot">Turtle reads</div>
+      <div class="r"><b class="s-d">F</b><span>step forward, draw</span></div>
+      <div class="r"><b class="s-t">+ −</b><span>turn left / right by δ</span></div>
+      <div class="r"><b class="s-b">[ ]</b><span>start / end a branch</span></div>
+      <div class="r"><b class="s-v">X Y</b><span>placeholders (no line)</span></div>
+    </div>
+    <div class="float hint" id="hint" hidden>Click to plant <b id="hintSeed">Fractal plant</b> · drag to pan · scroll to zoom</div>
+  </div>
+</main>
+</div>
+
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const fmt=n=>n.toLocaleString('en-US');
+
+/* ---------- Seed packets (classic rule sets, mostly from Prusinkiewicz & Lindenmayer, "The Algorithmic Beauty of Plants") ---------- */
+const PRESETS=[
+ {name:'Fractal plant',g:'plant',ax:'X',r:[['X','F+[[X]-X]-F[-FX]+X'],['F','FF']],ang:25,n:6,head:70,sh:1,pal:'spring',cm:'depth',w:2.6,tp:.8,lv:true},
+ {name:'Bush',g:'plant',ax:'F',r:[['F','FF-[-F+F+F]+[+F-F-F]']],ang:22.5,n:4,head:90,sh:1,pal:'autumn',cm:'depth',w:3.4,tp:.75,lv:true},
+ {name:'Twig',g:'plant',ax:'F',r:[['F','F[+F]F[-F]F']],ang:25.7,n:5,head:90,sh:1,pal:'spring',cm:'depth',w:2.6,tp:.78,lv:true},
+ {name:'Weed',g:'plant',ax:'X',r:[['X','F[+X]F[-X]+X'],['F','FF']],ang:20,n:7,head:90,sh:1,pal:'spring',cm:'depth',w:2.6,tp:.8,lv:true},
+ {name:'Fan tree',g:'plant',ax:'X',r:[['X','F[+X][-X]FX'],['F','FF']],ang:25.7,n:7,head:90,sh:1,pal:'ocean',cm:'depth',w:2.6,tp:.8,lv:true},
+ {name:'Binary tree',g:'plant',ax:'FX',r:[['X','[+FX][-FX]']],ang:30,n:10,head:90,sh:.72,pal:'spring',cm:'depth',w:7,tp:.72,lv:true},
+ {name:'Wild shrub',g:'plant',ax:'F',r:[['F','F[+F]F[-F]F'],['F','F[+F]F'],['F','F[-F]F']],ang:25.7,n:5,head:90,sh:1,pal:'autumn',cm:'depth',w:2.8,tp:.78,lv:true,ja:12,jl:10},
+ {name:'Koch curve',g:'curve',ax:'F',r:[['F','F+F--F+F']],ang:60,n:4,head:0,sh:1,pal:'aurora',cm:'path',w:1.6,tp:1,lv:false,th:Math.log(4)/Math.log(3)},
+ {name:'Koch snowflake',g:'curve',ax:'F--F--F',r:[['F','F+F--F+F']],ang:60,n:4,head:0,sh:1,pal:'ocean',cm:'path',w:1.6,tp:1,lv:false,th:Math.log(4)/Math.log(3)},
+ {name:'Koch island',g:'curve',ax:'F-F-F-F',r:[['F','F-F+F+FF-F-F+F']],ang:90,n:3,head:0,sh:1,pal:'ember',cm:'path',w:1.2,tp:1,lv:false,th:1.5},
+ {name:'Sierpiński triangle',g:'curve',ax:'F-G-G',r:[['F','F-G+F+G-F'],['G','GG']],ang:120,n:6,head:0,sh:1,pal:'aurora',cm:'path',w:1.2,tp:1,lv:false,th:Math.log(3)/Math.log(2)},
+ {name:'Sierpiński arrowhead',g:'curve',ax:'A',r:[['A','B-A-B'],['B','A+B+A']],ang:60,n:7,head:0,sh:1,pal:'ember',cm:'path',w:1.2,tp:1,lv:false,th:Math.log(3)/Math.log(2)},
+ {name:'Dragon curve',g:'curve',ax:'FX',r:[['X','X+YF+'],['Y','-FX-Y']],ang:90,n:12,head:0,sh:1,pal:'aurora',cm:'path',w:1.4,tp:1,lv:false,th:2},
+ {name:'Lévy C curve',g:'curve',ax:'F',r:[['F','+F--F+']],ang:45,n:12,head:0,sh:1,pal:'ocean',cm:'path',w:1.2,tp:1,lv:false,th:2},
+ {name:'Hilbert curve',g:'curve',ax:'X',r:[['X','-YF+XFX+FY-'],['Y','+XF-YFY-XF+']],ang:90,n:6,head:0,sh:1,pal:'aurora',cm:'path',w:1.6,tp:1,lv:false,th:2},
+ {name:'Gosper curve',g:'curve',ax:'A',r:[['A','A-B--B+A++AA+B-'],['B','+A-BB--B-A++A+B']],ang:60,n:4,head:0,sh:1,pal:'ember',cm:'path',w:1.4,tp:1,lv:false,th:2}
+];
+const PALS={
+ spring:{name:'Spring',c:['#8b5a2b','#6b8e23','#4ade80','#bbf7d0','#f9a8d4']},
+ autumn:{name:'Autumn',c:['#7c4a24','#b45309','#ea580c','#fbbf24','#fde68a']},
+ aurora:{name:'Aurora',c:['#3b82f6','#60a5fa','#c084fc','#f472b6','#fcd34d']},
+ ocean:{name:'Ocean',c:['#0e7490','#06b6d4','#22d3ee','#67e8f9','#ecfeff']},
+ ember:{name:'Ember',c:['#b91c1c','#ef4444','#f97316','#fbbf24','#fef3c7']},
+ moon:{name:'Moonlight',c:['#6b7280','#9ca3af','#d1d5db','#e5e7eb','#ffffff']}
+};
+const PALRGB={};for(const k in PALS)PALRGB[k]=PALS[k].c.map(h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]);
+function palColor(key,t,alpha){const s=PALRGB[key];t=clamp(t,0,1)*(s.length-1);const i=Math.min(s.length-2,Math.floor(t)),f=t-i,a=s[i],b=s[i+1];
+ const r=Math.round(a[0]+(b[0]-a[0])*f),g=Math.round(a[1]+(b[1]-a[1])*f),bl=Math.round(a[2]+(b[2]-a[2])*f);return alpha==null?`rgb(${r},${g},${bl})`:`rgba(${r},${g},${bl},${alpha})`}
+
+/* ---------- State ---------- */
+const S={name:'',preset:null,axiom:'',rules:[],angle:25,n:6,heading:90,shrink:1,jitA:0,jitL:0,seed:1,pal:'spring',colorMode:'depth',width:2.5,taper:.8,leaves:true,mode:'study',size:240};
+const CHAR_CAP=1500000, SEG_CAP=500000, GARDEN_CAP=1500000;
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+/* ---------- Rewriting ---------- */
+function expand(st){
+ const map=new Map();
+ for(const r of st.rules){if(!r.p)continue;if(!map.has(r.p))map.set(r.p,[]);map.get(r.p).push(r.s)}
+ const rng=mulberry32(st.seed*7919+11);
+ let s=st.axiom;const lens=[s.length],deriv=[s.slice(0,400)];let capped=false,reached=0;
+ for(let i=0;i<st.n;i++){
+  const parts=[];let len=0,over=false;
+  for(let j=0;j<s.length;j++){const c=s[j],m=map.get(c);const r=m?(m.length===1?m[0]:m[(rng()*m.length)|0]):c;parts.push(r);len+=r.length;if(len>CHAR_CAP){over=true;break}}
+  if(over){capped=true;break}
+  s=parts.join('');lens.push(len);if(deriv.length<7)deriv.push(s.slice(0,400));reached=i+1;
+ }
+ return{str:s,reached,capped,lens,deriv,stochastic:[...map.values()].some(v=>v.length>1)};
+}
+
+/* ---------- Turtle ---------- */
+function turtle(str,st){
+ let nd=0;for(let i=0;i<str.length;i++){const c=str.charCodeAt(i);if(c===70||c===71||c===65||c===66)nd++}
+ const N=Math.min(nd,SEG_CAP),segs=new Float32Array(N*4),dep=new Uint8Array(N);
+ const leaves=[],branching=str.indexOf('[')>=0;
+ const rng=mulberry32(st.seed*104729+5),A=st.angle*Math.PI/180,ja=st.jitA/100,jl=st.jitL/100;
+ let x=0,y=0,h=st.heading*Math.PI/180,d=0,len=1,k=0,drew=false,maxD=0;const stack=[];
+ let minx=0,maxx=0,miny=0,maxy=0;
+ for(let i=0;i<str.length;i++){
+  const c=str[i];
+  switch(c){
+   case'F':case'G':case'A':case'B':{
+    if(k>=N)break;const st2=jl?len*(1+(rng()*2-1)*jl):len;const nx=x+Math.cos(h)*st2,ny=y-Math.sin(h)*st2,o=k*4;
+    segs[o]=x;segs[o+1]=y;segs[o+2]=nx;segs[o+3]=ny;dep[k]=d>255?255:d;k++;x=nx;y=ny;drew=true;
+    if(x<minx)minx=x;if(x>maxx)maxx=x;if(y<miny)miny=y;if(y>maxy)maxy=y;break}
+   case'f':{const st2=jl?len*(1+(rng()*2-1)*jl):len;x+=Math.cos(h)*st2;y-=Math.sin(h)*st2;
+    if(x<minx)minx=x;if(x>maxx)maxx=x;if(y<miny)miny=y;if(y>maxy)maxy=y;break}
+   case'+':h+=ja?A*(1+(rng()*2-1)*ja):A;break;
+   case'-':h-=ja?A*(1+(rng()*2-1)*ja):A;break;
+   case'|':h+=Math.PI;break;
+   case'[':stack.push(x,y,h,d,len);d++;if(d>maxD)maxD=d;len*=st.shrink;drew=false;break;
+   case']':if(drew&&branching)leaves.push(x,y,k);if(stack.length){len=stack.pop();d=stack.pop();h=stack.pop();y=stack.pop();x=stack.pop()}drew=false;break;
+  }
+ }
+ if(drew&&branching)leaves.push(x,y,k);
+ let realMax=0;for(let i=0;i<k;i++)if(dep[i]>realMax)realMax=dep[i];
+ return{segs,dep,n:k,total:nd,leaves:new Float32Array(leaves),nleaf:leaves.length/3,maxDepth:realMax,branching,bb:{minx,maxx,miny,maxy}};
+}
+
+/* ---------- Color/width buckets so the whole drawing is a handful of stroke() calls ---------- */
+const CB=16,DW=10,K=CB*DW;
+function buckets(G,look){
+ const N=G.n,keys=new Uint8Array(N),cnt=new Uint32Array(K+1);
+ let mode=look.colorMode;if(mode==='depth'&&G.maxDepth===0)mode='path';
+ for(let i=0;i<N;i++){const d=G.dep[i];
+  const cb=mode==='depth'?Math.round(d/G.maxDepth*(CB-1)):mode==='path'?Math.min(CB-1,(i*CB/N)|0):0;
+  const kk=cb*DW+(d<DW?d:DW-1);keys[i]=kk;cnt[kk+1]++}
+ const off=new Uint32Array(K+1);for(let k=0;k<K;k++)off[k+1]=off[k]+cnt[k+1];
+ const fill=off.slice(0,K),idx=new Uint32Array(N);for(let i=0;i<N;i++)idx[fill[keys[i]]++]=i;
+ const colors=[];for(let c=0;c<CB;c++)colors.push(mode==='solid'?palColor(look.pal,.6):palColor(look.pal,c/(CB-1)));
+ return{idx,off,colors,leaf:palColor(look.pal,1,.9),leafCore:palColor(look.pal,.75,.95),mode};
+}
+function paint(ctx,G,B,count,a,e,f,pxMul,look){
+ ctx.setTransform(a,0,0,a,e,f);ctx.lineCap='round';ctx.lineJoin='round';
+ const P=G.segs;
+ for(let k=0;k<K;k++){const s0=B.off[k],s1=B.off[k+1];if(s0===s1||B.idx[s0]>=count)continue;
+  const cb=(k/DW)|0,wd=k%DW,wpx=Math.max(.35,look.width*Math.pow(look.taper,wd))*pxMul;
+  ctx.lineWidth=wpx/a;ctx.strokeStyle=B.colors[cb];ctx.beginPath();
+  for(let j=s0;j<s1;j++){const i=B.idx[j];if(i>=count)break;const o=i*4;ctx.moveTo(P[o],P[o+1]);ctx.lineTo(P[o+2],P[o+3])}
+  ctx.stroke()}
+ if(look.leaves&&G.nleaf){
+  const tipW=Math.max(.35,look.width*Math.pow(look.taper,Math.min(G.maxDepth,DW-1)));
+  const r=Math.max(1.6,tipW*1.7)*pxMul/a,L=G.leaves;
+  ctx.fillStyle=B.leaf;ctx.beginPath();
+  for(let i=0;i<G.nleaf;i++){if(L[i*3+2]>count)continue;const x=L[i*3],y=L[i*3+1];ctx.moveTo(x+r,y);ctx.arc(x,y,r,0,6.2832)}
+  ctx.fill();
+  ctx.fillStyle=B.leafCore;ctx.beginPath();const r2=r*.42;
+  for(let i=0;i<G.nleaf;i++){if(L[i*3+2]>count)continue;const x=L[i*3],y=L[i*3+1];ctx.moveTo(x+r2,y);ctx.arc(x,y,r2,0,6.2832)}
+  ctx.fill()}
+}
+
+/* ---------- Canvas & views ---------- */
+const cv=$('cv'),ctx=cv.getContext('2d'),vp=$('vp');
+let W=800,H=600,DPR=1;
+const V={cx:0,cy:0,s:1,fit:1};          // study view
+const GV={cx:0,cy:-200,s:1,init:false}; // garden view (ground is y = 0)
+function resize(){const r=vp.getBoundingClientRect();W=Math.max(50,r.width);H=Math.max(50,r.height);DPR=Math.min(window.devicePixelRatio||1,2.5);
+ cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);if(!GV.init)fitGarden();requestRender()}
+new ResizeObserver(resize).observe(vp);
+
+let EXP=null,G=null,B=null,expKey='',turtleKey='';
+let growT=1,growing=false,growStart=0,growDur=2500;
+const plants=[];
+
+function fitStudy(){const b=G.bb,bw=b.maxx-b.minx,bh=b.maxy-b.miny;let s=Math.min(W*.86/Math.max(bw,1e-9),H*.86/Math.max(bh,1e-9));
+ if(!isFinite(s)||s<=0||s>1e6)s=40;V.s=s;V.fit=s;V.cx=(b.minx+b.maxx)/2;V.cy=(b.miny+b.maxy)/2;updZoom()}
+function fitGarden(){GV.s=1;GV.cx=0;GV.cy=-H*.34;GV.init=true;updZoom()}
+function updZoom(){$('zPct').textContent=S.mode==='study'?Math.round(V.s/V.fit*100)+'%':Math.round(GV.s*100)+'%'}
+
+let rq=false;
+function requestRender(){if(!rq){rq=true;requestAnimationFrame(()=>{rq=false;render()})}}
+function render(){
+ ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);
+ if(S.mode==='study'){
+  if(!G)return;const count=growT>=1?G.n:Math.floor(growT*G.n);
+  paint(ctx,G,B,count,DPR*V.s,DPR*(W/2-V.cx*V.s),DPR*(H/2-V.cy*V.s),DPR,S);
+ }else renderGarden(performance.now());
+}
+function renderGarden(now){
+ const gy=H/2+(0-GV.cy)*GV.s;
+ if(gy<H){const g=ctx.createLinearGradient(0,gy*DPR,0,H*DPR);g.addColorStop(0,'#2a1a0c');g.addColorStop(.25,'#160e07');g.addColorStop(1,'#080503');
+  ctx.fillStyle=g;ctx.fillRect(0,Math.max(0,gy)*DPR,cv.width,cv.height);
+  ctx.strokeStyle='#5b3d1b';ctx.lineWidth=2*DPR;ctx.beginPath();ctx.moveTo(0,gy*DPR);ctx.lineTo(cv.width,gy*DPR);ctx.stroke()}
+ for(const p of plants){
+  const fr=clamp((now-p.born)/p.dur,0,1),e1=1-Math.pow(1-fr,2.2),count=fr>=1?p.G.n:Math.floor(e1*p.G.n);
+  const a=DPR*GV.s*p.k,e=DPR*(W/2+(p.wx-p.ax*p.k-GV.cx)*GV.s),f=DPR*(H/2+(p.wy-p.ay*p.k-GV.cy)*GV.s);
+  paint(ctx,p.G,p.B,count,a,e,f,DPR*GV.s*(p.size/240),p.look);
+ }
+}
+
+/* ---------- Pipeline ---------- */
+function recompute(opts={}){
+ const ek=JSON.stringify([S.axiom,S.rules,S.n,S.seed]);
+ if(ek!==expKey){EXP=expand(S);expKey=ek;turtleKey=''}
+ const tk=ek+'|'+[S.angle,S.heading,S.shrink,S.jitA,S.jitL].join(',');
+ let geo=false;if(tk!==turtleKey){G=turtle(EXP.str,S);turtleKey=tk;geo=true}
+ B=buckets(G,S);
+ if(geo){if(!opts.keepView)fitStudy();updDeriv();updStats();scheduleBox()}
+ updIter();updTitle();requestRender();
+}
+function startGrow(){if(S.mode!=='study'||!G)return;growing=true;growStart=performance.now();growDur=clamp(1400+G.n*.012,1600,4200);growT=0;loop()}
+let looping=false;
+function loop(){if(looping)return;looping=true;requestAnimationFrame(tick)}
+function tick(now){
+ let active=false;
+ if(growing){growT=Math.min(1,(now-growStart)/growDur);growT=growT>=1?1:1-Math.pow(1-growT,1.6);if((now-growStart)>=growDur){growT=1;growing=false}else active=true;
+  $('gR').value=growT*100;$('gOut').textContent=Math.round(growT*100)+'%'}
+ if(S.mode==='garden')for(const p of plants)if(now-p.born<p.dur){active=true;break}
+ $('dot').classList.toggle('grow',active);
+ render();
+ if(active)requestAnimationFrame(tick);else looping=false;
+}
+
+/* ---------- Panels ---------- */
+function updIter(){
+ $('nOut').textContent=EXP.capped?`${EXP.reached} of ${S.n}`:S.n;
+ const p=$('iterPill');if(EXP.capped){p.textContent='capped at n = '+EXP.reached;p.className='pill warn'}else{p.textContent='n = '+S.n;p.className='pill'}
+}
+function updTitle(){
+ if(S.mode==='study'){$('vtName').textContent=S.name;$('vtInfo').textContent=`n = ${EXP.reached} · ${fmt(G.n)} segments`+(G.total>G.n?' (limited)':'')}
+ else{$('vtName').textContent='Garden';let t=0;for(const p of plants)t+=p.G.n;$('vtInfo').textContent=`${plants.length} plant${plants.length===1?'':'s'} · ${fmt(t)} segments · seed: ${S.name}`}
+ $('namePill').textContent=S.name;$('hintSeed').textContent=S.name;
+}
+function esc(c){return c==='<'?'&lt;':c==='>'?'&gt;':c==='&'?'&amp;':c}
+function colorStr(s){let o='',cur='',buf='';
+ const cls=c=>'FGAB'.includes(c)?'s-d':c==='f'?'s-m':'+-|'.includes(c)?'s-t':'[]'.includes(c)?'s-b':/[A-Za-z]/.test(c)?'s-v':'s-x';
+ for(const c of s){const k=cls(c);if(k!==cur){if(buf)o+=`<span class="${cur}">${buf}</span>`;buf='';cur=k}buf+=esc(c)}
+ if(buf)o+=`<span class="${cur}">${buf}</span>`;return o}
+function updDeriv(){
+ let h='';EXP.deriv.forEach((s,i)=>{const L=EXP.lens[i];h+=`<div class="ln"><span class="n">n = ${i} · ${fmt(L)} symbol${L===1?'':'s'}</span>${colorStr(s)}${L>s.length?'<span class="s-x">…</span>':''}</div>`});
+ if(EXP.reached>=EXP.deriv.length)h+=`<div class="ln"><span class="n">… up to n = ${EXP.reached} · ${fmt(EXP.lens[EXP.reached])} symbols</span></div>`;
+ $('deriv').innerHTML=h;$('derPill').textContent=fmt(EXP.str.length)+' symbols';
+}
+function updStats(){
+ $('stSym').textContent=fmt(EXP.str.length);
+ $('stSeg').textContent=fmt(G.n)+(G.total>G.n?' / '+fmt(G.total):'');
+ const L=EXP.lens;$('stRatio').textContent=L.length>=2&&L[L.length-2]>0?'× '+(L[L.length-1]/L[L.length-2]).toFixed(2):'—';
+ $('stDepth').textContent=G.branching?G.maxDepth:'0 (no branches)';
+ $('stTips').textContent=G.branching?fmt(G.nleaf):'—';
+ $('stTh').textContent=S.preset&&S.preset.th?S.preset.th.toFixed(3)+(S.preset.th===2?' (fills area)':''):'—';
+ $('stD').textContent='…';
+}
+/* Box counting on a 512×512 raster, pooled down to coarser grids */
+let boxTok=0;
+function scheduleBox(){const t=++boxTok;setTimeout(()=>{if(t===boxTok)boxCount()},40)}
+function boxCount(){
+ const R=512,grid=new Uint8Array(R*R),b=G.bb,L=Math.max(b.maxx-b.minx,b.maxy-b.miny);
+ if(G.n<1||L<=0){$('stD').textContent='—';drawPlot(null);return}
+ const sc=(R-1)/L,P=G.segs;
+ for(let i=0;i<G.n;i++){const o=i*4,x0=(P[o]-b.minx)*sc,y0=(P[o+1]-b.miny)*sc,x1=(P[o+2]-b.minx)*sc,y1=(P[o+3]-b.miny)*sc;
+  const st=Math.ceil(Math.hypot(x1-x0,y1-y0)*1.5)+1;
+  for(let t=0;t<=st;t++){const u=t/st,xi=(x0+(x1-x0)*u)|0,yi=(y0+(y1-y0)*u)|0;if(xi>=0&&xi<R&&yi>=0&&yi<R)grid[yi*R+xi]=1}}
+ const pts=[];let cur=grid,side=R;
+ while(side>=2){let c=0;for(let i=0;i<cur.length;i++)c+=cur[i];pts.push({x:Math.log2(side),y:Math.log2(Math.max(c,1))});
+  const ns=side>>1,nx=new Uint8Array(ns*ns);
+  for(let yy=0;yy<side;yy++)for(let xx=0;xx<side;xx++)if(cur[yy*side+xx])nx[(yy>>1)*ns+(xx>>1)]=1;cur=nx;side=ns}
+ const fit=pts.filter(p=>p.x>=2&&p.x<=7);
+ let sx=0,sy=0,sxx=0,sxy=0;for(const p of fit){sx+=p.x;sy+=p.y;sxx+=p.x*p.x;sxy+=p.x*p.y}
+ const m=fit.length,slope=(m*sxy-sx*sy)/(m*sxx-sx*sx),icpt=(sy-slope*sx)/m;
+ $('stD').textContent=isFinite(slope)?'D ≈ '+slope.toFixed(3):'—';
+ drawPlot({pts,slope,icpt});
+}
+function drawPlot(d){
+ const c=$('bcv'),r=c.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2.5);
+ const w=Math.max(100,r.width),h=Math.max(80,r.height);c.width=w*dpr;c.height=h*dpr;const g=c.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const l=34,rt=10,tp=10,bt=24;g.font='10px ui-monospace,Menlo,monospace';
+ g.strokeStyle='#374151';g.lineWidth=1;g.beginPath();g.moveTo(l,tp);g.lineTo(l,h-bt);g.lineTo(w-rt,h-bt);g.stroke();
+ g.fillStyle='#6b7280';g.fillText('log₂(1/ε)',w-rt-58,h-6);g.save();g.translate(10,h/2+22);g.rotate(-Math.PI/2);g.fillText('log₂ N(ε)',0,0);g.restore();
+ if(!d)return;
+ const xs=d.pts.map(p=>p.x),ys=d.pts.map(p=>p.y),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(0,...ys),y1=Math.max(...ys)+.5;
+ const X=v=>l+(v-x0)/(x1-x0)*(w-l-rt),Y=v=>h-bt-(v-y0)/(y1-y0)*(h-bt-tp);
+ g.fillStyle='#4b5563';for(let v=Math.ceil(x0);v<=x1;v++){g.fillText(v,X(v)-3,h-bt+12)}
+ g.strokeStyle='#34d399';g.lineWidth=1.6;g.setLineDash([4,3]);g.beginPath();g.moveTo(X(2),Y(d.icpt+d.slope*2));g.lineTo(X(7),Y(d.icpt+d.slope*7));g.stroke();g.setLineDash([]);
+ for(const p of d.pts){const used=p.x>=2&&p.x<=7;g.fillStyle=used?'#60a5fa':'#4b5563';g.beginPath();g.arc(X(p.x),Y(p.y),used?3.2:2.4,0,6.2832);g.fill()}
+ g.fillStyle='#34d399';g.font='600 11px ui-monospace,Menlo,monospace';g.fillText('slope ≈ '+d.slope.toFixed(2),l+8,tp+10);
+}
+
+/* ---------- Controls ---------- */
+const sliders=[['nR','n',v=>v,v=>''+v],['aR','angle',v=>v,v=>v.toFixed(1)+'°'],['hR','heading',v=>v,v=>v+'°'],['shR','shrink',v=>v,v=>'× '+v.toFixed(2)],
+ ['jaR','jitA',v=>v,v=>v+'%'],['jlR','jitL',v=>v,v=>v+'%'],['wR','width',v=>v,v=>v.toFixed(1)+' px'],['tpR','taper',v=>v,v=>'× '+v.toFixed(2)],['szR','size',v=>v,v=>v+' px']];
+const OUT={nR:'nOut',aR:'aOut',hR:'hOut',shR:'shOut',jaR:'jaOut',jlR:'jlOut',wR:'wOut',tpR:'tpOut',szR:'szOut'};
+function syncControls(){
+ for(const[id,key,,f]of sliders){$(id).value=S[key];$(OUT[id]).textContent=f(+S[key])}
+ $('axiom').value=S.axiom;renderRules();
+ document.querySelectorAll('#cmSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.colorMode));
+ document.querySelectorAll('#pals .palb').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.pal));
+ $('palPill').textContent=PALS[S.pal].name;$('lvT').checked=S.leaves;
+ document.querySelectorAll('.chips .chip').forEach(c=>c.setAttribute('aria-pressed',c.dataset.name===S.name&&!!S.preset));
+ validate();
+}
+for(const[id,key]of sliders){$(id).addEventListener('input',e=>{
+ const v=+e.target.value;S[key]=v;const f=sliders.find(s=>s[0]===id)[3];$(OUT[id]).textContent=f(v);
+ if(key==='size')return;
+ if(['width','taper'].includes(key)){B=buckets(G,S);requestRender();return}
+ growing=false;growT=1;$('gR').value=100;$('gOut').textContent='100%';
+ recompute({keepView:false});
+})}
+$('gR').addEventListener('input',e=>{growing=false;growT=+e.target.value/100;$('gOut').textContent=Math.round(growT*100)+'%';requestRender()});
+$('growBtn').onclick=()=>{if(S.mode!=='study')setMode('study');startGrow()};
+$('stepDn').onclick=()=>stepN(-1);$('stepUp').onclick=()=>stepN(1);
+function stepN(d){S.n=clamp(S.n+d,0,14);$('nR').value=S.n;growing=false;growT=1;recompute();if(d>0)startGrow()}
+$('reseed').onclick=()=>{S.seed=(Math.random()*1e6)|0;recompute({keepView:true});if(EXP.stochastic||S.jitA||S.jitL)toast('New random seed');else toast('This seed has no randomness — add jitter or a second rule for a symbol')};
+$('lvT').onchange=e=>{S.leaves=e.target.checked;requestRender()};
+document.querySelectorAll('#cmSeg button').forEach(b=>b.onclick=()=>{S.colorMode=b.dataset.v;syncSeg();B=buckets(G,S);requestRender()});
+function syncSeg(){document.querySelectorAll('#cmSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.colorMode))}
+
+const palWrap=$('pals');
+for(const k in PALS){const b=document.createElement('button');b.className='palb';b.dataset.v=k;b.innerHTML=`<i style="background:linear-gradient(90deg,${PALS[k].c.join(',')})"></i>${PALS[k].name}`;
+ b.onclick=()=>{S.pal=k;document.querySelectorAll('#pals .palb').forEach(x=>x.setAttribute('aria-pressed',x===b));$('palPill').textContent=PALS[k].name;B=buckets(G,S);requestRender()};palWrap.appendChild(b)}
+
+/* Rule editor */
+let lastField=null;
+function renderRules(){
+ const w=$('rules');w.innerHTML='';
+ S.rules.forEach((r,i)=>{const d=document.createElement('div');d.className='rule';
+  d.innerHTML=`<input class="p" maxlength="1" spellcheck="false" autocomplete="off" aria-label="Symbol to replace" data-i="${i}" data-k="p"><span class="arrow">→</span><input spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="Replacement" data-i="${i}" data-k="s"><button class="xbtn" title="Remove rule" data-i="${i}"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>`;
+  d.querySelector('[data-k=p]').value=r.p;d.querySelector('[data-k=s]').value=r.s;w.appendChild(d)});
+}
+let edT=0;
+function edited(){S.name='Custom seed';S.preset=null;document.querySelectorAll('.chips .chip').forEach(c=>c.setAttribute('aria-pressed','false'));validate();
+ clearTimeout(edT);edT=setTimeout(()=>{growing=false;growT=1;recompute()},160)}
+$('rules').addEventListener('input',e=>{const t=e.target,i=+t.dataset.i;if(!S.rules[i])return;S.rules[i][t.dataset.k]=t.value;edited()});
+$('rules').addEventListener('focusin',e=>{if(e.target.dataset.k==='s')lastField=e.target});
+$('rules').addEventListener('click',e=>{const b=e.target.closest('.xbtn');if(!b)return;S.rules.splice(+b.dataset.i,1);renderRules();edited()});
+$('axiom').addEventListener('input',e=>{S.axiom=e.target.value;edited()});
+$('axiom').addEventListener('focus',e=>lastField=e.target);
+$('addRule').onclick=()=>{if(S.rules.length>=8){toast('Up to 8 rules');return}S.rules.push({p:'',s:''});renderRules();const ins=$('rules').querySelectorAll('input.p');ins[ins.length-1].focus()};
+const SYMS=[['F','d'],['G','d'],['f','m'],['+','t'],['-','t'],['|','t'],['[','b'],[']','b'],['X','v'],['Y','v']];
+for(const[c,k]of SYMS){const b=document.createElement('button');b.className='sym '+k;b.textContent=c==='-'?'−':c;b.title='Insert '+c;
+ b.addEventListener('mousedown',e=>e.preventDefault());
+ b.onclick=()=>{const f=lastField&&document.body.contains(lastField)?lastField:$('axiom');const s=f.selectionStart??f.value.length,e2=f.selectionEnd??s;
+  f.value=f.value.slice(0,s)+c+f.value.slice(e2);f.focus();f.setSelectionRange(s+1,s+1);f.dispatchEvent(new Event('input',{bubbles:true}))};$('syms').appendChild(b)}
+function balanced(s){let d=0;for(const c of s){if(c==='[')d++;else if(c===']'){d--;if(d<0)return false}}return d===0}
+function validate(){
+ const st=$('status');const bad=[];
+ if(!S.axiom)bad.push('Axiom is empty');else if(!balanced(S.axiom))bad.push('Axiom has unbalanced [ ]');
+ S.rules.forEach(r=>{if(!r.p&&r.s)bad.push('A rule is missing its symbol');else if(r.p&&!balanced(r.s))bad.push(`Rule ${r.p} has unbalanced [ ]`)});
+ if(bad.length){st.className='status err';st.textContent='⚠ '+bad[0]}
+ else{const active=S.rules.filter(r=>r.p).length;st.className='status ok';st.textContent=`✓ ${active} rule${active===1?'':'s'} ready`}
+}
+
+/* Presets */
+function presetChip(p,wrap,mine){const c=document.createElement('button');c.className='chip';c.dataset.name=p.name;c.textContent=p.name;
+ if(mine){const x=document.createElement('span');x.className='x';x.textContent='×';x.title='Delete saved seed';x.onclick=e=>{e.stopPropagation();mySeeds=mySeeds.filter(s=>s.name!==p.name);storeSeeds();renderMine()};c.appendChild(x)}
+ c.onclick=()=>applyPreset(p);wrap.appendChild(c)}
+PRESETS.forEach(p=>presetChip(p,$(p.g==='plant'?'chipsPlant':'chipsCurve')));
+function applyPreset(p){
+ Object.assign(S,{name:p.name,preset:p,axiom:p.ax,rules:p.r.map(([a,b])=>({p:a,s:b})),angle:p.ang,n:p.n,heading:p.head,shrink:p.sh??1,jitA:p.ja||0,jitL:p.jl||0,
+  pal:p.pal||'spring',colorMode:p.cm||'depth',width:p.w||2,taper:p.tp??1,leaves:!!p.lv});
+ syncControls();growing=false;growT=1;recompute();startGrow();
+}
+let mySeeds=[];
+try{mySeeds=JSON.parse(localStorage.getItem('fractalGarden.seeds')||'[]')||[]}catch(e){mySeeds=[]}
+function storeSeeds(){try{localStorage.setItem('fractalGarden.seeds',JSON.stringify(mySeeds))}catch(e){}}
+function renderMine(){const w=$('chipsMine');w.innerHTML='';mySeeds.forEach(p=>presetChip(p,w,true));$('mineLbl').hidden=!mySeeds.length;syncControls()}
+$('saveBtn').onclick=()=>{const nm=$('saveName').value.trim()||('My seed '+(mySeeds.length+1));
+ const p={name:nm,g:'mine',ax:S.axiom,r:S.rules.filter(r=>r.p).map(r=>[r.p,r.s]),ang:S.angle,n:S.n,head:S.heading,sh:S.shrink,ja:S.jitA,jl:S.jitL,pal:S.pal,cm:S.colorMode,w:S.width,tp:S.taper,lv:S.leaves};
+ mySeeds=mySeeds.filter(s=>s.name!==nm);mySeeds.push(p);storeSeeds();S.name=nm;S.preset=p;$('saveName').value='';renderMine();updTitle();toast('Saved “'+nm+'”')};
+
+/* Mode */
+function setMode(m){S.mode=m;document.querySelectorAll('#modeSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===m));
+ $('gardenCard').hidden=m!=='garden';$('clearBtn').hidden=m!=='garden';$('hint').hidden=m!=='garden'||plants.length>0;
+ cv.classList.toggle('plant',m==='garden');updZoom();updTitle();requestRender()}
+document.querySelectorAll('#modeSeg button').forEach(b=>b.onclick=()=>setMode(b.dataset.v));
+
+/* Planting */
+function plantAt(wx,wy){
+ let g=G;const varied=EXP.stochastic||S.jitA>0||S.jitL>0;
+ if(varied){const st={...S,seed:(Math.random()*1e9)|0};g=turtle(expand(st).str,st)}
+ let tot=0;for(const p of plants)tot+=p.G.n;
+ if(tot+g.n>GARDEN_CAP){toast('Garden is full — undo a plant or lower the iterations');return}
+ if(g.n===0){toast('This seed draws nothing yet');return}
+ const look={pal:S.pal,colorMode:S.colorMode,width:S.width,taper:S.taper,leaves:S.leaves};
+ const b=g.bb,bw=b.maxx-b.minx,bh=b.maxy-b.miny,k=S.size/Math.max(bw,bh,1e-9);
+ let ax=0,ay=0;if(!g.branching){ax=(b.minx+b.maxx)/2;ay=(b.miny+b.maxy)/2}else wy=0;
+ plants.push({G:g,B:buckets(g,look),look,wx,wy,k,ax,ay,size:S.size,born:performance.now(),dur:clamp(900+g.n*.01,1100,2600)});
+ $('plantPill').textContent=plants.length+' plant'+(plants.length===1?'':'s');$('hint').hidden=true;updTitle();loop();
+}
+$('undoPlant').onclick=()=>{plants.pop();$('plantPill').textContent=plants.length+' plant'+(plants.length===1?'':'s');$('hint').hidden=plants.length>0;updTitle();requestRender()};
+$('fitGarden').onclick=()=>{fitGarden();requestRender()};
+let armT=0;
+$('clearBtn').onclick=()=>{const b=$('clearBtn');if(!b.classList.contains('arm')){b.classList.add('arm');$('clearTxt').textContent='Click again to clear';clearTimeout(armT);armT=setTimeout(()=>{b.classList.remove('arm');$('clearTxt').textContent='Clear garden'},2500);return}
+ b.classList.remove('arm');$('clearTxt').textContent='Clear garden';plants.length=0;$('plantPill').textContent='0 plants';$('hint').hidden=false;updTitle();requestRender()};
+
+/* Pan / zoom / click */
+let drag=null;
+cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);drag={x:e.clientX,y:e.clientY,moved:false}});
+cv.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;
+ if(!drag.moved&&Math.hypot(dx,dy)>4){drag.moved=true;cv.classList.add('dragging')}
+ if(drag.moved){const v=S.mode==='study'?V:GV;v.cx-=dx/v.s;v.cy-=dy/v.s;drag.x=e.clientX;drag.y=e.clientY;requestRender()}});
+cv.addEventListener('pointerup',e=>{if(!drag)return;cv.classList.remove('dragging');
+ if(!drag.moved&&S.mode==='garden'){const r=cv.getBoundingClientRect(),sx=e.clientX-r.left,sy=e.clientY-r.top;plantAt(GV.cx+(sx-W/2)/GV.s,GV.cy+(sy-H/2)/GV.s)}drag=null});
+cv.addEventListener('pointercancel',()=>{drag=null;cv.classList.remove('dragging')});
+function zoomAt(f,sx,sy){const v=S.mode==='study'?V:GV;const wx=v.cx+(sx-W/2)/v.s,wy=v.cy+(sy-H/2)/v.s;
+ const lim=S.mode==='study'?[V.fit*.1,V.fit*400]:[.08,12];v.s=clamp(v.s*f,lim[0],lim[1]);v.cx=wx-(sx-W/2)/v.s;v.cy=wy-(sy-H/2)/v.s;updZoom();requestRender()}
+cv.addEventListener('wheel',e=>{e.preventDefault();const r=cv.getBoundingClientRect();zoomAt(Math.exp(-e.deltaY*.0015),e.clientX-r.left,e.clientY-r.top)},{passive:false});
+cv.addEventListener('dblclick',()=>{if(S.mode==='study'){fitStudy();requestRender()}});
+$('zIn').onclick=()=>zoomAt(1.25,W/2,H/2);$('zOut').onclick=()=>zoomAt(.8,W/2,H/2);
+$('zFit').onclick=()=>{S.mode==='study'?fitStudy():fitGarden();requestRender()};
+
+/* PNG export */
+$('pngBtn').onclick=()=>{const o=document.createElement('canvas');o.width=cv.width;o.height=cv.height;const g=o.getContext('2d');g.fillStyle='#030712';g.fillRect(0,0,o.width,o.height);g.drawImage(cv,0,0);
+ o.toBlob(b=>{if(!b){toast('Could not create image');return}const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=(S.mode==='garden'?'fractal_garden':S.name.replace(/\W+/g,'_').toLowerCase())+'.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000)})};
+
+/* Toast */
+let toastT=0;function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2600)}
+
+/* Keys */
+document.addEventListener('keydown',e=>{const tg=e.target.tagName;if(tg==='INPUT'&&e.target.type!=='range'&&e.target.type!=='checkbox')return;if(e.metaKey||e.ctrlKey||e.altKey)return;
+ const k=e.key.toLowerCase();
+ if(k==='-'||k==='_'){stepN(-1);e.preventDefault()}else if(k==='='||k==='+'){stepN(1);e.preventDefault()}
+ else if(k==='g')$('growBtn').click();else if(k==='f')$('zFit').click();else if(k==='r')$('reseed').click();else if(k==='m')setMode(S.mode==='study'?'garden':'study')});
+window.addEventListener('resize',()=>{if(G)scheduleBox()});
+
+/* Go */
+resize();
+applyPreset(PRESETS[0]);
+</script>
+</body>
+</html>

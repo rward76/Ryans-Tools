@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Simple Machines Lab</title>
+<style>
+/* Same shell as Bridge & Tower Lab / Gear Train Lab / Optics Bench: header bar, 384px control rail, framed 2D bench viewport with floating glass overlays. Dark-only. */
+:root{color-scheme:dark;
+--g950:#030712;--g900:#111827;--g800:#1f2937;--g700:#374151;--g600:#4b5563;--g500:#6b7280;--g400:#9ca3af;--g300:#d1d5db;--g200:#e5e7eb;--g100:#f3f4f6;
+--blue7:#1d4ed8;--blue6:#2563eb;--blue5:#3b82f6;--blue4:#60a5fa;--blue3:#93c5fd;
+--purple6:#9333ea;--purple4:#c084fc;--pink4:#f472b6;
+--emerald6:#059669;--emerald5:#10b981;--emerald4:#34d399;
+--amber3:#fcd34d;--amber4:#fbbf24;--rose4:#fb7185;--rose6:#e11d48;
+--f-sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+--f-mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0}
+body{background:var(--g950);color:var(--g100);font-family:var(--f-sans);font-size:14px;display:flex;flex-direction:column;overflow:hidden;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box}
+*,*:before,*:after{box-sizing:border-box}
+button,select,output,input{font:inherit;color:inherit}
+button:focus-visible,input:focus-visible{outline:2px solid var(--blue5);outline-offset:2px}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:var(--g900)}::-webkit-scrollbar-thumb{background:var(--g700);border-radius:3px}
+svg.i{width:14px;height:14px;flex:none}
+header{background:var(--g900);border-bottom:1px solid var(--g800);padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;flex:none}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{background:linear-gradient(to top right,var(--blue6),var(--purple6));padding:8px;border-radius:8px;box-shadow:0 10px 15px -3px #0006;display:grid;place-items:center}
+.logo svg{width:20px;height:20px;color:#fff}
+h1{margin:0;font-size:18px;font-weight:700;line-height:1.4;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+h1 .grad{background:linear-gradient(to right,var(--blue4),var(--purple4),var(--pink4));-webkit-background-clip:text;background-clip:text;color:transparent}
+.badge-v{font-size:12px;font-weight:600;padding:2px 8px;border-radius:4px;background:#1e3a8a99;color:var(--blue3);border:1px solid var(--blue7)}
+.hctl{display:flex;align-items:center;flex-wrap:wrap;justify-content:flex-end;gap:12px}
+.seg{display:flex;align-items:center;background:var(--g800);border:1px solid var(--g700);border-radius:8px;padding:4px;font-size:12px;flex-wrap:wrap}
+.seg .lbl{color:var(--g400);padding:0 8px;font-weight:500}
+.seg button{background:transparent;border:0;padding:4px 10px;border-radius:4px;color:var(--g300);cursor:pointer;transition:color .15s,background .15s}
+.seg button:hover{color:#fff}
+.seg button[aria-pressed=true]{background:var(--blue6);color:#fff;font-weight:600;box-shadow:0 1px 3px #0006}
+.seg.wide{display:grid;grid-auto-flow:column;grid-auto-columns:1fr}
+.seg.wide button{padding:4px 6px}
+.btn-clear{background:var(--g700);color:var(--g100);border:0;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;cursor:pointer;transition:background .15s}
+.btn-clear:hover{background:var(--g600)}
+.row{flex:1;display:flex;overflow:hidden;min-height:0;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+aside{width:384px;background:var(--g900);border-right:1px solid var(--g800);overflow-y:auto;flex:none}
+.stack{padding:16px;display:flex;flex-direction:column;gap:14px}
+.card{background:#1f293799;padding:14px;border-radius:12px;border:1px solid rgba(55,65,81,.6);display:flex;flex-direction:column;gap:12px}
+.card-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card-h .t{font-size:12px;font-weight:700;color:var(--g200);text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:8px}
+.pill{font-size:10px;background:var(--g700);color:var(--g300);padding:2px 8px;border-radius:999px;font-family:var(--f-mono);white-space:nowrap}
+.pill.hi{background:#05966933;color:var(--emerald4)}
+.pill.bad{background:#e11d4833;color:var(--rose4)}
+.pill.idle{background:#37415199;color:var(--g400)}
+.pill.warn{background:#f59e0b26;color:var(--amber3)}
+.c-blue{color:var(--blue4)}.c-purple{color:var(--purple4)}.c-emerald{color:var(--emerald4)}.c-amber{color:var(--amber3)}.c-pink{color:var(--pink4)}.c-rose{color:var(--rose4)}
+.parts{display:grid;gap:6px;grid-template-columns:repeat(4,minmax(0,1fr))}
+.part{display:flex;flex-direction:column;align-items:center;gap:5px;padding:9px 4px 7px;background:var(--g800);border:1px solid var(--g700);border-radius:8px;color:var(--g200);font-size:10.5px;font-weight:600;cursor:pointer;transition:border-color .15s,background .15s;user-select:none;-webkit-user-select:none;text-align:center;line-height:1.2}
+.part:hover{border-color:var(--blue5);background:#1e293b}
+.part svg{width:36px;height:24px;color:var(--g300)}
+.part:hover svg{color:var(--blue3)}
+.part[aria-pressed=true]{background:#9333ea33;border-color:var(--purple4);color:#f3e8ff}
+.part[aria-pressed=true] svg{color:var(--purple4)}
+.muted{color:var(--g500);font-size:11px;margin:0;line-height:1.5}
+.muted b{color:var(--g300);font-weight:600}
+.selname{font-size:20px;font-weight:700;color:#fff;margin:0;line-height:1.2}
+.desc{font-size:12px;color:var(--g300);margin:-6px 0 0;line-height:1.5}
+.ctl{display:grid;grid-template-columns:84px minmax(0,1fr) 76px;align-items:center;gap:10px;font-size:12px;color:var(--g300)}
+.ctl output{font:12px var(--f-mono);color:var(--blue3);text-align:right;font-variant-numeric:tabular-nums}
+.ctl.amber output{color:var(--amber3)}
+.ctl.em output{color:var(--emerald4)}
+input[type=range]{width:100%;accent-color:var(--blue5);margin:0}
+.ctl.amber input[type=range]{accent-color:var(--amber4)}
+.ctl.em input[type=range]{accent-color:var(--emerald5)}
+.chrow{display:grid;grid-template-columns:84px minmax(0,1fr);align-items:center;gap:10px;font-size:12px;color:var(--g300)}
+.btns3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.btns2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.btn{font-size:11.5px;background:var(--g700);color:var(--g100);border:0;padding:7px 6px;border-radius:8px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .15s}
+.btn:hover{background:var(--g600)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.go{background:var(--emerald6);color:#fff}
+.btn.go:hover{background:var(--emerald5)}
+.lawbox{background:var(--g950);border:1px solid var(--g800);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.lawbox .big{font:700 17px var(--f-sans);color:#fff;line-height:1.25}
+.lawbox .big.hi{color:var(--emerald4)}.lawbox .big.bad{color:var(--rose4)}.lawbox .big.warn{color:var(--amber3)}.lawbox .big.idle{color:var(--g300)}
+.lawrow{display:flex;justify-content:space-between;gap:10px;font:11.5px var(--f-mono);color:var(--g400)}
+.lawrow b{color:var(--emerald4);font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+.lawrow b.am{color:var(--amber3)}.lawrow b.bl{color:var(--blue3)}.lawrow b.pk{color:var(--rose4)}.lawrow b.wh{color:var(--g100)}.lawrow b.dim{color:var(--g500)}
+.gauge{position:relative;height:8px;border-radius:4px;background:var(--g800);overflow:visible;margin:6px 0 2px}
+.gauge .band{position:absolute;top:0;bottom:0;background:#05966955;border-left:2px solid var(--blue4);border-right:2px solid var(--emerald4)}
+.gauge .needle{position:absolute;top:-4px;width:3px;height:16px;border-radius:2px;background:#fff;box-shadow:0 0 0 1px #0008;transform:translateX(-1.5px)}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font-size:11.5px;font-weight:600;background:var(--g800);color:var(--g300);border:1px solid var(--g700);border-radius:999px;padding:4px 10px;cursor:pointer;white-space:nowrap}
+.chip:hover{border-color:var(--g600)}
+.chip[aria-pressed=true]{background:#9333ea40;border-color:var(--purple4);color:#f3e8ff}
+.eq{display:grid;gap:6px;font:11.5px/1.5 var(--f-mono);color:var(--g300)}
+.eq div{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.eq span{color:var(--g500);font-family:var(--f-sans);font-size:11px;text-align:right;flex:none;max-width:48%}
+.eq span.v{color:var(--emerald4);font-family:var(--f-mono);font-weight:600}
+.eq .hd{color:var(--purple4);font:700 10.5px var(--f-sans);text-transform:uppercase;letter-spacing:.06em;margin-top:4px}
+.qbox{background:var(--g950);border:1px solid var(--g800);border-radius:8px;padding:10px 12px;font-size:12px;line-height:1.55;color:var(--g200)}
+.qbox b{color:var(--amber3)}
+.ans{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px;align-items:center}
+.ans input{background:var(--g950);border:1px solid var(--g700);border-radius:8px;padding:7px 10px;font:12px var(--f-mono);min-width:0}
+.ans .u{font:12px var(--f-mono);color:var(--g400)}
+.fb{font-size:12px;margin:0;line-height:1.5}
+.fb.ok{color:var(--emerald4)}.fb.no{color:var(--rose4)}
+.phys{font-size:11.5px;color:var(--g400);line-height:1.6;margin:0}
+.phys b{color:var(--g200);font-weight:600}
+.keys{font:10px/1.7 var(--f-mono);color:var(--g500);padding:0 4px;margin-top:-6px}
+main{flex:1;display:flex;min-width:0;background:#11182780;padding:8px}
+.vp{flex:1;position:relative;background:radial-gradient(ellipse at 50% 35%,#0f1a2b 0%,var(--g950) 75%);border:1px solid var(--g800);border-radius:12px;overflow:hidden;min-height:0}
+#cv{position:absolute;inset:0;display:block;width:100%;height:100%;touch-action:none}
+.float{position:absolute;z-index:2;background:#111827e6;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid var(--g700);border-radius:8px;box-shadow:0 10px 15px -3px #00000080}
+.vp-title{top:12px;left:12px;padding:6px 12px;font-size:12px;display:flex;align-items:center;gap:8px;pointer-events:none;max-width:calc(100% - 24px)}
+.vp-title b{color:var(--g200);white-space:nowrap}
+.vp-title span{color:var(--g400);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--emerald4);flex:none;transition:background .3s}
+.dot.idle{background:var(--g500)}.dot.jam{background:var(--rose4)}.dot.warn{background:var(--amber4)}.dot.hold{background:var(--blue4)}
+.vp-tool{top:50px;left:12px;padding:4px 10px;font:11px var(--f-mono);color:var(--g400);pointer-events:none;max-width:calc(100% - 24px)}
+.vp-tool b{color:var(--purple4);font-weight:600}
+.insp{right:12px;bottom:12px;padding:9px 11px;display:flex;flex-direction:column;gap:5px;font-size:11px;color:var(--g300);pointer-events:none}
+.insp .ot{font-size:10px;font-weight:700;color:var(--g400);text-transform:uppercase;letter-spacing:.05em}
+.lg{display:flex;align-items:center;gap:8px}
+.lg i{width:18px;height:5px;border-radius:2px;flex:none}
+@media (max-width:820px){
+ html,body{height:auto}
+ body{overflow:auto}
+ .row{flex-direction:column;overflow:visible}
+ main{order:-1;flex:none;height:58vh;min-height:340px}
+ aside{width:100%;border-right:0;border-top:1px solid var(--g800);overflow:visible}
+ .vp-tool{display:none}
+ .insp{display:none}
+ .hctl .seg .lbl{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body>
+
+<header>
+  <div class="brand">
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13L22 8"/><path d="M12 10.5l-4 9h8z"/><path d="M4 19.5h16"/><rect x="2.5" y="7" width="4" height="4" rx=".6"/></svg></div>
+    <div><h1><span class="grad">Simple Machines Lab</span> <span class="badge-v">v1.0</span></h1></div>
+  </div>
+  <div class="hctl">
+    <div class="seg" role="group" aria-label="Units"><span class="lbl">Units</span><button data-u="si" aria-pressed="true">SI</button><button data-u="us" aria-pressed="false">US</button></div>
+    <div class="seg" role="group" aria-label="Free-body forces"><span class="lbl">Forces</span><button data-f="0" aria-pressed="false">Off</button><button data-f="1" aria-pressed="true">FBD</button></div>
+    <div class="seg" role="group" aria-label="Dimensions"><span class="lbl">Dimensions</span><button data-d="0" aria-pressed="false">Off</button><button data-d="1" aria-pressed="true">On</button></div>
+    <button class="btn-clear" id="resetBtn" title="Reset this machine (R)"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>Reset</button>
+  </div>
+</header>
+
+<div class="row">
+  <aside>
+    <div class="stack">
+      <section class="card">
+        <div class="card-h"><span class="t"><svg class="i c-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9L7 7M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>Machine</span><span class="pill" id="macPill">1 / 7</span></div>
+        <div class="parts" id="macs"></div>
+        <div><p class="selname" id="macName"></p></div>
+        <p class="desc" id="macDesc"></p>
+      </section>
+
+      <section class="card">
+        <div class="card-h"><span class="t"><svg class="i c-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>Setup</span><span class="pill" id="setPill">givens</span></div>
+        <div class="chips" id="presets" role="group" aria-label="Presets"></div>
+        <div id="params" style="display:flex;flex-direction:column;gap:10px"></div>
+      </section>
+
+      <section class="card">
+        <div class="card-h"><span class="t"><svg class="i c-emerald" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-4 0v5M14 10V4a2 2 0 0 0-4 0v6M10 10.5V6a2 2 0 0 0-4 0v8a8 8 0 0 0 16 0v-2a2 2 0 0 0-4 0"/></svg><span id="effT">Your effort</span></span><span class="pill idle" id="statPill">—</span></div>
+        <div class="ctl em"><label for="pIn" id="pLab">Effort P</label><input type="range" id="pIn" min="0" max="1000" step="1" value="500"><output id="oP">—</output></div>
+        <div class="btns3"><button class="btn" id="bDrop">Let it slip</button><button class="btn" id="bHold">Just hold</button><button class="btn go" id="bRaise">Raise</button></div>
+        <div class="lawbox">
+          <div class="big idle" id="stBig">—</div>
+          <div class="gauge" title="Blue edge = least effort that holds · green edge = effort that starts raising"><div class="band" id="gBand"></div><div class="needle" id="gNeedle"></div></div>
+          <div class="lawrow"><span id="lRaise">Effort to start raising</span><b id="vRaise">—</b></div>
+          <div class="lawrow"><span id="lHold">Least effort that holds</span><b class="bl" id="vHold">—</b></div>
+          <div class="lawrow" id="xRow" hidden><span id="lX">—</span><b class="pk" id="vX">—</b></div>
+          <div class="lawrow"><span>Ideal mechanical advantage</span><b class="wh" id="vIMA">—</b></div>
+          <div class="lawrow"><span>Actual MA = W / P_raise</span><b class="wh" id="vAMA">—</b></div>
+          <div class="lawrow"><span>Efficiency = AMA / IMA</span><b class="am" id="vEff">—</b></div>
+          <div class="lawrow"><span>Effort travel : load travel</span><b class="dim" id="vVR">—</b></div>
+        </div>
+        <p class="muted" id="effHelp">Between the two thresholds, friction holds the load still: the band on the gauge. Above it the load rises; below it the load slips back.</p>
+      </section>
+
+      <section class="card">
+        <div class="card-h"><span class="t"><svg class="i c-pink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h10M4 17h7"/><path d="M15 17l2 2 4-4"/></svg>Worked solution</span><span class="pill" id="solPill">equilibrium</span></div>
+        <div class="eq" id="sol"></div>
+      </section>
+
+      <section class="card">
+        <div class="card-h"><span class="t"><svg class="i c-amber" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.5h0"/></svg>Practice problem</span><span class="pill idle" id="pracPill">off</span></div>
+        <div class="btns2"><button class="btn go" id="newQ">New problem</button><button class="btn" id="revQ" disabled>Show answer</button></div>
+        <div class="qbox" id="qText" hidden></div>
+        <div class="ans" id="ansRow" hidden><input id="ansIn" inputmode="decimal" placeholder="your answer" aria-label="Your answer"><span class="u" id="ansU">N</span><button class="btn" id="chkQ">Check</button></div>
+        <p class="fb" id="qFb" hidden></p>
+        <p class="muted">Draws random givens for the current machine and hides the answers. Solve it on paper with a free-body diagram, then check. You can also find the threshold by experiment with the effort slider.</p>
+      </section>
+
+      <section class="card">
+        <div class="card-h"><span class="t"><svg class="i c-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5v14z"/></svg>The physics</span></div>
+        <p class="phys" id="phys"></p>
+        <div class="eq">
+          <div>IMA = d_effort / d_load<span>from geometry alone</span></div>
+          <div>AMA = W / P<span>what you actually get</span></div>
+          <div>η = AMA / IMA = W·d_W / (P·d_P)<span>work out ÷ work in</span></div>
+          <div>F ≤ μ_s·N<span>F = μN only when slip impends</span></div>
+          <div>self-locking ⇔ P_hold ≤ 0<span>friction alone holds the load</span></div>
+        </div>
+      </section>
+      <p class="keys">1–7 pick a machine · ↑/↓ nudge effort · H hold · Space raise · R reset</p>
+    </div>
+  </aside>
+
+  <main>
+    <div class="vp" id="vp">
+      <canvas id="cv"></canvas>
+      <div class="float vp-title"><i class="dot idle" id="vDot"></i><b id="vName">—</b><span id="vStat">—</span></div>
+      <div class="float vp-tool" id="vTool">—</div>
+      <div class="float insp">
+        <div class="ot">Forces</div>
+        <div class="lg"><i style="background:#fbbf24"></i>Load / weight</div>
+        <div class="lg"><i style="background:#34d399"></i>Effort</div>
+        <div class="lg"><i style="background:#60a5fa"></i>Normal force</div>
+        <div class="lg"><i style="background:#fb7185"></i>Friction</div>
+        <div class="lg"><i style="background:#c084fc"></i>Reaction / tension</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const D2R=Math.PI/180, MONO='ui-monospace,SFMono-Regular,Menlo,Consolas,monospace', SANS='ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif';
+const C={load:'#fbbf24',eff:'#34d399',norm:'#60a5fa',fric:'#fb7185',reac:'#c084fc',rope:'#d6c7a1',ropeD:'#7c6f52',steel:'#8fa3bf',steelD:'#475569',wood:'#c99560',woodD:'#7c5530',dark:'#1f2937',line:'#9ca3af',dim:'#93c5fd'};
+const UN={si:{F:'N',L:'m',l:'mm',T:'N·mm'},us:{F:'lb',L:'ft',l:'in',T:'lb·in'}};
+let U='si', SHOWF=true, SHOWD=true;
+const F=()=>UN[U].F;
+
+function nf(x,sig){sig=sig||4;if(x===Infinity)return '∞';if(!isFinite(x))return '—';if(Math.abs(x)<1e-12)return '0';const a=Math.abs(x);if(a>=1e6)return x.toExponential(2);let d=Math.max(0,sig-1-Math.floor(Math.log10(a)));d=Math.min(d,5);let s=x.toFixed(d);if(s.indexOf('.')>=0)s=s.replace(/0+$/,'').replace(/\.$/,'');return s;}
+const pct=x=>isFinite(x)?(x*100).toFixed(x>=0.995?0:1)+'%':'—';
+
+/* ---------------- machines ---------------- */
+const ICON={
+ lever:'<svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M3 13.5L37 7.5" stroke-width="3" stroke-linecap="round"/><path d="M20 11l-5 9h10z"/><path d="M11 21h18" stroke-linecap="round"/><rect x="4" y="6" width="6" height="5.5" rx=".8" stroke="#fbbf24"/></svg>',
+ pulley:'<svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 1.5h20"/><circle cx="17" cy="6" r="3.5"/><circle cx="22" cy="14" r="3.5"/><path d="M13.5 6v8M20.5 6v8M18.5 14V6M25.5 14V6M30 6v13" stroke="#d6c7a1"/><path d="M22 17.5v2" /><path d="M18.5 19.5h7l1 3h-9z" stroke="#fbbf24"/></svg>',
+ wheel:'<svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="20" cy="9" r="8"/><circle cx="20" cy="9" r="2.6"/><path d="M20 1v16M12 9h16"/><path d="M28 9v12M17.4 9v8" stroke="#d6c7a1"/><path d="M14.5 17h6l1 5h-8z" stroke="#fbbf24"/></svg>',
+ incline:'<svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M3 21h34V5z"/><g transform="rotate(-25.2 17 14)"><rect x="12" y="8" width="9" height="6" rx=".8" stroke="#fbbf24"/></g></svg>',
+ wedge:'<svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M6 1v14" stroke-width="2.5"/><path d="M7 21h30V13z"/><path d="M7.5 6h11v8.5l-11 3z" stroke="#fbbf24"/><path d="M34 17h-4" stroke="#34d399"/></svg>',
+ screw:'<svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M12 22h16l-3-4h-10z"/><path d="M17 18V7h6v11"/><path d="M17 15l6-2M17 11.5l6-2" /><path d="M4 6h32" stroke-width="2" stroke-linecap="round"/><rect x="14" y="1.5" width="12" height="3" rx=".6" stroke="#fbbf24"/></svg>',
+ belt:'<svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="20" cy="9" r="6.5"/><path d="M12.5 9a7.5 7.5 0 0 1 15 0" stroke="#d6c7a1" stroke-width="2"/><path d="M12.5 9v9M27.5 9v12" stroke="#d6c7a1"/><path d="M9.5 18h6l1 4.5h-8z" stroke="#fbbf24"/></svg>'
+};
+const M={};
+
+/* ===== LEVER ===== */
+M.lever={name:'Lever',short:'lever',desc:'A rigid bar that turns about a fulcrum (pin). Sum moments about the fulcrum: effort × its arm = load × its arm. The class depends on what sits in the middle.',
+ s0:0.5, frictionless:true, effName:'Effort P',
+ params:[
+  {k:'W',lab:'Load W',sym:'W',kind:'F',si:[50,2000,10,600],us:[10,500,5,150]},
+  {k:'L',lab:'Bar length',sym:'L',kind:'L',si:[2,6,0.1,4],us:[6,20,0.5,12]},
+  {k:'fa',lab:'Fulcrum at',sym:'x_F',kind:'frac',r:[0,1,0.01,0.25]},
+  {k:'fb',lab:'Load at',sym:'x_W',kind:'frac',r:[0,1,0.01,0.03]},
+  {k:'fc',lab:'Effort at',sym:'x_P',kind:'frac',r:[0,1,0.01,1]},
+  {k:'Wb',lab:'Bar weight',sym:'W_b',kind:'F',si:[0,500,10,0],us:[0,100,5,0]},
+  {k:'th',lab:'Effort tilt θ',sym:'θ',kind:'deg',r:[0,60,1,0]}],
+ presets:[['Class 1 · crowbar',{fa:0.25,fb:0.03,fc:1}],['Class 2 · wheelbarrow',{fa:0,fb:0.3,fc:1}],['Class 3 · forearm',{fa:0,fb:1,fc:0.25}]],
+ fix(v,k){if(Math.abs(v.fc-v.fa)<0.04){if(k==='fa')v.fa=Math.round((v.fc>0.5?v.fc-0.04:v.fc+0.04)*100)/100;else v.fc=Math.round((v.fa>0.5?v.fa-0.04:v.fa+0.04)*100)/100;}},
+ compute(v){
+  const L=v.L,a=v.fa*L,b=v.fb*L,c=v.fc*L,W=v.W,Wb=v.Wb,th=v.th*D2R,Fu=F(),Lu=UN[U].L;
+  const dW=b-a,dP=c-a,db=L/2-a,Mo=W*dW+Wb*db,Py=Mo/dP,Pp=Math.abs(Py),P=Pp/Math.cos(th);
+  const IMA=Math.abs(dW)>1e-9?Math.abs(dP)/Math.abs(dW):Infinity;
+  const ord=[['F',a],['L',b],['E',c]].sort((x,y)=>x[1]-y[1]||(x[0]==='F'?-1:1)).map(x=>x[0]);
+  const cls=ord[1]==='F'?1:ord[1]==='L'?2:3;
+  const Ry=W+Wb-Py,Rx=P*Math.sin(th);
+  const st=[['hd','Moments about the fulcrum (distances from F, + to the right)'],
+   ['d_W = x_W − x_F',nf(dW)+' '+Lu],['d_P = x_P − x_F',nf(dP)+' '+Lu]];
+  if(Wb>0)st.push(['d_b = L/2 − x_F',nf(db)+' '+Lu]);
+  st.push(['ΣM_F = 0:  P_y·d_P = W·d_W'+(Wb>0?' + W_b·d_b':''),'']);
+  st.push(['P_y = '+(Wb>0?'('+nf(W)+'·'+nf(dW)+' + '+nf(Wb)+'·'+nf(db)+')':nf(W)+'·'+nf(dW))+' / '+nf(dP),'v:'+nf(Py)+' '+Fu]);
+  st.push([Py>=0?'P_y > 0 → effort pushes up':'P_y < 0 → effort pushes down','']);
+  if(v.th>0)st.push(['P = |P_y| / cos θ','v:'+nf(P)+' '+Fu]);
+  st.push(['hd','Fulcrum reaction']);
+  st.push(['ΣF_y: R_y = W + W_b − P_y','v:'+nf(Ry)+' '+Fu]);
+  if(v.th>0)st.push(['ΣF_x: R_x = P sin θ','v:'+nf(Rx)+' '+Fu]);
+  st.push(['IMA = |d_P| / |d_W|','v:'+nf(IMA)]);
+  const eff=(Wb===0)?Math.cos(th):NaN;
+  return {Praise:P,Phold:P,IMA,AMA:W/P,eff,vr:IMA,steps:st,Mo,Py,Ry,Rx,dW,dP,cls,tag:'Class '+cls+' lever',
+   words:{up:'Load rising',hold:'Balanced',down:'Load dropping'}};
+ },
+ draw(v,r,s,o){
+  const L=v.L,sc=700/L,a=v.fa*L,b=v.fb*L,c=v.fc*L,px=150+a*sc,py=300,sg=r.Mo>=0?1:-1;
+  const phi=(s-0.5)*0.34*sg,cs=Math.cos(phi),sn=Math.sin(phi);
+  const pos=x=>[px+(x-a)*sc*cs,py-(x-a)*sc*sn],nU=[-sn,-cs],tU=[cs,-sn];
+  ground(60,940,py+110);
+  ctx.fillStyle='#374151';ctx.strokeStyle=C.line;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(px,py+8);ctx.lineTo(px-44,py+110);ctx.lineTo(px+44,py+110);ctx.closePath();ctx.fill();ctx.stroke();
+  ctx.save();ctx.translate(px,py);ctx.rotate(-phi);
+  ctx.fillStyle=C.wood;ctx.strokeStyle=C.woodD;ctx.lineWidth=2;rr(-a*sc,-8,L*sc,16,4);ctx.fill();ctx.stroke();
+  ctx.strokeStyle='#a87a4a';ctx.lineWidth=1;ctx.beginPath();for(let x=-a*sc+30;x<(L-a)*sc;x+=60){ctx.moveTo(x,-3);ctx.lineTo(x+22,-3);}ctx.stroke();
+  const bx=(b-a)*sc;ctx.fillStyle=C.dark;ctx.strokeStyle=C.load;ctx.lineWidth=2.5;rr(bx-36,-8-60,72,60,5);ctx.fill();ctx.stroke();
+  ctx.fillStyle='#fcd34d';ctx.font=`700 ${TS+3}px ${SANS}`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('W',bx,-38);
+  ctx.restore();
+  ctx.fillStyle='#111827';ctx.strokeStyle=C.line;ctx.lineWidth=2;ctx.beginPath();ctx.arc(px,py,5,0,7);ctx.fill();ctx.stroke();
+  const up=r.Py>=0,ep=pos(c),es=up?-8:8,E=[ep[0]+nU[0]*es*-1*(up?1:1),ep[1]];
+  const sideS=up?-1:1; // effort applied on bottom face if pushing up
+  const Ept=[ep[0]-nU[0]*8*(up?1:-1),ep[1]-nU[1]*8*(up?1:-1)];
+  const th=v.th*D2R,dir=up?1:-1,ax=Math.sign(r.dP)||1;
+  const fv=[nU[0]*dir*Math.cos(th)+tU[0]*ax*Math.sin(th),nU[1]*dir*Math.cos(th)+tU[1]*ax*Math.sin(th)];
+  const ref=Math.max(v.W,r.Praise,1);
+  if(SHOWD){
+   const b1=pos(a),b2=pos(b),b3=pos(c);
+   dimLine(b1,b2,[sn,cs],142,'d_W = '+nf(Math.abs(r.dW))+' '+UN[U].L,C.load);
+   dimLine(b1,b3,[sn,cs],176,'d_P = '+nf(Math.abs(r.dP))+' '+UN[U].L,C.eff);
+  }
+  force(Ept[0],Ept[1],fv[0],fv[1],flen(r.Praise,ref),C.eff,o.lab('P',Number(o.P)),true);
+  if(SHOWF){
+   const lc=pos(b);const lcc=[lc[0]+nU[0]*38,lc[1]+nU[1]*38];
+   force(lcc[0],lcc[1],0,1,flen(v.W,ref),C.load,o.lab('W',v.W),false,{lx:-52});
+   if(v.Wb>0){const m=pos(L/2);force(m[0],m[1],0,1,flen(v.Wb,ref),C.load,o.lab('W_b',v.Wb),false,{lx:44});}
+   const Ry=r.Ry;if(Math.abs(Ry)>1e-9)force(px,py,0,Ry>=0?-1:1,flen(Math.abs(Ry),ref,120),C.reac,o.lab('R_y',Math.abs(Ry)),Ry>=0,{lx:62});
+   if(v.th>0&&r.Rx>1e-9)force(px,py,-fv[0]>0?1:-1,0,flen(r.Rx,ref,100),C.reac,o.lab('R_x',r.Rx),false,{ly:18});
+  }
+  tagAt(500,590,'Class '+r.cls+(r.cls===1?': fulcrum between load and effort':r.cls===2?': load between fulcrum and effort':': effort between fulcrum and load'),C.line);
+ },
+ travel:'Effort moves '+'IMA× as far as the load'};
+
+/* ===== PULLEY ===== */
+M.pulley={name:'Block & tackle',short:'pulleys',desc:'Rope reeved through fixed and movable sheaves. Cut the rope around the lower block: n rope segments hold it up. Sheave bearing friction makes each tension a little larger than the one before.',
+ s0:0.25,effName:'Pull P',
+ params:[
+  {k:'W',lab:'Load W',sym:'W',kind:'F',si:[100,5000,50,1200],us:[20,1000,10,250]},
+  {k:'n',lab:'Segments n',sym:'n',kind:'int',r:[1,6,1,4]},
+  {k:'Wb',lab:'Lower block',sym:'W_b',kind:'F',si:[0,300,10,40],us:[0,60,2,8]},
+  {k:'eta',lab:'Sheave eff. η',sym:'η',kind:'pct',r:[80,100,1,95]},
+  {k:'red',lab:'Pull',sym:'pull',kind:'chips',opts:[[1,'Down (over a fixed sheave)'],[0,'Up']],r:1}],
+ compute(v){
+  const n=v.n,red=n===1?1:+v.red,eta=v.eta/100,Wt=v.W+(n>1?v.Wb:0),Fu=F(),ex=n-1+red;
+  const Pk=k=>{const T1=Math.abs(k-1)<1e-12?Wt/n:Wt*(k-1)/(Math.pow(k,n)-1);return {T1,Ts:Array.from({length:n},(_,i)=>T1*Math.pow(k,i)),P:T1*Math.pow(k,ex)};};
+  const up=Pk(1/eta),dn=Pk(eta);
+  const st=[['hd','Lower block (cut every rope segment)'],
+   ['ΣF_y: T_1 + … + T_'+n+' = W'+(n>1?' + W_b':''),'v:'+nf(Wt)+' '+Fu]];
+  if(eta<1){
+   st.push(['hd','Raising: friction resists every sheave']);
+   st.push(['T_out = k·T_in,  k = 1/η',nf(1/eta,4)]);
+   st.push(['T_1 = (W+W_b)(k−1) / (kⁿ − 1)','v:'+nf(up.T1)+' '+Fu]);
+   st.push(['P = T_1·k^'+ex+(red?'  ('+ex+' sheaves)':''),'v:'+nf(up.P)+' '+Fu]);
+   st.push(['hd','Lowering: friction flips, k = η']);
+   st.push(['P_hold = T_1·k^'+ex,'v:'+nf(dn.P)+' '+Fu]);
+  }else{
+   st.push(['Ideal sheaves: all segments share T','']);
+   st.push(['P = T = (W'+(n>1?' + W_b':'')+') / '+n,'v:'+nf(up.P)+' '+Fu]);
+  }
+  st.push(['IMA = n','v:'+n]);
+  const AMA=v.W/up.P;
+  return {Praise:up.P,Phold:dn.P,IMA:n,AMA,eff:AMA/n,vr:n,steps:st,up,dn,red,tag:n+' supporting segment'+(n>1?'s':''),
+   words:{up:'Load rising',hold:eta<1?'Held by sheave friction':'Balanced',down:'Load dropping'}};
+ },
+ draw(v,r,s,o){
+  const n=v.n,red=r.red,S=48,R=S/2,h=s*170,yT=150,yB=330-h,ref=Math.max(v.W,1);
+  const x0=500-((n-1)*S+(red?S:0))/2,xs=[];for(let i=0;i<n;i++)xs.push(x0+i*S);
+  const aTop=n%2===0,joins=[];
+  for(let i=0;i<n-1;i++)joins.push({x:(xs[i]+xs[i+1])/2,top:aTop?(i%2===1):(i%2===0),i});
+  const tops=joins.filter(j=>j.top).map(j=>j.x),bots=joins.filter(j=>!j.top).map(j=>j.x);
+  if(aTop)tops.push(xs[0]);else bots.push(xs[0]);
+  const xr=xs[n-1]+R;if(red)tops.push(xr);
+  const barY=yT-R-18,bbY=yB+R+16;
+  const tl=Math.min(...tops)-R-8,trr=Math.max(...tops)+R+8,tm=(tl+trr)/2;
+  ceiling(tl-40,trr+40,40);
+  line(tm,40,tm,barY,C.steelD,8);
+  ctx.fillStyle=C.steel;rr(tl,barY-7,trr-tl,14,5);ctx.fill();
+  // rope speeds for sheave rotation
+  const u=[aTop?0:1];for(const j of joins)u[j.i+1]=j.top?-u[j.i]:2-u[j.i];
+  // segments
+  ctx.lineCap='round';
+  for(let i=0;i<n;i++){
+   const y1=(i===0&&aTop)?barY+7:yT,y2=(i===0&&!aTop)?bbY-7:yB;
+   rope(xs[i],y1,xs[i],y2);
+  }
+  for(const j of joins){ctx.strokeStyle=C.rope;ctx.lineWidth=3.2;ctx.beginPath();if(j.top)ctx.arc(j.x,yT,R,Math.PI,2*Math.PI);else ctx.arc(j.x,yB,R,0,Math.PI);ctx.stroke();}
+  // free end
+  let hx,hy;
+  if(red){ctx.strokeStyle=C.rope;ctx.lineWidth=3.2;ctx.beginPath();ctx.arc(xr,yT,R,Math.PI,2*Math.PI);ctx.stroke();hx=xr+R;hy=455;rope(hx,yT,hx,hy,n*h);}
+  else{hx=xs[n-1];hy=70;rope(hx,yT,hx,-20,n*h);}
+  // lower block
+  const bl=Math.min(...(bots.length?bots:[xs[0]]))-R-6,br=Math.max(...(bots.length?bots:[xs[0]]))+R+6,bm=(bl+br)/2;
+  ctx.fillStyle=C.steel;rr(bl,bbY-7,br-bl,14,5);ctx.fill();
+  for(const x of bots)if(joins.some(j=>!j.top&&j.x===x))line(x,yB,x,bbY,C.steelD,5);
+  for(const x of tops)if(joins.some(j=>j.top&&j.x===x)||(red&&x===xr))line(x,barY,x,yT,C.steelD,5);
+  line(bm,bbY+7,bm,bbY+26,C.line,3);
+  // sheaves
+  for(const j of joins)sheave(j.x,j.top?yT:yB,R,(j.top?u[j.i]:u[j.i]-1)*h/R*(j.top?-1:1));
+  if(red)sheave(xr,yT,R,-u[n-1]*h/R);
+  weight(bm,bbY+26,96,64,'W');
+  // handle + effort arrow
+  ctx.fillStyle=C.dark;ctx.strokeStyle=C.eff;ctx.lineWidth=2.5;rr(hx-14,hy-(red?0:14),28,14,4);ctx.fill();ctx.stroke();
+  if(red)force(hx,hy+14,0,1,flen(r.Praise,ref,120),C.eff,o.lab('P',Number(o.P)),false,{lx:0});
+  else force(hx+22,hy+80,0,-1,70,C.eff,o.lab('P',Number(o.P)),false,{lx:58,ly:30});
+  if(SHOWF){
+   const sol=o.st==='up'?r.up:o.st==='down'?r.dn:null;
+   for(let i=0;i<n;i++){const t=sol?sol.Ts[i]:null;tagAt(xs[i]-(i===0?40:0),(yT+yB)/2+(i%2?16:-16)+(i===0?0:0),'T'+(i+1)+(t!=null&&!o.hide?'='+nf(t,3):''),C.reac,i===0?'right':'center',i===0?xs[0]-12:xs[i]);}
+  }
+  if(SHOWD){tagAt(500,598,'n = '+n+' segments hold the lower block → rope moves '+n+'× the load travel',C.dim);}
+ }};
+
+/* ===== WHEEL & AXLE ===== */
+M.wheel={name:'Wheel & axle',short:'wheel & axle',desc:'A large wheel fixed to a small axle (windlass, capstan, steering wheel). Effort on the wheel rim, load on the axle. A journal bearing adds a friction moment R·r_f, where r_f is the friction-circle radius.',
+ s0:0.25,effName:'Pull P',
+ params:[
+  {k:'W',lab:'Load W',sym:'W',kind:'F',si:[100,4000,50,1000],us:[20,800,10,200]},
+  {k:'R',lab:'Wheel radius R',sym:'R',kind:'L',si:[0.15,1,0.01,0.5],us:[0.5,3,0.05,1.5]},
+  {k:'r',lab:'Axle radius r',sym:'r',kind:'L',si:[0.03,0.4,0.01,0.1],us:[0.1,1.2,0.02,0.3]},
+  {k:'rs',lab:'Shaft radius',sym:'r_s',kind:'L',si:[0.005,0.08,0.005,0.025],us:[0.02,0.25,0.01,0.08]},
+  {k:'mu',lab:'Bearing μ',sym:'μ',kind:'mu',r:[0,0.4,0.01,0.2]}],
+ fix(v,k){const st=U==='si'?0.01:0.02;if(v.r>v.R*0.8){if(k==='R')v.r=Math.max(0.03,Math.floor(v.R*0.8/st)*st);else v.r=Math.floor(v.R*0.8/st)*st;}if(v.rs>v.r){v.rs=Math.min(v.rs,v.r);}},
+ compute(v){
+  const W=v.W,R=v.R,r=v.r,rf=v.rs*Math.sin(Math.atan(v.mu)),Fu=F(),Lu=UN[U].L;
+  const Pr=R-rf>0?W*(r+rf)/(R-rf):Infinity,lock=r<=rf,Ph=lock?0:W*(r-rf)/(R+rf);
+  const st=[['hd','Moments about the axle center O'],
+   ['ΣM_O = 0:  P·R = W·r + R_b·r_f',''],
+   ['r_f = r_s·sin(tan⁻¹ μ)','v:'+nf(rf)+' '+Lu],
+   ['R_b = P + W  (both ropes hang straight down)',''],
+   ['P = W(r + r_f) / (R − r_f)','v:'+nf(Pr)+' '+Fu],
+   ['hd','Lowering: bearing friction flips'],
+   ['P_hold = W(r − r_f) / (R + r_f)',lock?'v:0 (self-locking)':'v:'+nf(Ph)+' '+Fu],
+   ['IMA = R / r','v:'+nf(R/r)]];
+  const AMA=W/Pr;
+  return {Praise:Pr,Phold:Ph,IMA:R/r,AMA,eff:AMA/(R/r),vr:R/r,steps:st,rf,lock,Rb:Pr+W,tag:'R/r = '+nf(R/r,3),
+   words:{up:'Load winding up',hold:v.mu>0?'Held by bearing friction':'Balanced',down:'Load unwinding'}};
+ },
+ draw(v,r,s,o){
+  const cx=480,cy=210,Rp=150,rp=Math.max(12,Rp*v.r/v.R),rsp=Math.max(4,Rp*v.rs/v.R),h=s*130,ref=Math.max(v.W,1);
+  const ang=h/rp;
+  ground(80,920,600);
+  ctx.strokeStyle='#4b5563';ctx.lineWidth=12;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(cx-130,598);ctx.lineTo(cx,cy);ctx.lineTo(cx+130,598);ctx.stroke();
+  // wheel
+  ctx.save();ctx.translate(cx,cy);ctx.rotate(ang);
+  ctx.strokeStyle=C.steel;ctx.lineWidth=10;ctx.beginPath();ctx.arc(0,0,Rp-5,0,7);ctx.stroke();
+  ctx.lineWidth=4;ctx.strokeStyle=C.steelD;for(let i=0;i<6;i++){const a=i*Math.PI/3;ctx.beginPath();ctx.moveTo(Math.cos(a)*rp,Math.sin(a)*rp);ctx.lineTo(Math.cos(a)*(Rp-9),Math.sin(a)*(Rp-9));ctx.stroke();}
+  ctx.fillStyle='#334155';ctx.beginPath();ctx.arc(0,0,rp,0,7);ctx.fill();ctx.strokeStyle=C.ropeD;ctx.lineWidth=1.5;
+  for(let i=0;i<10;i++){const a=i*Math.PI/5;ctx.beginPath();ctx.moveTo(Math.cos(a)*(rp-5),Math.sin(a)*(rp-5));ctx.lineTo(Math.cos(a)*rp,Math.sin(a)*rp);ctx.stroke();}
+  ctx.restore();
+  ctx.fillStyle='#111827';ctx.strokeStyle=C.line;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(cx,cy,rsp,0,7);ctx.fill();ctx.stroke();
+  if(SHOWF&&r.rf>0){const rfp=Math.max(1.5,rsp*r.rf/v.rs);ctx.setLineDash([3,3]);ctx.strokeStyle=C.reac;ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(cx,cy,rfp,0,7);ctx.stroke();ctx.setLineDash([]);}
+  // ropes
+  const yW=470-h;rope(cx-rp,cy,cx-rp,yW,h);weight(cx-rp,yW,92,62,'W');
+  const hy=500;rope(cx+Rp,cy,cx+Rp,hy,h*v.R/v.r);
+  ctx.fillStyle=C.dark;ctx.strokeStyle=C.eff;ctx.lineWidth=2.5;rr(cx+Rp-14,hy,28,14,4);ctx.fill();ctx.stroke();
+  force(cx+Rp,hy+14,0,1,flen(r.Praise,ref,90),C.eff,o.lab('P',Number(o.P)),false,{lx:62,ly:-30});
+  if(SHOWF){
+   force(cx-rp,yW+76,0,1,flen(v.W,ref,60),C.load,o.lab('W',v.W),false,{lx:-58});
+   const rfp=Math.max(1.5,rsp*r.rf/v.rs),side=o.st==='down'?-1:1;
+   force(cx+side*rfp,cy,0,-1,flen(r.Rb,ref,150),C.reac,o.lab('R_b',o.st==='down'?r.Phold+v.W:r.Rb),true,{lx:side*60,ly:40});
+  }
+  if(SHOWD){
+   dimLine([cx,cy],[cx+Rp,cy],[0,-1],Rp+26,'R = '+nf(v.R)+' '+UN[U].L,C.eff);
+   dimLine([cx-rp,cy],[cx,cy],[0,-1],Rp+26,'',C.load);tagAt(cx-rp-10,cy-Rp-44,'r = '+nf(v.r)+' '+UN[U].L,C.load,'right');
+  }
+ }};
+
+/* ===== INCLINE ===== */
+M.incline={name:'Inclined plane',short:'ramp',desc:'Push a block up a ramp. Trade a longer path for a smaller force. With friction, the force to push up and the force to just hold differ, and friction alone holds the block once tan α ≤ μ_s.',
+ s0:0.2,effName:'Push P',
+ params:[
+  {k:'W',lab:'Block W',sym:'W',kind:'F',si:[50,3000,50,800],us:[10,600,5,150]},
+  {k:'al',lab:'Ramp angle α',sym:'α',kind:'deg',r:[5,60,1,30]},
+  {k:'mu',lab:'Friction μ_s',sym:'μ_s',kind:'mu',r:[0,1,0.01,0.25]},
+  {k:'be',lab:'Push angle β',sym:'β',kind:'deg',r:[-30,40,1,0]}],
+ compute(v){
+  const W=v.W,a=v.al*D2R,b=v.be*D2R,m=v.mu,Fu=F(),sa=Math.sin(a),ca=Math.cos(a),sb=Math.sin(b),cb=Math.cos(b);
+  const dU=cb+m*sb,Pr=dU>1e-9?W*(sa+m*ca)/dU:Infinity,lock=Math.tan(a)<=m+1e-12;
+  const Ph=lock?0:W*(sa-m*ca)/(cb-m*sb),N=W*ca-Pr*sb,Nh=W*ca-Ph*sb;
+  const st=[['hd','Axes: x up the slope, y normal to it'],
+   ['ΣF_y: N = W cos α − P sin β','v:N = '+nf(N)+' '+Fu],
+   ['Impending slip up: F = μ_s·N, acting down-slope',''],
+   ['ΣF_x: P cos β = W sin α + μ_s N',''],
+   ['P = W(sin α + μ cos α) / (cos β + μ sin β)','v:'+nf(Pr)+' '+Fu],
+   ['hd','Impending slip down: F flips up-slope']];
+  if(lock)st.push(['tan α = '+nf(Math.tan(a),3)+' ≤ μ_s','v:holds with P = 0']);
+  else st.push(['P_hold = W(sin α − μ cos α) / (cos β − μ sin β)','v:'+nf(Ph)+' '+Fu]);
+  st.push(['IMA = cos β / sin α  (slope length ÷ height)','v:'+nf(cb/sa)]);
+  if(N<0)st.push(['N < 0: the push lifts the block off the ramp','v:reduce β']);
+  const AMA=W/Pr;
+  return {Praise:Pr,Phold:Ph,IMA:cb/sa,AMA,eff:AMA/(cb/sa),vr:1/sa,steps:st,N,Nh,lock,tag:'tan α = '+nf(Math.tan(a),3)+(lock?' ≤ μ':' > μ'),
+   words:{up:'Block sliding up',hold:lock?'Held by friction':'Held by friction',down:'Block sliding down'}};
+ },
+ draw(v,r,s,o){
+  const a=v.al*D2R,x0=100,y0=540;let Lx=800,H=Lx*Math.tan(a);if(H>430){H=430;Lx=H/Math.tan(a);}
+  const Ls=Math.hypot(Lx,H),t=[Math.cos(a),-Math.sin(a)],n=[-Math.sin(a),-Math.cos(a)],ref=Math.max(v.W,1);
+  ground(50,950,y0);
+  ctx.fillStyle='#1e293b';ctx.strokeStyle=C.line;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x0+Lx,y0);ctx.lineTo(x0+Lx,y0-H);ctx.closePath();ctx.fill();ctx.stroke();
+  const bw=110,bh=70,d=40+s*(Ls-bw-110),Bx=x0+t[0]*(d+bw/2),By=y0+t[1]*(d+bw/2);
+  ctx.save();ctx.translate(Bx,By);ctx.rotate(-a);ctx.fillStyle=C.dark;ctx.strokeStyle=C.load;ctx.lineWidth=2.5;rr(-bw/2,-bh,bw,bh,5);ctx.fill();ctx.stroke();
+  ctx.fillStyle='#fcd34d';ctx.font=`700 ${TS+3}px ${SANS}`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('W',0,-bh/2);ctx.restore();
+  const Cx=Bx+n[0]*bh/2,Cy=By+n[1]*bh/2,Pt=[Cx-t[0]*bw/2,Cy-t[1]*bw/2];
+  const pa=a+v.be*D2R,pv=[Math.cos(pa),-Math.sin(pa)];
+  force(Pt[0],Pt[1],pv[0],pv[1],flen(r.Praise,ref,150),C.eff,o.lab('P',Number(o.P)),true);
+  if(SHOWF){
+   force(Cx,Cy,0,1,flen(v.W,ref),C.load,o.lab('W',v.W),false);
+   const Nv=o.st==='down'||o.st==='hold'&&!r.lock?r.Nh:r.N;
+   force(Bx,By,n[0],n[1],flen(Math.max(Nv,0),ref,150),C.norm,o.lab('N',Nv),true,{lx:-30});
+   const fd=o.st==='up'?-1:1,fm=o.st==='up'?v.mu*r.N:o.st==='down'?v.mu*r.Nh:null;
+   const fp=[Bx+t[0]*bw*0.32,By+t[1]*bw*0.32];
+   if(v.mu>0)force(fp[0],fp[1],t[0]*fd,t[1]*fd,fm==null?60:flen(fm,ref,120),C.fric,o.lab('F',fm),false,{ly:22});
+  }
+  if(SHOWD){
+   ctx.strokeStyle=C.dim;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(x0,y0,90,-a,0);ctx.stroke();
+   tagAt(x0+118,y0-20,'α = '+v.al+'°',C.dim);
+   if(v.be!==0){tagAt(Pt[0]-pv[0]*40-30,Pt[1]-pv[1]*40-18,'β = '+v.be+'°',C.dim);}
+  }
+ }};
+
+/* ===== WEDGE ===== */
+M.wedge={name:'Wedge',short:'wedge',desc:'Drive a wedge under a block held against a wall. Two free-body diagrams (block, then wedge) and three friction surfaces. A shallow wedge with enough friction stays put by itself: it is self-locking.',
+ s0:0.15,effName:'Push P',
+ params:[
+  {k:'W',lab:'Block W',sym:'W',kind:'F',si:[100,5000,50,1500],us:[20,1000,10,300]},
+  {k:'th',lab:'Wedge angle θ',sym:'θ',kind:'deg',r:[3,30,0.5,12]},
+  {k:'m1',lab:'μ floor',sym:'μ_1',kind:'mu',r:[0,0.6,0.01,0.25]},
+  {k:'m2',lab:'μ wedge–block',sym:'μ_2',kind:'mu',r:[0,0.6,0.01,0.25]},
+  {k:'m3',lab:'μ wall',sym:'μ_3',kind:'mu',r:[0,0.6,0.01,0.15]}],
+ compute(v){
+  const W=v.W,t=v.th*D2R,s=Math.sin(t),c=Math.cos(t),Fu=F();
+  const solve=(m1,m2,m3)=>{const den=c-m2*s-m3*(s+m2*c);if(den<=1e-9)return null;const N2=W/den,N3=N2*(s+m2*c),N1=N2*(c-m2*s);return {N1,N2,N3,P:N2*(s+m2*c)+m1*N1};};
+  const up=solve(v.m1,v.m2,v.m3),dn=solve(-v.m1,-v.m2,-v.m3);
+  const Pr=up?up.P:Infinity,lock=dn.P<=0,Ph=lock?0:dn.P,pull=lock?-dn.P:0;
+  const st=[['hd','Block (raising: friction opposes upward slide)'],
+   ['ΣF_x: N_3 = N_2(sin θ + μ_2 cos θ)',up?'v:'+nf(up.N3)+' '+Fu:''],
+   ['ΣF_y: N_2(cos θ − μ_2 sin θ) − μ_3 N_3 = W',up?'v:N_2 = '+nf(up.N2)+' '+Fu:'v:jams'],
+   ['hd','Wedge (moving toward the wall)'],
+   ['ΣF_y: N_1 = N_2(cos θ − μ_2 sin θ)',up?'v:'+nf(up.N1)+' '+Fu:''],
+   ['ΣF_x: P = N_2(sin θ + μ_2 cos θ) + μ_1 N_1',up?'v:'+nf(Pr)+' '+Fu:'v:∞'],
+   ['hd','Removal: reverse every friction force'],
+   ['P′ = N_2′(sin θ − μ_2 cos θ) − μ_1 N_1′','v:'+nf(dn.P)+' '+Fu],
+   [lock?'P′ ≤ 0 → self-locking':'P′ > 0 → slips out unless pushed',lock?'v:pull '+nf(pull)+' '+Fu:''],
+   ['IMA = 1 / tan θ  (wedge travel ÷ rise)','v:'+nf(1/Math.tan(t))]];
+  const AMA=W/Pr;
+  return {Praise:Pr,Phold:Ph,IMA:1/Math.tan(t),AMA,eff:AMA*Math.tan(t),vr:1/Math.tan(t),steps:st,up,dn,lock,pull,
+   tag:lock?'self-locking':'not self-locking',extra:lock?['Pull needed to remove it',pull]:null,
+   words:{up:'Wedge driving in, block rising',hold:lock?'Self-locked by friction':'Held by friction',down:'Wedge squeezed out, block dropping'}};
+ },
+ draw(v,r,s,o){
+  const t=Math.tan(v.th*D2R),y0=540,Lw=560,xt=190-s*170,ys=x=>y0-(x-xt)*t,ref=Math.max(v.W,1);
+  ground(40,960,y0);
+  // rail (wall)
+  ctx.fillStyle='#374151';ctx.fillRect(168,40,32,390);ctx.strokeStyle=C.line;ctx.lineWidth=2;ctx.strokeRect(168,40,32,390);
+  ctx.strokeStyle='#4b5563';ctx.lineWidth=1.2;ctx.beginPath();for(let y=50;y<430;y+=16){ctx.moveTo(170,y+12);ctx.lineTo(198,y);}ctx.stroke();
+  ceiling(150,220,40);
+  // wedge
+  ctx.fillStyle='#57534e';ctx.strokeStyle='#d6d3d1';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(xt,y0);ctx.lineTo(xt+Lw,y0);ctx.lineTo(xt+Lw,y0-Lw*t);ctx.closePath();ctx.fill();ctx.stroke();
+  // block
+  const xa=202,xb=392,yTop=ys(xa)-150;
+  ctx.fillStyle=C.dark;ctx.strokeStyle=C.load;ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(xa,ys(xa));ctx.lineTo(xb,ys(xb));ctx.lineTo(xb,yTop);ctx.lineTo(xa,yTop);ctx.closePath();ctx.fill();ctx.stroke();
+  ctx.fillStyle='#fcd34d';ctx.font=`700 ${TS+3}px ${SANS}`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('W',(xa+xb)/2,yTop+48);
+  const pX=xt+Lw,pY=y0-Lw*t/2;
+  force(pX,pY,-1,0,flen(r.Praise,ref,150),C.eff,o.lab('P',Number(o.P)),true,{ly:-22});
+  if(SHOWF){
+   const sol=o.st==='up'?r.up:(o.st==='down'||(!r.lock&&o.st==='hold'))?r.dn:null,up=o.st!=='down'&&!(o.st==='hold'&&!r.lock),sg=up?1:-1;
+   const cs=Math.cos(v.th*D2R),sn=Math.sin(v.th*D2R);
+   force((xa+xb)/2,yTop,0,1,flen(v.W,ref,110),C.load,o.lab('W',v.W),true);
+   const wy=(yTop+ys(xa))/2-10;
+   force(xa,wy,1,0,sol?flen(sol.N3,ref,120):60,C.norm,o.lab('N_3',sol&&sol.N3),true,{ly:-22});
+   if(v.m3>0)force(xa+4,wy+34,0,sg,sol?flen(v.m3*sol.N3,ref,70):40,C.fric,o.lab('F_3',sol&&v.m3*sol.N3),false,{lx:-44});
+   const mx=(xa+xb)/2+20,my=ys(mx);
+   force(mx,my,-sn,-cs,sol?flen(sol.N2,ref,130):70,C.norm,o.lab('N_2',sol&&sol.N2),true,{lx:44,ly:30});
+   if(v.m2>0)force(mx+10,my-6,-cs*sg,sn*sg,sol?flen(v.m2*sol.N2,ref,90):50,C.fric,o.lab('F_2',sol&&v.m2*sol.N2),false);
+   const bx=xt+Lw*0.72;
+   force(bx,y0,0,-1,sol?flen(sol.N1,ref,90):60,C.norm,o.lab('N_1',sol&&sol.N1),false,{lx:40});
+   if(v.m1>0)force(bx-60,y0-6,sg,0,sol?flen(v.m1*sol.N1,ref,90):50,C.fric,o.lab('F_1',sol&&v.m1*sol.N1),false,{lx:-34});
+  }
+  if(SHOWD){ctx.strokeStyle=C.dim;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(xt,y0,110,-Math.atan(t),0);ctx.stroke();tagAt(xt+150,y0+18,'θ = '+v.th+'°',C.dim);}
+ }};
+
+/* ===== SCREW JACK ===== */
+M.screw={name:'Screw jack',short:'screw',desc:'A screw is an inclined plane wrapped around a cylinder. Unwrap one thread: the lead angle α plays the ramp angle and the friction angle φ = tan⁻¹ μ decides whether the jack holds the load by itself (φ > α).',
+ s0:0.15,effName:'Handle force P',
+ params:[
+  {k:'W',lab:'Load W',sym:'W',kind:'F',si:[1000,50000,500,12000],us:[200,10000,100,2500]},
+  {k:'dm',lab:'Mean dia. d_m',sym:'d_m',kind:'l',si:[10,60,1,30],us:[0.4,2.5,0.05,1.2]},
+  {k:'p',lab:'Pitch p',sym:'p',kind:'l',si:[2,12,0.5,6],us:[0.08,0.5,0.01,0.25]},
+  {k:'st',lab:'Starts',sym:'starts',kind:'chips',opts:[[1,'Single'],[2,'Double'],[3,'Triple']],r:1},
+  {k:'thr',lab:'Thread',sym:'thread',kind:'chips',opts:[['sq','Square'],['acme','Acme 29°']],r:'sq'},
+  {k:'mu',lab:'Thread μ',sym:'μ',kind:'mu',r:[0.05,0.4,0.01,0.15]},
+  {k:'a',lab:'Handle a',sym:'a',kind:'l',si:[100,800,10,300],us:[4,30,0.5,12]}],
+ compute(v){
+  const W=v.W,r=v.dm/2,L=v.p*v.st,al=Math.atan(L/(2*Math.PI*r)),acme=v.thr==='acme',me=acme?v.mu/Math.cos(14.5*D2R):v.mu,ph=Math.atan(me),Fu=F(),lu=UN[U].l,Tu=UN[U].T;
+  const Mu=W*r*Math.tan(al+ph),Pr=Mu/v.a,lock=ph>=al,Md=W*r*Math.tan(Math.abs(ph-al)),Ph=lock?0:Md/v.a,IMA=2*Math.PI*v.a/L;
+  const st=[['hd','Unwrap one thread into a ramp'],
+   ['Lead L = p × starts','v:'+nf(L)+' '+lu],
+   ['α = tan⁻¹(L / π d_m)','v:'+nf(al/D2R,3)+'°']];
+  if(acme)st.push(['Acme: μ′ = μ / cos 14.5°','v:'+nf(me,3)]);
+  st.push(['φ = tan⁻¹ μ'+(acme?'′':''),'v:'+nf(ph/D2R,3)+'°']);
+  st.push(['hd','Raising']);
+  st.push(['M = W·(d_m/2)·tan(α + φ)','v:'+nf(Mu)+' '+Tu]);
+  st.push(['P = M / a','v:'+nf(Pr)+' '+Fu]);
+  st.push(['hd','Lowering']);
+  if(lock)st.push(['φ ≥ α → self-locking',''],['M_lower = W(d_m/2)·tan(φ − α)','v:'+nf(Md)+' '+Tu]);
+  else st.push(['φ < α → overhauls (unwinds)',''],['M_hold = W(d_m/2)·tan(α − φ)','v:'+nf(Md)+' '+Tu]);
+  st.push(['IMA = 2πa / L','v:'+nf(IMA)],['η = tan α / tan(α + φ)','v:'+pct(Math.tan(al)/Math.tan(al+ph))]);
+  const AMA=W/Pr;
+  return {Praise:Pr,Phold:Ph,IMA,AMA,eff:AMA/IMA,vr:IMA,steps:st,lock,Mu,Md,al,ph,
+   tag:'α = '+nf(al/D2R,3)+'°, φ = '+nf(ph/D2R,3)+'°',extra:lock?['Handle pull to lower it',Md/v.a]:null,
+   words:{up:'Screw turning, load rising',hold:lock?'Self-locked by thread friction':'Held by friction',down:'Screw overhauling, load dropping'}};
+ },
+ draw(v,r,s,o){
+  const cx=480,y0=570,h=s*150,yH=330-h,rp=26,pp=10+5*v.st,ref=Math.max(v.W,1);
+  const ap=80+250*(v.a-pRange(this.params[6])[0])/(pRange(this.params[6])[1]-pRange(this.params[6])[0]),ang=2*Math.PI*h/pp,ry=ap*0.24,hy=yH-14;
+  ground(80,920,y0);
+  ctx.fillStyle='#374151';ctx.strokeStyle=C.line;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(cx-120,y0);ctx.lineTo(cx+120,y0);ctx.lineTo(cx+62,y0-44);ctx.lineTo(cx-62,y0-44);ctx.closePath();ctx.fill();ctx.stroke();
+  // shaft (threads fixed in space: the helix stays put in the nut while the screw rises)
+  const sTop=yH,sBot=y0-44;
+  ctx.fillStyle='#64748b';ctx.fillRect(cx-rp,sTop,2*rp,sBot-sTop);
+  ctx.save();ctx.beginPath();ctx.rect(cx-rp,sTop,2*rp,sBot-sTop);ctx.clip();ctx.strokeStyle='#cbd5e1';ctx.lineWidth=2.2;ctx.beginPath();
+  const ph0=(ang/(2*Math.PI))*pp;for(let y=sBot+40;y>sTop-40;y-=pp){const yy=y-((h)%pp)+((h)%pp);ctx.moveTo(cx-rp,yy);ctx.lineTo(cx+rp,yy-pp*0.5);}ctx.stroke();ctx.restore();
+  ctx.strokeStyle=C.line;ctx.lineWidth=1.5;ctx.strokeRect(cx-rp,sTop,2*rp,sBot-sTop);
+  // nut housing
+  ctx.fillStyle='#4b5563';ctx.strokeStyle=C.line;ctx.lineWidth=2;rr(cx-48,y0-130,96,86,6);ctx.fill();ctx.stroke();
+  ctx.fillStyle='#64748b';ctx.fillRect(cx-rp,y0-130,2*rp,8);
+  // handle path & handle
+  ctx.setLineDash([4,5]);ctx.strokeStyle='#4b5563';ctx.lineWidth=1.3;ctx.beginPath();ctx.ellipse(cx,hy,ap,ry,0,0,7);ctx.stroke();ctx.setLineDash([]);
+  const hx=cx+ap*Math.cos(ang),hY=hy+ry*Math.sin(ang),behind=Math.sin(ang)<0;
+  const drawHandle=()=>{line(cx,hy,hx,hY,C.steel,7);ctx.fillStyle=C.eff;ctx.beginPath();ctx.arc(hx,hY,8,0,7);ctx.fill();};
+  if(behind)drawHandle();
+  ctx.fillStyle='#94a3b8';ctx.strokeStyle='#e2e8f0';ctx.lineWidth=1.5;rr(cx-36,yH-28,72,28,4);ctx.fill();ctx.stroke();
+  if(!behind)drawHandle();
+  ctx.fillStyle=C.steelD;rr(cx-80,yH-40,160,12,3);ctx.fill();
+  ctx.fillStyle=C.dark;ctx.strokeStyle=C.load;ctx.lineWidth=2.5;rr(cx-70,yH-40-86,140,86,6);ctx.fill();ctx.stroke();
+  ctx.fillStyle='#fcd34d';ctx.font=`700 ${TS+3}px ${SANS}`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('W',cx,yH-83);
+  let tx=-ap*Math.sin(ang),ty=ry*Math.cos(ang);const tn=Math.hypot(tx,ty)||1;tx/=tn;ty/=tn;
+  force(hx,hY,tx,ty,flen(r.Praise,ref,110),C.eff,o.lab('P',Number(o.P)),false);
+  if(SHOWF){force(cx,yH-126,0,1,flen(v.W,ref,100),C.load,o.lab('W',v.W),true,{lx:44});
+   tagAt(cx+150,yH-60,(o.hide?'M':'M = '+nf(o.st==='down'?r.Md:r.Mu)+' '+UN[U].T),C.reac);}
+  if(SHOWD){tagAt(cx+ap/2,hy+ry+22,'a = '+nf(v.a)+' '+UN[U].l,C.dim);tagAt(cx-170,(sTop+sBot)/2,'lead L = '+nf(v.p*v.st)+' '+UN[U].l,C.dim);}
+ }};
+
+/* ===== BELT FRICTION ===== */
+M.belt={name:'Belt friction',short:'capstan',desc:'A rope wrapped around a fixed drum. Tension grows exponentially with wrap angle: T_tight = T_slack·e^{μβ}. A few turns let a small pull hold a huge load (capstan, bollard, band brake).',
+ s0:0.25,effName:'Pull T',
+ params:[
+  {k:'W',lab:'Load W',sym:'W',kind:'F',si:[100,3000,10,500],us:[20,600,5,100]},
+  {k:'mu',lab:'Friction μ_s',sym:'μ_s',kind:'mu',r:[0.05,0.6,0.01,0.3]},
+  {k:'be',lab:'Wrap β',sym:'β',kind:'deg',r:[30,900,5,180]},
+  {k:'bt',lab:'Belt',sym:'belt',kind:'chips',opts:[['flat','Flat / rope'],['v','V-belt 40°']],r:'flat'}],
+ compute(v){
+  const be=v.be*D2R,vb=v.bt==='v',me=vb?v.mu/Math.sin(20*D2R):v.mu,e=Math.exp(me*be),W=v.W,Fu=F();
+  const st=[['hd','Rope on a fixed drum, slip impending'],
+   ['T_tight = T_slack · e^(μβ)',''],
+   ['β = '+v.be+'° × π/180','v:'+nf(be,4)+' rad']];
+  if(vb)st.push(['V-belt: μ′ = μ / sin(γ/2), γ = 40°','v:'+nf(me,3)]);
+  st.push(['e^(μβ)','v:'+nf(e)]);
+  st.push(['hd','Raising: your side is tight']);
+  st.push(['T = W·e^(μβ)','v:'+nf(W*e)+' '+Fu]);
+  st.push(['hd','Holding: the load side is tight']);
+  st.push(['T = W / e^(μβ)','v:'+nf(W/e)+' '+Fu]);
+  st.push(['Turns of wrap','v:'+nf(v.be/360,3)]);
+  return {Praise:W*e,Phold:W/e,IMA:1,AMA:1/e,eff:1/e,vr:1,steps:st,e,tag:'e^(μβ) = '+nf(e,3),
+   words:{up:'Rope slipping, load rising',hold:'Held by drum friction',down:'Rope slipping, load dropping'}};
+ },
+ draw(v,r,s,o){
+  const cx=520,cy=240,R=100,h=s*140,be=v.be*D2R,ref=Math.max(v.W,1);
+  ctx.fillStyle='#374151';ctx.fillRect(cx-10,40,20,cy-40);ceiling(cx-80,cx+80,40);
+  ctx.fillStyle='#334155';ctx.strokeStyle=C.steel;ctx.lineWidth=6;ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.fill();ctx.stroke();
+  if(v.bt==='v'){ctx.strokeStyle='#1e293b';ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx,cy,R-12,0,7);ctx.stroke();}
+  ctx.fillStyle='#111827';ctx.beginPath();ctx.arc(cx,cy,14,0,7);ctx.fill();ctx.strokeStyle=C.line;ctx.lineWidth=2;ctx.stroke();
+  for(let i=0;i<4;i++){const a=i*Math.PI/2+0.4;ctx.fillStyle=C.line;ctx.beginPath();ctx.arc(cx+Math.cos(a)*30,cy+Math.sin(a)*30,3,0,7);ctx.fill();}
+  const rad=f=>R+3+7*f/(2*Math.PI),pt=f=>{const th=Math.PI-f,rr_=rad(f);return [cx+rr_*Math.cos(th),cy-rr_*Math.sin(th)];};
+  ctx.strokeStyle=C.rope;ctx.lineWidth=4;ctx.lineJoin='round';ctx.beginPath();for(let f=0;f<=be;f+=0.03){const p=pt(f);f===0?ctx.moveTo(p[0],p[1]):ctx.lineTo(p[0],p[1]);}const E=pt(be);ctx.lineTo(E[0],E[1]);ctx.stroke();
+  const te=Math.PI-be,dir=[Math.sin(te),Math.cos(te)],Lr=150,H=[E[0]+dir[0]*Lr,E[1]+dir[1]*Lr];
+  rope(E[0],E[1],H[0],H[1],h);
+  ctx.fillStyle=C.dark;ctx.strokeStyle=C.eff;ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(H[0],H[1],9,0,7);ctx.fill();ctx.stroke();
+  force(H[0]+dir[0]*9,H[1]+dir[1]*9,dir[0],dir[1],Math.min(90,flen(r.Praise,ref*3,90)),C.eff,o.lab('T',Number(o.P)),false);
+  const lx=cx-R-3,yW=470-h;rope(lx,cy,lx,yW,h);weight(lx,yW,92,62,'W');
+  if(SHOWF){force(lx,yW+76,0,1,flen(v.W,ref,60),C.load,o.lab('W',v.W),false,{lx:-58});}
+  if(SHOWD){ctx.strokeStyle=C.dim;ctx.lineWidth=1.4;ctx.setLineDash([4,4]);ctx.beginPath();ctx.arc(cx,cy,R+30+7*be/(2*Math.PI),-Math.PI,-Math.PI+Math.min(be,2*Math.PI-0.01));ctx.stroke();ctx.setLineDash([]);
+   tagAt(cx,cy-R-52-7*be/(2*Math.PI),'β = '+v.be+'° ('+nf(v.be/360,3)+' turns)',C.dim);}
+ }};
+
+const ORDER=['lever','pulley','wheel','incline','wedge','screw','belt'];
+
+/* ---------------- canvas helpers ---------------- */
+const cv=$('cv'),ctx=cv.getContext('2d');
+let DPR=1,VW=0,VH=0,SC=1,OX=0,OY=0,TS=13;
+function resize(){const r=cv.getBoundingClientRect();DPR=Math.min(2,window.devicePixelRatio||1);VW=r.width;VH=r.height;cv.width=Math.max(1,Math.round(VW*DPR));cv.height=Math.max(1,Math.round(VH*DPR));SC=Math.min(VW/1000,(VH-40)/620);OX=(VW-1000*SC)/2;OY=Math.max(36,(VH-620*SC)/2+14);TS=Math.max(13,11/SC);dirty=true;}
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
+function line(x1,y1,x2,y2,c,w){ctx.strokeStyle=c;ctx.lineWidth=w;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();}
+function ground(x1,x2,y){ctx.fillStyle='#0b1220';ctx.fillRect(x1,y,x2-x1,30);line(x1,y,x2,y,'#6b7280',2);ctx.strokeStyle='#374151';ctx.lineWidth=1.2;ctx.beginPath();for(let x=x1+12;x<x2;x+=14){ctx.moveTo(x,y+2);ctx.lineTo(x-10,y+14);}ctx.stroke();}
+function ceiling(x1,x2,y){line(x1,y,x2,y,'#6b7280',2);ctx.strokeStyle='#374151';ctx.lineWidth=1.2;ctx.beginPath();for(let x=x1+12;x<x2;x+=14){ctx.moveTo(x,y-2);ctx.lineTo(x-10,y-14);}ctx.stroke();}
+function rope(x1,y1,x2,y2,off){ctx.lineCap='round';line(x1,y1,x2,y2,C.rope,3.4);if(off!==undefined){ctx.save();ctx.setLineDash([5,11]);ctx.lineDashOffset=-off;line(x1,y1,x2,y2,C.ropeD,3.4);ctx.restore();}}
+function sheave(x,y,R,ang){ctx.fillStyle='#334155';ctx.strokeStyle=C.steel;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,R-2,0,7);ctx.fill();ctx.stroke();ctx.strokeStyle='#64748b';ctx.lineWidth=2;for(let i=0;i<3;i++){const a=ang+i*2*Math.PI/3;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+Math.cos(a)*(R-5),y+Math.sin(a)*(R-5));ctx.stroke();}ctx.fillStyle='#0f172a';ctx.beginPath();ctx.arc(x,y,4,0,7);ctx.fill();ctx.strokeStyle=C.line;ctx.lineWidth=1.5;ctx.stroke();}
+function weight(cx,yt,w,h,txt){ctx.strokeStyle=C.load;ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(cx,yt+6,6,0,7);ctx.stroke();ctx.fillStyle=C.dark;ctx.beginPath();ctx.moveTo(cx-w*0.34,yt+12);ctx.lineTo(cx+w*0.34,yt+12);ctx.lineTo(cx+w/2,yt+12+h);ctx.lineTo(cx-w/2,yt+12+h);ctx.closePath();ctx.fill();ctx.stroke();ctx.fillStyle='#fcd34d';ctx.font=`700 ${TS+3}px ${SANS}`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(txt,cx,yt+12+h*0.56);}
+function tagAt(x,y,t,col,align,ax){ctx.font=`600 ${TS}px ${MONO}`;const w=ctx.measureText(t).width+12,h=TS+8;let x0=align==='right'?x-w:align==='left'?x:x-w/2;ctx.fillStyle='rgba(3,7,18,.8)';rr(x0,y-h/2,w,h,5);ctx.fill();ctx.fillStyle=col;ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(t,x0+6,y+0.5);}
+function flen(v,ref,max){return Math.max(30,Math.min(max||170,38+120*Math.abs(v||0)/Math.max(ref,1e-9)));}
+function force(x,y,ux,uy,len,col,txt,tip,op){op=op||{};let x1,y1,x2,y2;if(tip){x2=x;y2=y;x1=x-ux*len;y1=y-uy*len;}else{x1=x;y1=y;x2=x+ux*len;y2=y+uy*len;}
+ ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=3.4;ctx.lineCap='round';const hl=14,hx=x2-ux*hl,hy=y2-uy*hl;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(hx,hy);ctx.stroke();
+ ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(hx-uy*7,hy+ux*7);ctx.lineTo(hx+uy*7,hy-ux*7);ctx.closePath();ctx.fill();
+ if(txt){let lx,ly;if(tip){lx=x1-ux*18;ly=y1-uy*18;}else{lx=x2+ux*18;ly=y2+uy*18;}if(op.lx!==undefined)lx=(tip?x1:x2)+op.lx;if(op.ly!==undefined)ly=(tip?y1:y2)+(op.ly||0);if(op.lx!==undefined&&op.ly===undefined)ly=(y1+y2)/2;tagAt(lx,ly,txt,col);}}
+function dimLine(p1,p2,nrm,off,txt,col){const a=[p1[0]+nrm[0]*off,p1[1]+nrm[1]*off],b=[p2[0]+nrm[0]*off,p2[1]+nrm[1]*off];if(Math.hypot(b[0]-a[0],b[1]-a[1])<2)return;ctx.save();ctx.globalAlpha=.85;line(a[0],a[1],b[0],b[1],col,1.4);line(p1[0]+nrm[0]*(off-8),p1[1]+nrm[1]*(off-8),p1[0]+nrm[0]*(off+8),p1[1]+nrm[1]*(off+8),col,1.4);line(p2[0]+nrm[0]*(off-8),p2[1]+nrm[1]*(off-8),p2[0]+nrm[0]*(off+8),p2[1]+nrm[1]*(off+8),col,1.4);ctx.restore();if(txt)tagAt((a[0]+b[0])/2+nrm[0]*14,(a[1]+b[1])/2+nrm[1]*14,txt,col);}
+
+/* ---------------- state ---------------- */
+let cur='lever',vals={},Rz=null,P=0,stat='hold',sPos={},dirty=true,prac=null;
+function pRange(p){if(p.kind==='chips')return null;return p.r||p[U];}
+function defaults(id){const v={};for(const p of M[id].params)v[p.k]=p.kind==='chips'?p.r:pRange(p)[3];return v;}
+function resetAll(){for(const id of ORDER){vals[id]=defaults(id);sPos[id]=M[id].s0;}}
+function fmtP(p,v){const x=v[p.k];switch(p.kind){case 'F':return nf(x)+' '+UN[U].F;case 'L':return nf(x)+' '+UN[U].L;case 'l':return nf(x)+' '+UN[U].l;case 'deg':return x+'°';case 'mu':return x.toFixed(2);case 'pct':return x+'%';case 'int':return String(x);case 'frac':return nf(x*v.L,3)+' '+UN[U].L;case 'chips':{const o=p.opts.find(q=>String(q[0])===String(x));return o?o[1]:'';}}return String(x);}
+
+/* ---------------- UI build ---------------- */
+function buildMacs(){const g=$('macs');g.innerHTML='';ORDER.forEach((id,i)=>{const b=document.createElement('button');b.className='part';b.dataset.m=id;b.innerHTML=ICON[id]+M[id].name;b.setAttribute('aria-pressed',id===cur);b.title=(i+1)+' · '+M[id].name;b.onclick=()=>pick(id);g.appendChild(b);});}
+function buildParams(){
+ const m=M[cur],v=vals[cur],box=$('params');box.innerHTML='';
+ const pr=$('presets');pr.innerHTML='';pr.hidden=!m.presets;
+ if(m.presets)m.presets.forEach(([lab,set])=>{const b=document.createElement('button');b.className='chip';b.textContent=lab;b.setAttribute('aria-pressed','false');b.onclick=()=>{Object.assign(v,set);endPrac();buildParams();refresh(true);};pr.appendChild(b);});
+ for(const p of m.params){
+  if(p.kind==='chips'){
+   if(cur==='pulley'&&p.k==='red'&&v.n===1)continue;
+   const row=document.createElement('div');row.className='chrow';row.innerHTML=`<span>${p.lab}</span>`;const sg=document.createElement('div');sg.className='seg wide';
+   for(const [val,lab] of p.opts){const b=document.createElement('button');b.textContent=lab;b.setAttribute('aria-pressed',String(v[p.k])===String(val));b.onclick=()=>{v[p.k]=val;endPrac();buildParams();refresh(true);};sg.appendChild(b);}
+   row.appendChild(sg);box.appendChild(row);continue;}
+  const [mn,mx,st]=pRange(p),row=document.createElement('div');row.className='ctl'+(p.k==='W'?' amber':'');
+  const id='p_'+p.k;row.innerHTML=`<label for="${id}">${p.lab}</label><input type="range" id="${id}" min="${mn}" max="${mx}" step="${st}" value="${v[p.k]}"><output id="o_${p.k}">${fmtP(p,v)}</output>`;
+  box.appendChild(row);
+  row.querySelector('input').addEventListener('input',e=>{v[p.k]=parseFloat(e.target.value);if(m.fix)m.fix(v,p.k);endPrac();
+   for(const q of m.params){const el=$('p_'+q.k);if(el&&parseFloat(el.value)!==v[q.k])el.value=v[q.k];const ou=$('o_'+q.k);if(ou)ou.textContent=fmtP(q,v);}
+   if(cur==='pulley'&&p.k==='n'){const had=!!$('presets').nextElementSibling.querySelector('.chrow');if((v.n===1)===had){buildParams();}}
+   refresh(true);});
+ }
+}
+function pick(id){if(id===cur)return;cur=id;endPrac();document.querySelectorAll('#macs .part').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===id));buildParams();refresh(true,true);}
+
+/* ---------------- effort slider (log scale between the thresholds) ---------------- */
+function effRange(){const r=Rz;if(!isFinite(r.Praise))return [1,10];const hi=Math.max(r.Praise,1e-9)*2.2;let lo=r.Phold>0?r.Phold*0.35:r.Praise*0.05;lo=Math.min(lo,hi*0.2);lo=Math.max(lo,hi*1e-6);return [lo,hi];}
+function p2pos(p){if(p<=0)return 0;const [lo,hi]=effRange();if(p<=lo)return 1;return Math.min(1000,1+999*Math.log(p/lo)/Math.log(hi/lo));}
+function pos2p(t){if(t<=0)return 0;const [lo,hi]=effRange();return lo*Math.pow(hi/lo,(t-1)/999);}
+
+function startP(){const r=Rz;if(!isFinite(r.Praise))return 0;if(M[cur].frictionless)return r.Praise;return r.Phold>0?Math.sqrt(r.Phold*r.Praise):0;}
+function getStat(){const r=Rz;if(!isFinite(r.Praise))return P>0?'jam':'hold';const tol=2e-3;if(P>r.Praise*(1+tol))return 'up';if(P>=r.Phold*(1-tol)-1e-12)return 'hold';return 'down';}
+
+/* ---------------- refresh ---------------- */
+function refresh(paramsChanged,resetP){
+ const m=M[cur],v=vals[cur];Rz=m.compute(v);
+ if(resetP)P=startP();
+ stat=getStat();
+ const hide=!!(prac&&!prac.revealed),Fu=F(),r=Rz;
+ $('macName').textContent=m.name;$('macDesc').textContent=m.desc;$('macPill').textContent=(ORDER.indexOf(cur)+1)+' / 7';
+ $('setPill').textContent=r.tag||'givens';
+ $('pLab').textContent=m.effName;$('effT').textContent='Your '+(m.effName.split(' ')[0].toLowerCase());
+ $('pIn').disabled=!isFinite(r.Praise);$('pIn').value=p2pos(P);$('oP').textContent=nf(P,3)+' '+Fu;
+ const W=r.words,big=$('stBig'),pill=$('statPill');
+ const msg=stat==='jam'?'Jammed: no push can raise it':stat==='up'?W.up:stat==='down'?W.down:(P<=0&&r.Phold<=0?(m.frictionless?'At rest':'Self-locking: holds with no effort'):W.hold);
+ big.textContent=msg;big.className='big '+(stat==='up'?'hi':stat==='down'?'warn':stat==='jam'?'bad':'idle');
+ pill.textContent=stat==='up'?'raising':stat==='down'?'slipping':stat==='jam'?'jammed':'static';pill.className='pill '+(stat==='up'?'hi':stat==='down'?'warn':stat==='jam'?'bad':'idle');
+ const q=x=>hide?'?':x;
+ $('vRaise').textContent=q(nf(r.Praise)+' '+Fu);
+ $('lHold').textContent=m.frictionless?'Effort that balances':'Least effort that holds';
+ $('vHold').textContent=q(r.Phold>0?nf(r.Phold)+' '+Fu:'0  (self-locking)');
+ if(r.extra){$('xRow').hidden=false;$('lX').textContent=r.extra[0];$('vX').textContent=q(nf(r.extra[1])+' '+Fu);}else $('xRow').hidden=true;
+ $('vIMA').textContent=nf(r.IMA);
+ $('vAMA').textContent=q(nf(r.AMA));
+ $('vEff').textContent=q(cur==='belt'?'—':isFinite(r.eff)?pct(r.eff):'— (bar weight)');
+ $('vVR').textContent=cur==='belt'?'1 : 1':nf(r.vr,3)+' : 1';
+ // gauge
+ const [lo,hi]=effRange(),gp=x=>x<=0?0:Math.max(0,Math.min(100,p2pos(x)/10));
+ const band=$('gBand');if(isFinite(r.Praise)){const a=gp(r.Phold),b=gp(r.Praise);band.style.left=a+'%';band.style.width=Math.max(0.6,b-a)+'%';band.hidden=hide;}else band.hidden=true;
+ $('gNeedle').style.left=gp(P)+'%';
+ $('bDrop').disabled=hide||r.Phold<=0;$('bHold').disabled=hide||!isFinite(r.Praise);$('bRaise').disabled=hide||!isFinite(r.Praise);
+ $('bDrop').textContent=m.frictionless?'Too little':'Let it slip';$('bHold').textContent=m.frictionless?'Balance':'Just hold';
+ $('effHelp').innerHTML=m.frictionless?'With no friction the two thresholds meet: only one effort balances the load exactly. Any more and the load rises; any less and it drops.':'Between the two thresholds friction holds the load still (the green band on the gauge). Above it the load rises; below it the load slips back.';
+ // solution
+ const sol=$('sol');
+ if(hide)sol.innerHTML='<div style="color:var(--g500);font-family:var(--f-sans)">Hidden while you work the practice problem. Check your answer or press “Show answer”.</div>';
+ else sol.innerHTML=r.steps.map(([a,b])=>a==='hd'?`<div class="hd">${b}</div>`:`<div>${a}<span${b.startsWith('v:')?' class="v"':''}>${b.startsWith('v:')?b.slice(2):b}</span></div>`).join('');
+ $('phys').innerHTML=PHYS[cur];
+ $('vName').textContent=m.name;$('vStat').textContent=msg;$('vDot').className='dot '+(stat==='up'?'':stat==='down'?'warn':stat==='jam'?'jam':'hold');
+ $('vTool').innerHTML=`<b>${m.effName}</b> = ${nf(P,3)} ${Fu}${hide?'':' · raise at '+nf(r.Praise,3)+' · hold at '+nf(r.Phold,3)}`;
+ dirty=true;
+}
+
+const PHYS={
+ lever:'Draw the bar as one free body. The fulcrum pin gives an unknown reaction (R_x, R_y), so take <b>moments about the fulcrum</b> to eliminate it. Only the part of the effort <b>perpendicular</b> to the bar has a moment arm, which is why tilting the push (θ) costs you. Class 1 can give any advantage, class 2 always gives MA &gt; 1, class 3 always gives MA &lt; 1 but more speed and travel. A frictionless pin means there is no “holding band”: exactly one effort balances.',
+ pulley:'Cut around the lower block and count the rope segments that cross the cut: that count is n, the ideal advantage. Pulling <b>up</b> on the free end makes it one of the supporting segments; pulling <b>down</b> over a fixed sheave only redirects it. With bearing friction each sheave multiplies the tension by k = 1/η when raising and by η when lowering, so tensions form a geometric series and the actual advantage drops below n.',
+ wheel:'Moments about the axle: P·R = W·r. A real <b>journal bearing</b> pushes back along a line tangent to the <b>friction circle</b> of radius r_f = r_s·sin(tan⁻¹ μ) ≈ μ·r_s, offset to oppose rotation (dashed purple circle). The bearing load here is P + W since both ropes hang down. If r ≤ r_f the axle is self-locking.',
+ incline:'Resolve forces along and normal to the slope. The normal force N depends on how you push (β), and the friction force reaches μ_s·N only when slip impends. Pushing slightly upward (β &gt; 0) lowers N and so lowers friction. The block holds itself when the ramp angle is at or below the <b>angle of repose</b> tan⁻¹ μ_s.',
+ wedge:'Solve the <b>block</b> first (two equations, two unknown normals N₂ and N₃), then the <b>wedge</b>. On each surface draw friction opposing the <b>relative</b> sliding: the block slides up the wall and up the wedge face, while the wedge slides toward the wall along the floor. To check removal, reverse every friction direction and solve again. A negative push means the wedge must be <b>pulled</b> out: it is self-locking.',
+ screw:'Unroll one thread: a ramp of rise L (lead) and run π·d_m, so the lead angle is α = tan⁻¹(L/π d_m). The torque to raise is M = W·r·tan(α + φ) and the handle force is M/a. The jack is <b>self-locking</b> when φ ≥ α, which is why jacks use fine single-start threads. An Acme thread’s 14.5° flank raises the effective friction to μ/cos 14.5°. Collar friction is ignored here.',
+ belt:'Look at a small piece of rope on the drum: the normal pressure and friction build tension along the wrap, giving <b>T₂ = T₁·e^{μβ}</b> with β in <b>radians</b>, T₂ the tight side. When you raise the load, your side is tight; when you hold it, the load side is tight. Adding wrap multiplies the holding ratio, which is how a sailor holds a ship with a bollard. A V-belt wedges into its groove, which multiplies μ by 1/sin(γ/2).'};
+
+/* ---------------- practice ---------------- */
+function endPrac(){if(!prac)return;prac=null;$('qText').hidden=true;$('ansRow').hidden=true;$('qFb').hidden=true;$('revQ').disabled=true;$('pracPill').textContent='off';$('pracPill').className='pill idle';}
+function snap(x,mn,st){return Math.round((x-mn)/st)*st+mn;}
+function newProblem(){
+ const m=M[cur];let v,r,tries=0;
+ do{v=defaults(cur);
+  for(const p of m.params){if(p.kind==='chips'){v[p.k]=p.opts[Math.floor(Math.random()*p.opts.length)][0];continue;}if(p.kind==='frac')continue;const [mn,mx,st]=pRange(p);let x=snap(mn+(0.12+0.76*Math.random())*(mx-mn),mn,st);x=Math.min(mx,Math.max(mn,x));v[p.k]=+x.toFixed(6);}
+  if(cur==='lever'){const pz=m.presets[Math.floor(Math.random()*3)][1];const j=()=>Math.round((Math.random()-0.5)*16)/100;v.fa=Math.min(1,Math.max(0,+(pz.fa+(pz.fa?j():0)).toFixed(2)));v.fb=Math.min(1,Math.max(0,+(pz.fb+j()).toFixed(2)));v.fc=Math.min(1,Math.max(0,+(pz.fc+(pz.fc<1?j():0)).toFixed(2)));if(Math.random()<0.6)v.Wb=0;if(Math.random()<0.6)v.th=0;}
+  if(cur==='incline'&&Math.random()<0.5)v.be=0;
+  if(m.fix)m.fix(v,'W');
+  vals[cur]=v;r=m.compute(v);tries++;
+ }while(tries<40&&(!isFinite(r.Praise)||(cur==='lever'&&(Math.abs(r.dW)<0.05*v.L||r.Praise<=0))||(cur==='incline'&&r.N<0)));
+ const hasHold=!m.frictionless&&r.Phold>0&&cur!=='belt'?Math.random()<0.4:(cur==='belt'?Math.random()<0.5:false);
+ const qt=m.frictionless?'bal':hasHold?'hold':'raise';
+ prac={q:qt,ans:qt==='hold'?r.Phold:r.Praise,revealed:false};
+ const giv=m.params.filter(p=>!(cur==='pulley'&&p.k==='red'&&v.n===1)&&!((p.k==='Wb'||p.k==='th')&&cur==='lever'&&v[p.k]===0)).map(p=>{if(p.kind==='chips')return p.lab.toLowerCase()+': '+fmtP(p,v).toLowerCase();if(p.kind==='frac')return p.sym+' = '+fmtP(p,v)+' from the left end';return p.sym+' = '+fmtP(p,v);});
+ const ask=qt==='bal'?'Find the effort P that holds the lever in balance.':qt==='hold'?`Find the <b>smallest ${m.effName.split(' ').pop()}</b> that keeps the load from slipping back down (impending motion down).`:`Find the <b>${m.effName.charAt(0).toLowerCase()+m.effName.slice(1)}</b> needed to start raising the load (impending motion up).`;
+ $('qText').innerHTML=`<b>${m.name}.</b> Given ${giv.join(', ')}. ${ask}`;
+ $('qText').hidden=false;$('ansRow').hidden=false;$('ansIn').value='';$('ansU').textContent=F();$('qFb').hidden=true;$('revQ').disabled=false;
+ $('pracPill').textContent='solving';$('pracPill').className='pill warn';
+ sPos[cur]=m.s0;buildParams();refresh(true,true);
+ if(!m.frictionless){P=0;refresh();}
+}
+function checkAns(){if(!prac)return;const x=parseFloat($('ansIn').value.replace(/,/g,''));const fb=$('qFb');fb.hidden=false;
+ if(!isFinite(x)){fb.className='fb no';fb.textContent='Enter a number.';return;}
+ const err=Math.abs(x-prac.ans)/Math.max(Math.abs(prac.ans),1e-9);
+ if(err<=0.02){fb.className='fb ok';fb.textContent='Correct: '+nf(prac.ans)+' '+F()+(err>0.002?' (within 2%)':'')+'. The full solution is unlocked below.';prac.revealed=true;$('pracPill').textContent='solved';$('pracPill').className='pill hi';refresh();}
+ else{fb.className='fb no';fb.textContent='Not yet: off by '+(err*100).toFixed(err<1?0:0)+'%. '+(x>prac.ans?'Too high.':'Too low.')+' Check friction directions and moment arms.';}}
+function reveal(){if(!prac)return;prac.revealed=true;const fb=$('qFb');fb.hidden=false;fb.className='fb';fb.style.color='var(--g300)';fb.textContent='Answer: '+nf(prac.ans)+' '+F()+'.';$('pracPill').textContent='revealed';$('pracPill').className='pill idle';refresh();}
+
+/* ---------------- events ---------------- */
+$('pIn').addEventListener('input',e=>{P=pos2p(+e.target.value);refresh();});
+$('bHold').onclick=()=>{P=M[cur].frictionless?Rz.Praise:Math.max(Rz.Phold>0?Rz.Phold:0,0);if(!M[cur].frictionless&&Rz.Phold>0)P=Math.sqrt(Rz.Phold*Rz.Praise);if(Rz.Phold<=0&&!M[cur].frictionless)P=0;refresh();};
+$('bRaise').onclick=()=>{P=Rz.Praise*1.08;refresh();};
+$('bDrop').onclick=()=>{P=Rz.Phold*0.6;refresh();};
+$('resetBtn').onclick=()=>{vals[cur]=defaults(cur);sPos[cur]=M[cur].s0;endPrac();buildParams();refresh(true,true);};
+$('newQ').onclick=newProblem;$('chkQ').onclick=checkAns;$('revQ').onclick=reveal;
+$('ansIn').addEventListener('keydown',e=>{if(e.key==='Enter')checkAns();});
+document.querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>{if(U===b.dataset.u)return;U=b.dataset.u;document.querySelectorAll('[data-u]').forEach(x=>x.setAttribute('aria-pressed',x===b));resetAll();endPrac();buildParams();refresh(true,true);});
+document.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{SHOWF=b.dataset.f==='1';document.querySelectorAll('[data-f]').forEach(x=>x.setAttribute('aria-pressed',x===b));dirty=true;});
+document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{SHOWD=b.dataset.d==='1';document.querySelectorAll('[data-d]').forEach(x=>x.setAttribute('aria-pressed',x===b));dirty=true;});
+document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'&&e.target.type!=='range')return;if(e.ctrlKey||e.metaKey||e.altKey)return;
+ const k=e.key;if(k>='1'&&k<='7'){pick(ORDER[+k-1]);e.preventDefault();}
+ else if(k==='h'||k==='H'){$('bHold').click();}
+ else if(k===' '){if(!$('bRaise').disabled)$('bRaise').click();e.preventDefault();}
+ else if(k==='r'||k==='R'){$('resetBtn').click();}
+ else if((k==='ArrowUp'||k==='ArrowDown')&&e.target.type!=='range'){const t=Math.max(0,Math.min(1000,+$('pIn').value+(k==='ArrowUp'?10:-10)));P=pos2p(t);refresh();e.preventDefault();}});
+new ResizeObserver(resize).observe($('vp'));
+
+/* ---------------- loop ---------------- */
+let last=performance.now();
+function frame(now){const dt=Math.min(0.05,(now-last)/1000);last=now;
+ const dir=stat==='up'?1:stat==='down'?-1:0;
+ if(dir){const s0=sPos[cur],s1=Math.max(0,Math.min(1,s0+dir*dt*0.14));if(s1!==s0){sPos[cur]=s1;dirty=true;}}
+ if(dirty){draw();dirty=false;}
+ requestAnimationFrame(frame);}
+function draw(){
+ ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);
+ ctx.setTransform(DPR*SC,0,0,DPR*SC,DPR*OX,DPR*OY);
+ const hide=!!(prac&&!prac.revealed),Fu=F();
+ const o={P,st:stat,hide,lab:(nm,val)=>{if(val==null||!isFinite(val)||(hide&&nm!=='P'&&nm!=='T'&&nm!=='W'))return nm;if(nm==='P'||nm==='T')return nm+' = '+nf(val,3)+' '+Fu;return nm+' = '+nf(Math.abs(val),3)+' '+Fu;}};
+ M[cur].draw(vals[cur],Rz,sPos[cur],o);
+ const atEnd=(stat==='up'&&sPos[cur]>=1)||(stat==='down'&&sPos[cur]<=0);
+ if(atEnd)tagAt(500,14,'End of travel: press Reset to start over',C.load);
+}
+
+resetAll();buildMacs();buildParams();resize();refresh(true,true);requestAnimationFrame(frame);
+</script>
+</body></html>
