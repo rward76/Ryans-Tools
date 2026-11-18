@@ -8,8 +8,8 @@
 --g950:#030712;--g900:#111827;--g800:#1f2937;--g700:#374151;--g600:#4b5563;--g500:#6b7280;--g400:#9ca3af;--g300:#d1d5db;--g200:#e5e7eb;--g100:#f3f4f6;
 --blue7:#1d4ed8;--blue6:#2563eb;--blue5:#3b82f6;--blue4:#60a5fa;--blue3:#93c5fd;
 --purple6:#9333ea;--purple4:#c084fc;--pink4:#f472b6;
---emerald6:#059669;--emerald5:#10b981;--emerald4:#34d399;
---amber3:#fcd34d;--amber4:#fbbf24;--rose4:#fb7185;--rose6:#e11d48;
+--emerald5:#10b981;--emerald4:#34d399;
+--amber3:#fcd34d;--rose4:#fb7185;
 --f-sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
 --f-mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace}
 [hidden]{display:none!important}
@@ -95,13 +95,6 @@ main{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:8px;min-w
 .flow .tr{height:7px;background:var(--g800);border-radius:4px;overflow:hidden}
 .flow .tr span{display:block;height:100%;width:0;transition:width .12s}
 .flow b{text-align:right;font-weight:500;color:var(--g200)}
-/* info */
-.info p{margin:0;font-size:12px;line-height:1.55;color:var(--g300)}
-.info p b{color:#fff}
-.eqs{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px}
-.eq{display:flex;align-items:center;gap:4px;font:12px var(--f-mono);color:var(--g500)}
-.eq i{width:15px;height:15px;border-radius:50%;border:1px solid #ffffff2e;flex:none}
-.eq b{color:var(--g200);font:600 11.5px var(--f-sans);margin-left:3px}
 /* palette */
 .pal{display:grid;gap:6px}
 .swc{display:flex;flex-direction:column;gap:3px;background:transparent;border:0;padding:0;cursor:pointer;text-align:left;min-width:0}
@@ -163,7 +156,7 @@ table.vt tr.cur td:first-child{color:#fff;font-weight:700}
 <header>
   <div class="brand">
     <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8.5" r="5.5"/><circle cx="8.5" cy="14.5" r="5.5"/><circle cx="15.5" cy="14.5" r="5.5"/></svg></div>
-    <h1><span class="grad">Color Theory Palette</span> <span class="badge-v">v1.9</span></h1>
+    <h1><span class="grad">Color Theory Palette</span> <span class="badge-v">v2.0</span></h1>
   </div>
   <div class="hctl">
     <div class="seg" role="group" aria-label="Mode"><span class="lbl">Mode</span><button data-tabbtn="wheel" aria-pressed="true">Color wheel</button><button data-tabbtn="add" aria-pressed="false">Light mixing</button><button data-tabbtn="sub" aria-pressed="false">Pigment mixing</button><button data-tabbtn="spec" aria-pressed="false">Spectrum</button></div>
@@ -177,7 +170,7 @@ table.vt tr.cur td:first-child{color:#fff;font-weight:700}
 
 
       <section class="card" data-tab="wheel">
-        <div class="card-h"><span class="t"><svg class="i c-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg>Color wheel</span><span class="pill" id="wPill">RYB</span></div>
+        <div class="card-h"><span class="t"><svg class="i c-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg>Color wheel</span><span class="pill">RGB</span></div>
         <p class="grp">Harmony</p>
         <div class="chips" id="harmChips"></div>
         <p class="sublabel" id="harmDesc"></p>
@@ -285,7 +278,7 @@ table.vt tr.cur td:first-child{color:#fff;font-weight:700}
       <section class="card" data-tab="add sub">
         <div class="card-h"><span class="t"><svg class="i c-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/><circle cx="12" cy="12" r="4"/></svg>Under the cursor</span><span class="pill" id="roPill">hover the view</span></div>
         <div class="ro"><div class="roSw sim" id="roSw"></div><div class="roTx"><b id="roName">—</b><span id="roHex">Point at any spot in the view.</span><span id="roRgb"></span></div></div>
-        <p class="grp" id="roBarsT">Light reaching your eye</p>
+        <p class="grp">Light reaching your eye</p>
         <div style="display:flex;flex-direction:column;gap:4px">
           <div class="flow"><span>Red</span><div class="tr"><span id="bR" style="background:#f87171"></span></div><b id="vR">—</b></div>
           <div class="flow"><span>Green</span><div class="tr"><span id="bG" style="background:#4ade80"></span></div><b id="vG">—</b></div>
@@ -297,7 +290,7 @@ table.vt tr.cur td:first-child{color:#fff;font-weight:700}
       </section>
       <section class="card" data-tab="add sub">
         <div class="card-h"><span class="t"><svg class="i c-emerald" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>Match challenge</span><span class="pill" id="mPill">keep mixing</span></div>
-        <div class="match sim" id="matchSw"><div>Target<i id="mTgt"></i></div><div>Your mix<i id="mMix"></i></div></div>
+        <div class="match sim"><div>Target<i id="mTgt"></i></div><div>Your mix<i id="mMix"></i></div></div>
         <div class="mbar"><span id="mBar"></span></div>
         <div class="flow" style="grid-template-columns:auto 1fr"><span>Color difference</span><b id="mDE">ΔE —</b></div>
         <div class="btns"><button class="btn" id="mNew">New target</button><button class="btn" id="mShow">Reveal recipe</button></div>
@@ -333,12 +326,12 @@ const clamp=(v,a,b)=>v<a?a:v>b?b:v;
 const PI=Math.PI;
 
 /* ---------- State ---------- */
-const DEFPOS=()=>[[0,-.62],[-.537,.31],[.537,.31]];
-const defWheel=()=>({model:'rgb',harm:'comp',base:0,sat:.9,L:.5,spr:{split:30,anal:30,anal5:25,accent:30,dsplit:30,rect:60},ring:true});
-const defSpec=()=>({lam:532,mode:'true',wave:true,cones:true,sweep:false});
-const S={tab:'wheel',vis:'normal',sev:1,thr:.5,
-  add:{I:[255,255,255],pos:DEFPOS(),soft:false,names:true},
-  sub:{D:[100,100,100],pos:DEFPOS(),soft:false,names:true,illum:'white'},
+const POS=[[0,-.62],[-.537,.31],[.537,.31]];
+const defWheel=()=>({harm:'comp',base:0,sat:.9,L:.5,spr:{split:30,anal:30,anal5:25,accent:30,dsplit:30,rect:60},ring:true});
+const defSpec=()=>({lam:532,wave:true,cones:true,sweep:false});
+const S={tab:'wheel',vis:'normal',thr:.5,
+  add:{I:[255,255,255],soft:false,names:true},
+  sub:{D:[100,100,100],soft:false,names:true,illum:'white'},
   wheel:defWheel(),spec:defSpec(),tgt:{add:null,sub:null},reveal:false};
 const ILLUM={white:[255,255,255],red:[255,0,0],green:[0,255,0],blue:[0,0,255],yellow:[255,255,0]};
 
@@ -351,7 +344,6 @@ const css=c=>`rgb(${c.map(v=>Math.round(clamp(v,0,255))).join(',')})`;
 function hsl2rgb(h,s,l){h=((h%360)+360)%360;const a=s*Math.min(l,1-l);const f=n=>{const k=(n+h/30)%12;return 255*(l-a*Math.max(-1,Math.min(k-3,9-k,1)))};return [f(0),f(8),f(4)]}
 function rgb2hsl(c){const r=c[0]/255,g=c[1]/255,b=c[2]/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn;let h=0,s=0;if(d){s=d/(1-Math.abs(2*l-1));h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}return [h,s,l]}
 const relLum=c=>c.map(toLin).reduce((a,v,i)=>a+v*LUM[i],0);
-const contrast=(a,b)=>{const x=relLum(a),y=relLum(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05)};
 function lab(c){const [r,g,b]=c.map(toLin);const f=t=>t>.008856?Math.cbrt(t):7.787*t+16/116;const x=f((.4124*r+.3576*g+.1805*b)/.95047),y=f(.2126*r+.7152*g+.0722*b),z=f((.0193*r+.1192*g+.9505*b)/1.08883);return [116*y-16,500*(x-y),200*(y-z)]}
 const dE=(a,b)=>{const p=lab(a),q=lab(b);return Math.hypot(p[0]-q[0],p[1]-q[1],p[2]-q[2])};
 const HN=['Red','Orange','Yellow','Chartreuse','Green','Spring green','Cyan','Azure','Blue','Violet','Magenta','Rose'];
@@ -365,17 +357,17 @@ const CVD={
  tritan:[[1.255528,-.076749,-.178779],[-.078411,.930809,.147602],[.004733,.691367,.3039]]};
 const VIS={
  normal:{n:'Normal vision',s:'Normal',d:'Typical trichromatic vision, with all three cone types (L, M and S) working.'},
- protan:{n:'Protanopia',a:'Protanomaly',s:'Protan',d:'L (red-sensitive) cones missing. Reds look darker and are confused with greens and browns. About 2% of males have some form.'},
- deutan:{n:'Deuteranopia',a:'Deuteranomaly',s:'Deutan',d:'M (green-sensitive) cones missing. The most common color vision deficiency, affecting about 6% of males: reds, oranges, yellows and greens blur together.'},
- tritan:{n:'Tritanopia',a:'Tritanomaly',s:'Tritan',d:'S (blue-sensitive) cones missing. Rare (well under 1 in 1,000). Blue is confused with green, and yellow with pink or violet.'},
+ protan:{n:'Protanopia',s:'Protan',d:'L (red-sensitive) cones missing. Reds look darker and are confused with greens and browns. About 2% of males have some form.'},
+ deutan:{n:'Deuteranopia',s:'Deutan',d:'M (green-sensitive) cones missing. The most common color vision deficiency, affecting about 6% of males: reds, oranges, yellows and greens blur together.'},
+ tritan:{n:'Tritanopia',s:'Tritan',d:'S (blue-sensitive) cones missing. Rare (well under 1 in 1,000). Blue is confused with green, and yellow with pink or violet.'},
  gray:{n:'Grayscale',s:'Gray',d:'Brightness only, like a black-and-white photo or complete color blindness (achromatopsia). This shows value contrast, the light-to-dark difference that carries shape and legibility.'},
  bw:{n:'Black & white',s:'B&W',d:'Each point becomes pure black or pure white at the threshold, like a photocopy or a rubber stamp. Colors of similar brightness fall on the same side.'}};
 const VORDER=['normal','protan','deutan','tritan','gray','bw'];
-function mat(mode,sev){const M=CVD[mode];if(M)return M.map((r,i)=>r.map((v,j)=>sev*v+(1-sev)*(i===j?1:0)));if(mode==='gray')return [LUM,LUM,LUM];return null}
-function sim(c,mode=S.vis,sev=S.sev){
+const mat=mode=>CVD[mode]||(mode==='gray'?[LUM,LUM,LUM]:null);
+function sim(c,mode=S.vis){
   if(mode==='normal')return c.slice();
   if(mode==='bw'){const y=(.299*c[0]+.587*c[1]+.114*c[2])/255,v=y>=S.thr?255:0;return [v,v,v]}
-  const m=mat(mode,CVD[mode]?sev:1),l=c.map(toLin);return m.map(r=>toS(r[0]*l[0]+r[1]*l[1]+r[2]*l[2]))}
+  const m=mat(mode),l=c.map(toLin);return m.map(r=>toS(r[0]*l[0]+r[1]*l[1]+r[2]*l[2]))}
 const visName=()=>VIS[S.vis].n;
 
 const NS='http://www.w3.org/2000/svg';let fid=0;
@@ -388,7 +380,7 @@ function applyVision(){
       F.append(el('feColorMatrix',{type:'matrix',values:'.299 .587 .114 0 0 .299 .587 .114 0 0 .299 .587 .114 0 0 0 0 0 1 0'}));
       const n=100,tv=Array.from({length:n},(_,k)=>k/n>=S.thr-1e-9?1:0).join(' '),T=el('feComponentTransfer',{});
       ['R','G','B'].forEach(ch=>T.append(el('feFunc'+ch,{type:'discrete',tableValues:tv})));F.append(T);
-    }else{const m=mat(S.vis,S.sev);F.append(el('feColorMatrix',{type:'matrix',values:m.map(r=>r.map(v=>v.toFixed(6)).join(' ')+' 0 0').join(' ')+' 0 0 0 1 0'}))}
+    }else{const m=mat(S.vis);F.append(el('feColorMatrix',{type:'matrix',values:m.map(r=>r.map(v=>v.toFixed(6)).join(' ')+' 0 0').join(' ')+' 0 0 0 1 0'}))}
     defs.append(F);f=`url(#${id})`;
   }
   document.querySelectorAll('.sim').forEach(e=>e.style.filter=f);
@@ -412,7 +404,7 @@ function draw(){if(W<2||H<2)return;ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clearRe
 /* ---------- Mixing (additive & subtractive) ---------- */
 const st=()=>S.tab==='add'?S.add:S.sub;
 const geo=()=>{const R=Math.min(W,H)*.25;return {R,cx:W/2,cy:H/2+R*.06}};
-const centers=s=>{const {R,cx,cy}=geo();return s.pos.map(p=>[cx+p[0]*R,cy+p[1]*R])};
+const centers=()=>{const {R,cx,cy}=geo();return POS.map(p=>[cx+p[0]*R,cy+p[1]*R])};
 function lightColor(i){if(S.tab==='add'){const c=[0,0,0];c[i]=S.add.I[i];return c}const c=[255,255,255];c[i]=255*(1-S.sub.D[i]/100);return c}
 function regionColor(set,tab=S.tab,vals){
   if(tab==='add'){const I=vals||S.add.I;return [0,1,2].map(i=>set.includes(i)?I[i]:0)}
@@ -426,7 +418,7 @@ function pill(x,y,text,dot){
   ctx.fillStyle='#f3f4f6';ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(text,tx,y+.5);
 }
 function drawMix(){
-  const add=S.tab==='add',s=st(),{R}=geo(),C=centers(s);
+  const add=S.tab==='add',s=st(),{R}=geo(),C=centers();
   ctx.fillStyle=add?'#000':css(ILLUM[s.illum]);ctx.fillRect(0,0,W,H);
   ctx.globalCompositeOperation=add?'lighter':'multiply';
   C.forEach((c,i)=>{
@@ -436,12 +428,10 @@ function drawMix(){
     else{ctx.fillStyle=css(col);ctx.beginPath();ctx.arc(c[0],c[1],R,0,2*PI);ctx.fill()}
   });
   ctx.globalCompositeOperation='source-over';
-  const cen=[(C[0][0]+C[1][0]+C[2][0])/3,(C[0][1]+C[1][1]+C[2][1])/3],D0=DEFPOS();
-  const dirOf=(i)=>{let d=[C[i][0]-cen[0],C[i][1]-cen[1]],m=Math.hypot(d[0],d[1]);if(m<2){d=D0[i];m=Math.hypot(d[0],d[1])}return [d[0]/m,d[1]/m]};
+  const cen=[(C[0][0]+C[1][0]+C[2][0])/3,(C[0][1]+C[1][1]+C[2][1])/3];
+  const dirOf=i=>{const d=[C[i][0]-cen[0],C[i][1]-cen[1]],m=Math.hypot(d[0],d[1]);return [d[0]/m,d[1]/m]};
   if(!s.soft)C.forEach(c=>{ctx.strokeStyle=add?'rgba(255,255,255,.14)':'rgba(0,0,0,.16)';ctx.setLineDash([4,5]);ctx.lineWidth=1;ctx.beginPath();ctx.arc(c[0],c[1],R,0,2*PI);ctx.stroke();ctx.setLineDash([])});
-  C.forEach((c,i)=>{const d=dirOf(i),stacked=Math.hypot(C[i][0]-cen[0],C[i][1]-cen[1])<2;
-    const off=stacked?[[0,0],[-1,0],[1,0]][i]:[0,0];
-    const x=stacked?cen[0]+off[0]*95:c[0]+d[0]*(R+20),y=stacked?cen[1]-R-20:c[1]+d[1]*(R+20);
+  C.forEach((c,i)=>{const d=dirOf(i),x=c[0]+d[0]*(R+20),y=c[1]+d[1]*(R+20);
     const name=add?['Red light','Green light','Blue light'][i]:['Cyan ink','Magenta ink','Yellow ink'][i];
     const v=add?S.add.I[i]:S.sub.D[i]+'%';
     pill(x,y,`${name} · ${v}`,add?['#ff3b3b','#3bff5a','#3b6bff'][i]:['#00e5ff','#ff3bf5','#ffe600'][i]);
@@ -460,8 +450,6 @@ function drawMix(){
 }
 
 /* ---------- Color wheel ---------- */
-const hueOf=t=>((t%360)+360)%360;
-const RGBN=['Red','Orange','Yellow','Chartreuse','Green','Spring green','Cyan','Azure','Blue','Violet','Magenta','Rose'];
 const HARM={
  comp:{n:'Complementary',o:()=>[0,180],d:'Hues directly opposite each other. The strongest contrast; side by side, each makes the other look more intense.'},
  split:{n:'Split complementary',o:s=>[0,180-s,180+s],sp:[10,75],d:'A base hue plus the two neighbors of its complement. Strong contrast with less tension than a straight complementary pair.'},
@@ -478,19 +466,18 @@ const HARM={
  mono:{n:'Monochromatic',o:()=>[0],d:'One hue at several lightness values (shades are darker, tints lighter). All the contrast comes from value.'}};
 function roleOf(o){o=((o%360)+540)%360-180;if(Math.abs(o)<.5)return 'Base';if(Math.abs(o)>179.5)return 'Complement';return (o>0?'+':'−')+Math.round(Math.abs(o))+'°'}
 function scheme(){const w=S.wheel;
-  if(w.harm==='mono'){const hu=hueOf(w.base);return [-.3,-.15,0,.15,.3].map((d,i)=>{const L=clamp(w.L+d,.06,.96);return {o:0,t:w.base,L,role:['Shade 2','Shade 1','Base','Tint 1','Tint 2'][i],rgb:hsl2rgb(hu,w.sat,L),base:d===0}})}
-  return HARM[w.harm].o(w.spr[w.harm]||0).map(o=>{const t=w.base+o;return {o,t,L:w.L,rgb:hsl2rgb(hueOf(t),w.sat,w.L),role:roleOf(o),base:o===0}})}
+  if(w.harm==='mono'){const hu=w.base;return [-.3,-.15,0,.15,.3].map((d,i)=>{const L=clamp(w.L+d,.06,.96);return {o:0,t:w.base,L,role:['Shade 2','Shade 1','Base','Tint 1','Tint 2'][i],rgb:hsl2rgb(hu,w.sat,L),base:d===0}})}
+  return HARM[w.harm].o(w.spr[w.harm]||0).map(o=>{const t=w.base+o;return {o,t,L:w.L,rgb:hsl2rgb(t,w.sat,w.L),role:roleOf(o),base:o===0}})}
 function wgeo(){const m=Math.min(W,H),lab=m>430&&S.wheel.ring,R=Math.min(m*(lab?.32:.37),lab?Math.min((W/2-105)/1.2,(H/2-60)/1.2):1e9);return {R,cx:W/2,cy:H/2,r1:R*1.05,r2:R*1.2,lab}}
 let disk=null,diskKey='';
 function getDisk(R){
-  const Rp=Math.min(320,Math.round(R*DPR)),w=S.wheel,key=Rp+'|'+w.L+'|'+w.model;if(key===diskKey)return disk;
+  const Rp=Math.min(320,Math.round(R*DPR)),w=S.wheel,key=Rp+'|'+w.L;if(key===diskKey)return disk;
   const c=document.createElement('canvas');c.width=c.height=2*Rp;const g=c.getContext('2d'),im=g.createImageData(2*Rp,2*Rp),d=im.data;
-  const N=1440,lut=new Float32Array(N);for(let k=0;k<N;k++)lut[k]=hueOf(k/4);
   const L=w.L;
   for(let y=0;y<2*Rp;y++)for(let x=0;x<2*Rp;x++){
     const dx=x+.5-Rp,dy=y+.5-Rp,r=Math.hypot(dx,dy);if(r>Rp+1)continue;
     let t=Math.atan2(dx,-dy)*180/PI;if(t<0)t+=360;
-    const h=lut[Math.floor(t*4)%N],s=Math.min(1,r/Rp),a=s*Math.min(L,1-L);
+    const h=t,s=Math.min(1,r/Rp),a=s*Math.min(L,1-L);
     const i=(y*2*Rp+x)*4;
     for(let ch=0;ch<3;ch++){const n=[0,8,4][ch],k=(n+h/30)%12;d[i+ch]=255*(L-a*Math.max(-1,Math.min(k-3,9-k,1)))}
     d[i+3]=clamp(Rp-r+.5,0,1)*255;
@@ -501,10 +488,10 @@ const polar=(cx,cy,r,t)=>[cx+r*Math.sin(t*PI/180),cy-r*Math.cos(t*PI/180)];
 function markers(){const w=S.wheel,{R,cx,cy}=wgeo();const sc=scheme();
   const list=w.harm==='mono'?[sc[2]]:sc;return list.map(c=>{const p=polar(cx,cy,w.sat*R,c.t);return {...c,x:p[0],y:p[1]}})}
 function drawWheel(){
-  const w=S.wheel,{R,cx,cy,r1,r2,lab}=wgeo(),names=RGBN;
+  const w=S.wheel,{R,cx,cy,r1,r2,lab}=wgeo(),names=HN;
   ctx.imageSmoothingQuality='high';ctx.drawImage(getDisk(R),cx-R,cy-R,2*R,2*R);
   for(let k=0;k<12;k++){
-    const a0=(k*30-15-90)*PI/180,a1=(k*30+15-90)*PI/180,col=hsl2rgb(hueOf(k*30),1,.5);
+    const a0=(k*30-15-90)*PI/180,a1=(k*30+15-90)*PI/180,col=hsl2rgb(k*30,1,.5);
     ctx.beginPath();ctx.arc(cx,cy,r2,a0,a1);ctx.arc(cx,cy,r1,a1,a0,true);ctx.closePath();ctx.fillStyle=css(col);ctx.fill();ctx.strokeStyle='#030712';ctx.lineWidth=2;ctx.stroke();
     const tier=k%4===0?'P':k%2===0?'S':'T',m=polar(cx,cy,(r1+r2)/2,k*30);
     ctx.fillStyle=relLum(col)>.4?'#111827':'#fff';ctx.font=`700 ${Math.max(9,Math.min(12,R*.05))}px ui-monospace,monospace`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(tier,m[0],m[1]+.5);
@@ -527,12 +514,12 @@ function renderPalette(){
   $('pal').style.gridTemplateColumns=`repeat(${sc.length},minmax(0,1fr))`;$('pal').classList.toggle('many',sc.length>5);
   $('pal').innerHTML=sc.map(c=>`<button class="swc${c.base?' base':''}" data-hex="${hex(c.rgb)}" title="Copy ${hex(c.rgb)}"><i style="background:${css(c.rgb)}"></i><span class="role">${sc.length>5&&c.role==='Complement'?'Compl.':c.role}</span><span class="hx">${hex(c.rgb)}</span></button>`).join('');
   const Ls=[.12,.24,.36,.5,.64,.78,.9],rows=w.harm==='mono'?[sc[2]]:sc;
-  $('strips').innerHTML=rows.map(c=>`<div class="strip">${Ls.map(L=>{const v=hsl2rgb(hueOf(c.t),w.sat,L);return `<i data-hex="${hex(v)}" title="${hex(v)}" style="background:${css(v)}"></i>`}).join('')}</div>`).join('');
+  $('strips').innerHTML=rows.map(c=>`<div class="strip">${Ls.map(L=>{const v=hsl2rgb(c.t,w.sat,L);return `<i data-hex="${hex(v)}" title="${hex(v)}" style="background:${css(v)}"></i>`}).join('')}</div>`).join('');
   $('palPill').textContent=HARM[w.harm].n.toLowerCase();
   // vision table
   const modes=['normal','protan','deutan','tritan','gray'];
-  $('vt').innerHTML=modes.map(m=>`<tr class="${m===S.vis?'cur':''}"><td>${VIS[m].s==='Gray'?'Grayscale':VIS[m].n}</td><td><div class="vrow">${sc.map(c=>`<i style="background:${css(sim(c.rgb,m,1))}"></i>`).join('')}</div></td></tr>`).join('');
-  const cvdP=[],grayP=[],pairs=(m,lim,out)=>{for(let i=0;i<sc.length;i++)for(let j=i+1;j<sc.length;j++){const e=dE(sim(sc[i].rgb,m,1),sim(sc[j].rgb,m,1));if(e<lim)out.push(`<b>${VIS[m].s}</b>: ${sc[i].role} ≈ ${sc[j].role} (ΔE ${e.toFixed(0)})`)}};
+  $('vt').innerHTML=modes.map(m=>`<tr class="${m===S.vis?'cur':''}"><td>${VIS[m].s==='Gray'?'Grayscale':VIS[m].n}</td><td><div class="vrow">${sc.map(c=>`<i style="background:${css(sim(c.rgb,m))}"></i>`).join('')}</div></td></tr>`).join('');
+  const cvdP=[],grayP=[],pairs=(m,lim,out)=>{for(let i=0;i<sc.length;i++)for(let j=i+1;j<sc.length;j++){const e=dE(sim(sc[i].rgb,m),sim(sc[j].rgb,m));if(e<lim)out.push(`<b>${VIS[m].s}</b>: ${sc[i].role} ≈ ${sc[j].role} (ΔE ${e.toFixed(0)})`)}};
   if(w.harm!=='mono'){['protan','deutan','tritan'].forEach(m=>pairs(m,12,cvdP));pairs('gray',12,grayP)}
   else{const e=dE(sim(sc[1].rgb,'gray'),sim(sc[2].rgb,'gray'));if(e<10)grayP.push('<b>Gray</b>: neighboring values are very close; spread the lightness.')}
   const list=a=>a.slice(0,6).join('<br>')+(a.length>6?'<br>…and '+(a.length-6)+' more':'');
@@ -542,7 +529,6 @@ function renderPalette(){
   else html=`<p class="warn ok">✓ Every pair of colors stays distinguishable (ΔE ≥ 12) in all four simulations, grayscale included.</p>`;
   $('warn').innerHTML=html;
 }
-const roleSort=o=>((o%360)+540)%360-180;
 
 /* ---------- Readout ---------- */
 const BAR=[['bR','vR'],['bG','vG'],['bB','vB']];
@@ -583,7 +569,6 @@ function syncControls(){
   $('aSoft').checked=S.add.soft;$('aNames').checked=S.add.names;$('sSoft').checked=S.sub.soft;$('sNames').checked=S.sub.names;
   document.querySelectorAll('[data-illum]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.illum===S.sub.illum));
   const w=S.wheel,h=HARM[w.harm];
-  $('wPill').textContent=w.model.toUpperCase();
   document.querySelectorAll('#harmChips .chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.h===w.harm));
   $('harmDesc').textContent=h.d;
   $('spRow').hidden=!h.sp;if(h.sp){$('spR').min=h.sp[0];$('spR').max=h.sp[1];$('spR').value=w.spr[w.harm];$('spOut').textContent=w.spr[w.harm]+'°'}
@@ -597,11 +582,11 @@ const TABS={add:['Light mixing','additive · red, green, blue','Hover to read a 
 function setTab(t){
   S.tab=t;document.querySelectorAll('[data-tabbtn]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tabbtn===t));
   document.querySelectorAll('[data-tab]').forEach(e=>e.hidden=!e.dataset.tab.split(' ').includes(t));
-  $('vpT').textContent=TABS[t][0];$('vpS').textContent=t==='wheel'?(HARM[S.wheel.harm].n+' · '+S.wheel.model.toUpperCase()):TABS[t][1];$('hint').textContent=TABS[t][2];
+  $('vpT').textContent=TABS[t][0];$('vpS').textContent=t==='wheel'?HARM[S.wheel.harm].n:TABS[t][1];$('hint').textContent=TABS[t][2];
   if(t==='wheel')renderPalette();else if(t==='spec'){syncSpec();updSpec();startLoop()}else updMatch();
   draw();
 }
-function wheelChanged(full){syncControls();$('vpS').textContent=HARM[S.wheel.harm].n+' · '+S.wheel.model.toUpperCase();if(full!==false)renderPalette();dirty()}
+function wheelChanged(full){syncControls();$('vpS').textContent=HARM[S.wheel.harm].n;if(full!==false)renderPalette();dirty()}
 
 document.querySelectorAll('[data-tabbtn]').forEach(b=>b.onclick=()=>setTab(b.dataset.tabbtn));
 document.querySelectorAll('[data-vis]').forEach(b=>b.onclick=()=>{S.vis=b.dataset.vis;applyVision()});
@@ -624,8 +609,8 @@ $('wRand').onclick=()=>{S.wheel.base=Math.floor(Math.random()*360);wheelChanged(
 $('wCopy').onclick=()=>copy(scheme().map(c=>hex(c.rgb)).join(' '));
 $('palWrap').addEventListener('click',e=>{const t=e.target.closest('[data-hex]');if(t)copy(t.dataset.hex)});
 $('resetBtn').onclick=()=>{
-  if(S.tab==='add')S.add={I:[255,255,255],pos:DEFPOS(),soft:false,names:true};
-  else if(S.tab==='sub')S.sub={D:[100,100,100],pos:DEFPOS(),soft:false,names:true,illum:'white'};
+  if(S.tab==='add')S.add={I:[255,255,255],soft:false,names:true};
+  else if(S.tab==='sub')S.sub={D:[100,100,100],soft:false,names:true,illum:'white'};
   else if(S.tab==='spec')S.spec=defSpec();
   else S.wheel=defWheel();
   syncControls();setTab(S.tab);
@@ -637,11 +622,11 @@ const LMIN=300,LMAX=850;
 function gs(x,m,s1,s2){const t=(x-m)/(x<m?s1:s2);return Math.exp(-.5*t*t)}
 /* CIE 1931 2° color matching functions, multi-lobe fit (Wyman, Sloan & Shirley 2013) */
 function cmf(l){return [1.056*gs(l,599.8,37.9,31)+.362*gs(l,442,16,26.7)-.065*gs(l,501.1,20.4,26.2),.821*gs(l,568.8,46.9,40.5)+.286*gs(l,530.9,16.3,31.1),1.217*gs(l,437,11.8,36)+.681*gs(l,459,26,13.8)]}
-function lamRGB(l,mode=S.spec.mode){
+function lamRGB(l,full){
   if(l<380||l>780)return [0,0,0];
   const [X,,Z]=cmf(Math.min(l,645)),Y0=cmf(Math.min(l,645))[1],Y=cmf(l)[1];let r=3.2406*X-1.5372*Y0-.4986*Z,g=-.9689*X+1.8758*Y0+.0415*Z,b=.0557*X-.204*Y0+1.057*Z;
   r=Math.max(0,r);g=Math.max(0,g);b=Math.max(0,b);const mx=Math.max(r,g,b)||1;r/=mx;g/=mx;b/=mx;
-  let k;if(mode==='true'){const L0=.2126*r+.7152*g+.0722*b;k=Math.min(1,Y/L0)}else k=l<420?.3+.7*(l-380)/40:l>700?.3+.7*(780-l)/80:1;
+  let k;if(!full){const L0=.2126*r+.7152*g+.0722*b;k=Math.min(1,Y/L0)}else k=l<420?.3+.7*(l-380)/40:l>700?.3+.7*(780-l)/80:1;
   return [r,g,b].map(v=>toS(v*k));
 }
 /* Approximate cone fundamentals, peak-normalized */
@@ -657,7 +642,7 @@ function sgeo(){const nar=W<600,x0=nar?44:58,x1=Math.max(x0+100,W-(nar?24:40)),t
 const specLamAt=x=>{const g=sgeo();return clamp(Math.round(LMIN+(x-g.x0)/(g.x1-g.x0)*(LMAX-LMIN)),LMIN,LMAX)};
 function setLam(l){S.spec.lam=l;updSpec();dirty()}
 let barC=null,barKey='';
-function specBar(w){const key=Math.round(w*DPR)+'|'+S.spec.mode;if(key===barKey)return barC;
+function specBar(w){const key=Math.round(w*DPR);if(key===barKey)return barC;
   const n=Math.max(2,Math.round(w*DPR)),c=document.createElement('canvas');c.width=n;c.height=1;const g=c.getContext('2d'),im=g.createImageData(n,1);
   for(let i=0;i<n;i++){const l=LMIN+(i+.5)/n*(LMAX-LMIN),v=lamRGB(l);im.data.set([v[0],v[1],v[2],255],i*4)}
   g.putImageData(im,0,0);barC=c;barKey=key;return c}
@@ -738,7 +723,7 @@ function startLoop(){if(!raf){lastT=0;raf=requestAnimationFrame(loop)}}
 function loop(t){if(S.tab!=='spec'){raf=0;return}const dt=lastT?Math.min(.05,(t-lastT)/1000):0;lastT=t;
   if(!RM)phase+=dt*70;if(S.spec.sweep){let l=S.spec.lam+dt*35;if(l>790)l=370;S.spec.lam=l;updSpec()}
   draw();raf=requestAnimationFrame(loop)}
-$('lamChips').innerHTML=SOURCES.map(([l,n])=>{const c=lamRGB(l,'full'),v=l>=380&&l<=780;return `<button class="chip" data-l="${l}" aria-pressed="false"><i class="cd" style="background:${v?css(c):'repeating-linear-gradient(45deg,#374151 0 2px,#111827 2px 4px)'}"></i>${n}<small>${l}</small></button>`}).join('');
+$('lamChips').innerHTML=SOURCES.map(([l,n])=>{const c=lamRGB(l,1),v=l>=380&&l<=780;return `<button class="chip" data-l="${l}" aria-pressed="false"><i class="cd" style="background:${v?css(c):'repeating-linear-gradient(45deg,#374151 0 2px,#111827 2px 4px)'}"></i>${n}<small>${l}</small></button>`}).join('');
 document.querySelectorAll('#lamChips .chip').forEach(b=>b.onclick=()=>{S.spec.sweep=false;syncSpec();setLam(+b.dataset.l)});
 $('lamR').oninput=e=>{S.spec.sweep=false;syncSpec();setLam(+e.target.value)};
 $('sweepBtn').onclick=()=>{S.spec.sweep=!S.spec.sweep;if(S.spec.sweep&&(S.spec.lam<370||S.spec.lam>780))S.spec.lam=370;syncSpec()};

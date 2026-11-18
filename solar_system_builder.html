@@ -7,15 +7,15 @@
 --blue7:#1d4ed8;--blue6:#2563eb;--blue5:#3b82f6;--blue4:#60a5fa;--blue3:#93c5fd;
 --purple6:#9333ea;--purple4:#c084fc;--pink4:#f472b6;
 --emerald6:#059669;--emerald5:#10b981;--emerald4:#34d399;
---amber3:#fcd34d;--amber4:#fbbf24;--rose4:#fb7185;--rose6:#e11d48;
+--amber3:#fcd34d;--amber4:#fbbf24;--rose4:#fb7185;
 --f-sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
 --f-mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace}
 [hidden]{display:none!important}
 html,body{height:100%;margin:0}
 body{background:var(--g950);color:var(--g100);font-family:var(--f-sans);font-size:14px;display:flex;flex-direction:column;overflow:hidden}
 *,*:before,*:after{box-sizing:border-box}
-button,select,output,input{font:inherit;color:inherit}
-button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--blue5);outline-offset:2px}
+button,output,input{font:inherit;color:inherit}
+button:focus-visible,input:focus-visible{outline:2px solid var(--blue5);outline-offset:2px}
 ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:var(--g900)}::-webkit-scrollbar-thumb{background:var(--g700);border-radius:3px}
 svg.i{width:14px;height:14px;flex:none}
 header{background:var(--g900);border-bottom:1px solid var(--g800);padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;flex:none}
@@ -27,7 +27,6 @@ h1 .grad{background:linear-gradient(to right,var(--blue4),var(--purple4),var(--p
 .badge-v{font-size:12px;font-weight:600;padding:2px 8px;border-radius:4px;background:#1e3a8a99;color:var(--blue3);border:1px solid var(--blue7)}
 .hctl{display:flex;align-items:center;flex-wrap:wrap;justify-content:flex-end;gap:12px}
 .seg{display:flex;align-items:center;background:var(--g800);border:1px solid var(--g700);border-radius:8px;padding:4px;font-size:12px;flex-wrap:wrap}
-.seg .lbl{color:var(--g400);padding:0 8px;font-weight:500}
 .seg button{background:transparent;border:0;padding:4px 10px;border-radius:4px;color:var(--g300);cursor:pointer;transition:color .15s,background .15s}
 .seg button:hover{color:#fff}
 .seg button[aria-pressed=true]{background:var(--blue6);color:#fff;font-weight:600;box-shadow:0 1px 3px #0006}
@@ -47,9 +46,8 @@ aside{width:384px;background:var(--g900);border-right:1px solid var(--g800);over
 .card-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .card-h .t{font-size:12px;font-weight:700;color:var(--g200);text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:8px}
 .pill{font-size:10px;background:var(--g700);color:var(--g300);padding:2px 8px;border-radius:999px;font-family:var(--f-mono);white-space:nowrap}
-.c-blue{color:var(--blue4)}.c-purple{color:var(--purple4)}.c-emerald{color:var(--emerald4)}.c-amber{color:var(--amber3)}.c-pink{color:var(--pink4)}.c-rose{color:var(--rose4)}
+.c-blue{color:var(--blue4)}.c-purple{color:var(--purple4)}.c-emerald{color:var(--emerald4)}.c-amber{color:var(--amber3)}.c-pink{color:var(--pink4)}
 .grp{font:600 10px var(--f-mono);color:var(--g500);text-transform:uppercase;letter-spacing:.08em;margin:0 0 -4px}
-.muted{color:var(--g500);font-size:11px;margin:0;line-height:1.5}
 .desc{font-size:12px;color:var(--g300);margin:0;line-height:1.55}
 .desc b{color:var(--g100)}
 .selname{font-size:20px;font-weight:700;color:#fff;margin:0;line-height:1.2;display:flex;align-items:center;gap:10px}
@@ -57,7 +55,6 @@ aside{width:384px;background:var(--g900);border-right:1px solid var(--g800);over
 .ctl{display:grid;grid-template-columns:78px minmax(0,1fr) 72px;align-items:center;gap:10px;font-size:12px;color:var(--g300)}
 .ctl output{font:12px var(--f-mono);color:var(--blue3);text-align:right;font-variant-numeric:tabular-nums}
 input[type=range]{width:100%;accent-color:var(--blue5);margin:0}
-.btns2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .btns3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .btn{font-size:11.5px;background:var(--g700);color:var(--g100);border:0;padding:7px 6px;border-radius:8px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .15s}
 .btn:hover{background:var(--g600)}
@@ -74,7 +71,6 @@ input[type=range]{width:100%;accent-color:var(--blue5);margin:0}
 .btn.pri{background:var(--blue6);color:#fff}.btn.pri:hover{background:var(--blue5)}
 .txtin{background:var(--g800);border:1px solid var(--g700);border-radius:8px;padding:5px 8px;font:13px var(--f-sans);color:#fff;min-width:0;width:100%}
 .txtin:hover{border-color:var(--g600)}.txtin:focus{border-color:var(--blue5);outline:none}
-.lawbox .big small{font-size:11px;color:var(--g400);font-weight:500;margin-left:6px}
 .lawrow{display:flex;justify-content:space-between;gap:10px;font:11.5px var(--f-mono);color:var(--g400)}
 .lawrow b{color:var(--emerald4);font-weight:600;text-align:right;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;min-width:0}
 .lawrow b.w{color:var(--g100)}
@@ -94,9 +90,7 @@ input[type=range]{width:100%;accent-color:var(--blue5);margin:0}
 .toggles{display:flex;flex-direction:column;gap:9px;font-size:12px}
 .tog{display:flex;align-items:center;justify-content:space-between;gap:10px;color:var(--g300);cursor:pointer}
 .tog input{width:16px;height:16px;accent-color:var(--emerald5);cursor:pointer;margin:0}
-.law-st{font-size:13px;color:#fff;font-weight:600;margin:0;line-height:1.45;border-left:3px solid var(--amber4);padding-left:10px}
 .err{color:var(--rose4);font-size:11.5px;margin:0}
-.keys{font:10px/1.7 var(--f-mono);color:var(--g500);padding:0 4px;margin-top:-6px}
 main{flex:1;display:flex;min-width:0;background:#11182780;padding:8px}
 .vp{flex:1;position:relative;background:radial-gradient(ellipse at 50% 45%,#0b1424 0%,var(--g950) 70%);border:1px solid var(--g800);border-radius:12px;overflow:hidden;min-height:0}
 #cv{position:absolute;inset:0;display:block;width:100%;height:100%;touch-action:none;cursor:grab}
@@ -137,7 +131,7 @@ main{flex:1;display:flex;min-width:0;background:#11182780;padding:8px}
 <header>
   <div class="brand">
     <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="10" ry="5.5" transform="rotate(-25 12 12)"/><circle cx="20.2" cy="8.4" r="1.6" fill="currentColor"/></svg></div>
-    <div><h1><span class="grad">Solar System Builder</span> <span class="badge-v">v2.0</span></h1></div>
+    <div><h1><span class="grad">Solar System Builder</span> <span class="badge-v">v2.1</span></h1></div>
   </div>
   <div class="hctl">
     <div class="seg" role="group" aria-label="Mode" id="modeSeg"><button data-m="solar" aria-pressed="true">Solar system</button><button data-m="sandbox" aria-pressed="false">Build a system</button></div>
@@ -152,7 +146,7 @@ main{flex:1;display:flex;min-width:0;background:#11182780;padding:8px}
     <!-- ============ SOLAR SYSTEM ============ -->
     <div class="stack" id="pSolar">
       <section class="card">
-        <div class="card-h"><span class="t"><svg class="i c-amber" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Solar system clock</span><span class="pill" id="sPill">real orbits</span></div>
+        <div class="card-h"><span class="t"><svg class="i c-amber" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Solar system clock</span><span class="pill">real orbits</span></div>
         <div class="lawbox">
           <button class="big datebtn" id="sDateBtn" title="Click to enter a date" aria-label="Change date"><span id="sDate">—</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
           <form class="daterow" id="dateRow" hidden><input type="date" id="sDateIn" required aria-label="Date"><button class="btn pri" type="submit">Go</button><button class="btn" type="button" id="sDateX">Cancel</button></form>
@@ -269,7 +263,7 @@ main{flex:1;display:flex;min-width:0;background:#11182780;padding:8px}
       <div class="float vp-tool" id="vTool" hidden></div>
       <div class="float toast" id="toast"></div>
       <div class="float legend" id="legend"></div>
-      <div class="float zoom"><button id="zOut" aria-label="Zoom out">−</button><span id="zLbl"><i class="sb" id="sbBar"></i><em id="sbTxt" style="font-style:normal">1 AU</em></span><button id="zIn" aria-label="Zoom in">+</button><button id="zFit" aria-label="Fit view" title="Fit view">⤢</button></div>
+      <div class="float zoom"><button id="zOut" aria-label="Zoom out">−</button><span><i class="sb" id="sbBar"></i><em id="sbTxt" style="font-style:normal">1 AU</em></span><button id="zIn" aria-label="Zoom in">+</button><button id="zFit" aria-label="Fit view" title="Fit view">⤢</button></div>
     </div>
   </main>
 </div>
@@ -356,7 +350,7 @@ const PL=[
 const EARTH=PL[2];
 for(const p of PL){p.pts=[];const b=p.a*Math.sqrt(1-p.e*p.e),c=Math.cos(p.w*D2R),s=Math.sin(p.w*D2R);
   for(let i=0;i<=240;i++){const E=i/240*TAU,x=p.a*(Math.cos(E)-p.e),y=b*Math.sin(E);p.pts.push([x*c-y*s,x*s+y*c])}}
-function plPos(p,t,M0){const M=(p.L-p.w+360*t/p.P)*D2R;const E=kepE(M,p.e),b=p.a*Math.sqrt(1-p.e*p.e);const x=p.a*(Math.cos(E)-p.e),y=b*Math.sin(E),c=Math.cos(p.w*D2R),s=Math.sin(p.w*D2R);return[x*c-y*s,x*s+y*c]}
+function plPos(p,t){const M=(p.L-p.w+360*t/p.P)*D2R;const E=kepE(M,p.e),b=p.a*Math.sqrt(1-p.e*p.e);const x=p.a*(Math.cos(E)-p.e),y=b*Math.sin(E),c=Math.cos(p.w*D2R),s=Math.sin(p.w*D2R);return[x*c-y*s,x*s+y*c]}
 const tToday=(Date.now()-J2000)/YRMS;
 const AUKM=149597870.7,SUN={id:'sun',name:'Sun',col:'#fcd34d',type:'Star · G2V',rad:696340,moonList:[],desc:'An ordinary yellow dwarf star, about 4.6 billion years old, that holds 99.86% of the solar system\u2019s mass. Fusion in its core turns about 4 million tonnes of matter into energy every second. Everything in this view orbits it, or more precisely orbits the system\u2019s center of mass, which sits near the Sun\u2019s surface because of Jupiter\u2019s pull.'};
 /* Major moons: [id, name, parent, a (km), period (days), radius (km), retrograde, description]. Circular orbits drawn in the ecliptic plane. */
@@ -791,12 +785,11 @@ cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);ptrs.set
 cv.addEventListener('pointermove',e=>{
   if(!ptrs.has(e.pointerId)){if(S.mode==='solar'){const p=hitPlanet(e.offsetX,e.offsetY);SO.hover=p?p.id:null;cv.style.cursor=p?'pointer':''}else if(S.mode==='sandbox'&&!SB.arm){cv.style.cursor=hitBody(e.offsetX,e.offsetY)?'pointer':''}return}
   ptrs.set(e.pointerId,[e.offsetX,e.offsetY]);if(!gesture)return;const c=cam();
-  if(gesture.type==='pinch'&&ptrs.size>=2){const[[x1,y1],[x2,y2]]=[...ptrs.values()];const mx=(x1+x2)/2,my=(y1+y2)/2,d=Math.hypot(x2-x1,y2-y1);c.s=clamp(gesture.s0*d/gesture.d0,0.5,2e9);c.x=gesture.w[0]-(mx-W/2)/c.s;c.y=gesture.w[1]+(my-H/2)/c.s;freeCam();return}
-  if(gesture.type==='pan'){if(Math.hypot(e.offsetX-gesture.sx,e.offsetY-gesture.sy)>4&&!gesture.moved){gesture.moved=true;freeCam();gesture.cx=c.x;gesture.cy=c.y;gesture.sx=e.offsetX;gesture.sy=e.offsetY}
+  if(gesture.type==='pinch'&&ptrs.size>=2){const[[x1,y1],[x2,y2]]=[...ptrs.values()];const mx=(x1+x2)/2,my=(y1+y2)/2,d=Math.hypot(x2-x1,y2-y1);c.s=clamp(gesture.s0*d/gesture.d0,0.5,2e9);c.x=gesture.w[0]-(mx-W/2)/c.s;c.y=gesture.w[1]+(my-H/2)/c.s;return}
+  if(gesture.type==='pan'){if(Math.hypot(e.offsetX-gesture.sx,e.offsetY-gesture.sy)>4&&!gesture.moved){gesture.moved=true;gesture.cx=c.x;gesture.cy=c.y;gesture.sx=e.offsetX;gesture.sy=e.offsetY}
     if(gesture.moved){c.x=gesture.cx-(e.offsetX-gesture.sx)/c.s;c.y=gesture.cy+(e.offsetY-gesture.sy)/c.s}}
   else if(gesture.type==='place'){gesture.cx=e.offsetX;gesture.cy=e.offsetY;SB.prevDirty=true}
   else if(gesture.type==='body'){if(Math.hypot(e.offsetX-gesture.sx,e.offsetY-gesture.sy)>3)gesture.moved=true;if(gesture.moved){const[wx,wy]=wW(e.offsetX,e.offsetY);gesture.b.x=wx;gesture.b.y=wy;gesture.b.trail=[]}}});
-function freeCam(){}
 function endPtr(e){ptrs.delete(e.pointerId);cv.classList.remove('dragging');if(!gesture)return;const g=gesture;
   if(g.type==='pinch'){if(ptrs.size===0)gesture=null;return}
   if(g.type==='place'&&e.type==='pointerup'){const[wx,wy]=wW(g.sx,g.sy),m=KINDS[SB.arm].m,pv=placeVel(wx,wy,m,g.cx-g.sx,g.cy-g.sy);

@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Linguistic Alphabet</title>
+<style>
+/* Same shell as the other teaching tools (gradient header, dark grid stage, side panel). Dark-only by design. */
+:root{color-scheme:dark;
+--g950:#030712;--g900:#111827;--g800:#1f2937;--g700:#374151;--g600:#4b5563;--g500:#6b7280;--g400:#9ca3af;--g300:#d1d5db;--g200:#e5e7eb;--g100:#f3f4f6;
+--blue7:#1d4ed8;--blue6:#2563eb;--blue5:#3b82f6;--blue4:#60a5fa;--blue3:#93c5fd;
+--purple6:#9333ea;--purple4:#c084fc;--pink4:#f472b6;
+--emerald6:#059669;--emerald5:#10b981;--emerald4:#34d399;
+--amber3:#fcd34d;--amber4:#fbbf24;--rose4:#fb7185;
+--f-sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+--f-ipa:"Charis SIL","Doulos SIL","Gentium Plus","Noto Sans","Segoe UI","Lucida Sans Unicode","DejaVu Sans","Arial Unicode MS",sans-serif;
+--f-mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0}
+body{background:var(--g950);color:var(--g100);font-family:var(--f-sans);font-size:14px;display:flex;flex-direction:column;overflow:hidden;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box}
+*,*:before,*:after{box-sizing:border-box}
+button,select,input{font:inherit;color:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--blue5);outline-offset:2px}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:var(--g900)}::-webkit-scrollbar-thumb{background:var(--g700);border-radius:3px}
+header{background:var(--g900);border-bottom:1px solid var(--g800);padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;flex:none}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{background:linear-gradient(to top right,var(--blue6),var(--purple6));padding:8px;border-radius:8px;box-shadow:0 10px 15px -3px #0006;display:grid;place-items:center}
+.logo svg{width:20px;height:20px;color:#fff}
+h1{margin:0;font-size:18px;font-weight:700;line-height:1.4;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+h1 .grad{background:linear-gradient(to right,var(--blue4),var(--purple4),var(--pink4));-webkit-background-clip:text;background-clip:text;color:transparent}
+.badge-v{font-size:12px;font-weight:600;padding:2px 8px;border-radius:4px;background:#1e3a8a99;color:var(--blue3);border:1px solid var(--blue7)}
+.hctl{display:flex;align-items:center;flex-wrap:wrap;justify-content:flex-end;gap:12px}
+.seg{display:flex;align-items:center;background:var(--g800);border:1px solid var(--g700);border-radius:8px;padding:4px;font-size:12px;flex-wrap:wrap}
+.seg .lbl{color:var(--g400);padding:0 8px;font-weight:500}
+.seg button{background:transparent;border:0;padding:4px 10px;border-radius:4px;color:var(--g300);cursor:pointer;transition:color .15s,background .15s}
+.seg button:hover{color:#fff}
+.seg button[aria-pressed=true]{background:var(--blue6);color:#fff;font-weight:600;box-shadow:0 1px 3px #0006}
+main{flex:1;display:flex;gap:8px;min-height:0;padding:8px;padding-left:max(8px,env(safe-area-inset-left,0px));padding-right:max(8px,env(safe-area-inset-right,0px));background:#11182780}
+.ws{flex:1;min-width:0;border:1px solid var(--g800);border-radius:12px;overflow:auto;position:relative;
+ background:linear-gradient(rgba(229,231,235,.035) 1px,transparent 1px) 0 0/32px 32px,linear-gradient(90deg,rgba(229,231,235,.035) 1px,transparent 1px) 0 0/32px 32px,radial-gradient(ellipse at 50% 40%,#0b1424 0%,var(--g950) 75%);background-attachment:local,local,fixed}
+.view{padding:18px 20px 24px;display:flex;flex-direction:column;gap:16px;min-height:100%}
+.hint{color:var(--g400);font-size:13px;line-height:1.5;max-width:900px}
+.hint b{color:var(--g200);font-weight:600}
+.panel{width:350px;flex:none;display:flex;flex-direction:column;background:var(--g900);border:1px solid var(--g800);border-radius:12px;overflow:auto}
+.vtwrap{position:relative;background:radial-gradient(ellipse at 45% 50%,#0d1729,var(--g950) 80%);border-bottom:1px solid var(--g800);flex:none}
+#vt{display:block;width:100%;height:auto;max-height:44vh}
+.lbltog{position:absolute;top:8px;right:10px;font-size:11px;color:var(--g400);display:flex;gap:5px;align-items:center;cursor:pointer;user-select:none}
+.vtcap{position:absolute;top:8px;left:12px;font:700 10px var(--f-sans);text-transform:uppercase;letter-spacing:.08em;color:var(--g500)}
+.readout{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--g800);border-bottom:1px solid var(--g800);flex:none}
+.readout>div{background:var(--g900);padding:7px 8px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.readout .k{font:700 9.5px var(--f-sans);text-transform:uppercase;letter-spacing:.07em;color:var(--g500)}
+.readout .v{font-size:12px;color:var(--g200);font-weight:600;display:flex;align-items:center;gap:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.readout svg{width:22px;height:14px;flex:none}
+.pbody{padding:14px 16px 18px;display:flex;flex-direction:column;gap:12px}
+.big{font:400 54px/1 var(--f-ipa);color:#fff;display:flex;align-items:baseline;gap:14px}
+.big small{font:600 13px var(--f-sans);color:var(--g400)}
+.nm{font-size:15px;font-weight:700;color:var(--g100);text-transform:capitalize}
+.chips{display:flex;flex-direction:column;gap:6px}
+.chip{display:grid;grid-template-columns:86px 1fr;gap:8px;align-items:start;font-size:12.5px;line-height:1.4;color:var(--g300)}
+.chip b{font:700 10px var(--f-sans);text-transform:uppercase;letter-spacing:.06em;color:var(--blue3);background:#1e3a8a66;border:1px solid #1d4ed8aa;border-radius:4px;padding:2px 6px;text-align:center;margin-top:1px}
+.chip b.v1{color:var(--amber3);background:#78350f55;border-color:#b4530988}
+.chip b.v0{color:var(--g300);background:var(--g800);border-color:var(--g700)}
+.ex{font-size:13px;color:var(--g300);line-height:1.45}
+.ex b{color:var(--g100)}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{font-size:12.5px;background:var(--g700);color:var(--g100);border:0;padding:7px 13px;border-radius:8px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .15s}
+.btn:hover{background:var(--g600)}
+.btn.pri{background:var(--blue6);color:#fff}.btn.pri:hover{background:var(--blue5)}
+.btn.grn{background:var(--emerald6);color:#fff}.btn.grn:hover{background:var(--emerald5)}
+.btn:disabled{opacity:.4;cursor:default}
+.sec{font:700 10.5px var(--f-sans);text-transform:uppercase;letter-spacing:.08em;color:var(--g500);margin-top:4px}
+.note{font-size:12px;color:var(--g400);line-height:1.5}
+.note b{color:var(--g200)}
+.fmt{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.fmt div{background:var(--g950);border:1px solid var(--g800);border-radius:8px;padding:6px 8px;text-align:center}
+.fmt i{display:block;font:700 9.5px var(--f-sans);color:var(--g500);font-style:normal;letter-spacing:.06em}
+.fmt span{font:700 14px var(--f-mono);color:var(--emerald4)}
+/* ---------- consonant chart ---------- */
+.chartwrap{overflow-x:auto;padding-bottom:4px}
+table.ipa{border-collapse:separate;border-spacing:0;margin:0 auto;font-size:clamp(16px,1.55vw,23px)}
+.ipa th{font:700 10.5px/1.2 var(--f-sans);color:var(--g400);text-transform:uppercase;letter-spacing:.04em;padding:6px 3px;cursor:pointer;user-select:none;transition:color .15s}
+.ipa th:hover{color:#fff}
+.ipa thead th{vertical-align:bottom;min-width:4.2em}
+.ipa th.row{text-align:right;padding-right:12px;white-space:nowrap}
+.ipa th.hl{color:var(--amber3)}
+.ipa td{border:1px solid var(--g800);width:2.15em;height:2.15em;text-align:center;padding:2px;background:#0b1220cc}
+.ipa td.l{border-right:1px dashed #1f293799}
+.ipa td.r{border-left:0}
+.ipa td.imp{background:repeating-linear-gradient(135deg,#1f2937 0 4px,#0f1623 4px 8px)}
+.ipa td.hl{background:#78350f33}
+.sym{width:100%;height:100%;min-height:1.7em;border:0;background:transparent;font:400 1em/1 var(--f-ipa);color:var(--g100);cursor:pointer;border-radius:6px;transition:background .15s,color .15s,opacity .2s;padding:0}
+.sym:hover{background:#3b82f62e;color:#fff}
+.sym.sel{background:var(--blue6)!important;color:#fff!important;opacity:1!important}
+.engOnly .sym:not(.en){opacity:.22}
+.engOnly .sym.en{color:var(--blue3)}
+.engOnly .vsym:not(.en){opacity:.22}
+.legend{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;font-size:12px;color:var(--g400)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:18px;height:14px;border:1px solid var(--g700);border-radius:3px;display:inline-block}
+.npwrap{display:flex;gap:22px;justify-content:center;flex-wrap:wrap}
+.others{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;align-items:center}
+.others .lab{font:700 10.5px var(--f-sans);color:var(--g400);text-transform:uppercase;letter-spacing:.05em;margin-right:4px}
+.others .sym{width:auto;min-width:2.3em;height:2.1em;padding:0 .3em;font-size:clamp(16px,1.55vw,23px);border:1px solid var(--g800);background:#0b1220cc}
+/* ---------- vowels ---------- */
+.vwrap{display:flex;justify-content:center}
+#vsvg{width:100%;max-width:760px;height:auto;touch-action:none;user-select:none}
+.vsym{cursor:pointer}
+.vsym text{font-family:var(--f-ipa);font-size:30px;fill:var(--g100);transition:fill .15s}
+.vsym circle.dot{fill:var(--g400)}
+.vsym:hover text{fill:#fff}
+.vsym .hit{fill:transparent}
+.vsym:hover .hit{fill:#3b82f62a}
+.vsym.sel .hit{fill:var(--blue6)}
+.vsym.sel text{fill:#fff}
+.engOnly .vsym.en text{fill:var(--blue3)}
+.dipr{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;align-items:center}
+.dipr .lab{font:700 10.5px var(--f-sans);color:var(--g400);text-transform:uppercase;letter-spacing:.05em}
+.dk{font:400 19px var(--f-ipa);background:#0b1220cc;border:1px solid var(--g700);border-radius:8px;padding:5px 12px;color:var(--g100);cursor:pointer}
+.dk small{font:500 11px var(--f-sans);color:var(--g400);margin-left:6px}
+.dk:hover{border-color:var(--blue5)}
+.dk.sel{background:var(--blue6);border-color:var(--blue5)}
+/* ---------- word builder ---------- */
+.wtop{display:flex;flex-direction:column;align-items:center;gap:12px;padding:6px 0 0}
+.trans{font:400 clamp(34px,4.6vw,58px)/1.15 var(--f-ipa);color:#fff;min-height:1.2em;text-align:center;word-break:break-all}
+.trans .sl{color:var(--g600)}
+.trans .ph{color:var(--g600);font-size:.5em;font-family:var(--f-sans)}
+.sylrow{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;min-height:86px;align-items:flex-start}
+.syl{border:1px solid var(--g700);border-radius:12px;padding:20px 8px 8px;display:flex;gap:5px;position:relative;background:#0b1220cc}
+.syl.st{border-color:#b45309;box-shadow:0 0 0 2px #b4530922}
+.syl .sh{position:absolute;top:3px;left:0;right:0;text-align:center;font:700 9px var(--f-sans);text-transform:uppercase;letter-spacing:.07em;color:var(--g500)}
+.syl.st .sh{color:var(--amber3)}
+.syl.bad{border-color:var(--rose4)}
+.tile{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:46px;height:54px;border-radius:9px;border:1px solid;cursor:pointer;padding:0 5px;transition:transform .12s,box-shadow .12s}
+.tile span{font:400 26px/1 var(--f-ipa);color:#fff}
+.tile i{font:700 8.5px var(--f-sans);font-style:normal;text-transform:uppercase;letter-spacing:.05em;margin-top:4px}
+.tile.on{background:#1e3a8a55;border-color:#3b82f6aa}.tile.on i{color:var(--blue3)}
+.tile.nu{background:#78350f55;border-color:#f59e0baa}.tile.nu i{color:var(--amber3)}
+.tile.co{background:#581c8755;border-color:#a855f7aa}.tile.co i{color:var(--purple4)}
+.tile.now{transform:translateY(-4px) scale(1.08);box-shadow:0 0 0 3px #fff8}
+.tile .x{position:absolute;top:-7px;right:-7px;width:17px;height:17px;border-radius:50%;background:var(--g700);color:var(--g200);border:0;font:700 11px/1 var(--f-sans);display:none;place-items:center;cursor:pointer;padding:0}
+.tile:hover .x{display:grid}
+.tile .x:hover{background:var(--rose4);color:#fff}
+.empty{color:var(--g500);font-size:13px;padding:24px 0;text-align:center}
+.verdict{border-radius:12px;padding:12px 16px;border:1px solid var(--g700);background:#0b1220cc;max-width:760px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:6px}
+.verdict .vh{font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.verdict .vd{font-size:13px;color:var(--g300);line-height:1.5}
+.verdict.real{border-color:var(--emerald6);background:#05966914}.verdict.real .vh{color:var(--emerald4)}
+.verdict.poss{border-color:#b45309;background:#b4530912}.verdict.poss .vh{color:var(--amber3)}
+.verdict.frn{border-color:#7c3aed;background:#7c3aed14}.verdict.frn .vh{color:var(--purple4)}
+.verdict.imp{border-color:#e11d48aa;background:#e11d4812}.verdict.imp .vh{color:var(--rose4)}
+.wordchip{font:700 16px var(--f-sans);color:#fff;background:var(--emerald6);border-radius:6px;padding:1px 9px}
+.lists{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:760px;width:100%;margin:0 auto}
+.lists>div{background:#0b1220aa;border:1px solid var(--g800);border-radius:10px;padding:9px 11px;min-width:0}
+.lists .sec{margin:0 0 6px}
+.wl{display:flex;flex-wrap:wrap;gap:5px}
+.wl button{background:var(--g800);border:1px solid var(--g700);border-radius:6px;padding:2px 8px;font-size:12px;color:var(--g200);cursor:pointer}
+.wl button:hover{border-color:var(--blue5);color:#fff}
+.wl button em{font-style:normal;font-family:var(--f-ipa);color:var(--g400);margin-left:5px}
+.wl .none{font-size:12px;color:var(--g500)}
+.pal{display:flex;flex-direction:column;gap:10px;max-width:980px;width:100%;margin:0 auto;padding-top:4px;border-top:1px solid var(--g800)}
+.prow{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.pg{display:flex;flex-direction:column;gap:4px}
+.pg .gl{font:700 9.5px var(--f-sans);text-transform:uppercase;letter-spacing:.08em;color:var(--g500);padding-left:2px}
+.pg .ks{display:flex;gap:4px;flex-wrap:wrap}
+.key{display:flex;flex-direction:column;align-items:center;justify-content:center;width:50px;height:50px;border-radius:9px;border:1px solid var(--g700);background:var(--g900);cursor:pointer;padding:0;transition:border-color .12s,background .12s,transform .08s}
+.key:hover{border-color:var(--blue5);background:#1e3a8a44}
+.key:active{transform:scale(.94)}
+.key b{font:400 22px/1 var(--f-ipa);color:#fff}
+.key i{font:500 9.5px var(--f-sans);color:var(--g400);font-style:normal;margin-top:3px;max-width:48px;overflow:hidden;white-space:nowrap}
+.key.v{border-color:#78350f}.key.v:hover{border-color:var(--amber4);background:#78350f44}
+.key.m b{color:var(--amber3)}
+.key.ctl b{font:700 15px var(--f-sans)}
+.inrow{display:flex;gap:6px}
+.inrow input{flex:1;min-width:0;background:var(--g950);border:1px solid var(--g700);border-radius:8px;padding:7px 10px;font-size:13px}
+.inrow input:focus{border-color:var(--blue5);outline:none}
+.credits a{background:var(--g800);border:1px solid var(--g700);border-radius:6px;padding:2px 7px;font:400 14px var(--f-ipa);color:var(--g200);text-decoration:none}
+.credits a:hover{border-color:var(--blue5);color:#fff}
+.recstat{font-size:11.5px;color:var(--g400);line-height:1.45;min-height:1em}
+.recstat a,.note a{color:var(--blue3)}
+.chal{border:1px solid #7c3aed88;background:#581c8722;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.chal .prompt{font-size:13px;color:var(--g300)}
+.chal .prompt b{font-size:22px;color:#fff;display:block;margin-top:2px}
+.chal .res{font-size:12.5px;line-height:1.5}
+.chal .res.ok{color:var(--emerald4)}.chal .res.no{color:var(--rose4)}.chal .res.mid{color:var(--amber3)}
+.chal .res span{font-family:var(--f-ipa);font-size:15px}
+.score{font:700 11px var(--f-sans);color:var(--purple4);text-transform:uppercase;letter-spacing:.06em}
+.rlegend{display:flex;gap:10px;font-size:11px;color:var(--g400);flex-wrap:wrap}
+.rlegend span{display:inline-flex;align-items:center;gap:4px}
+.rlegend i{width:10px;height:10px;border-radius:3px;display:inline-block;border:1px solid}
+/* vocal tract */
+.ar{fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:5 6;animation:flow .55s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-11}}
+.vib{animation:vib .07s linear infinite alternate;transform-box:fill-box;transform-origin:center}
+@keyframes vib{from{transform:scaleX(1)}to{transform:scaleX(.72)}}
+.vlab{font:600 7.5px var(--f-sans);fill:var(--g300);paint-order:stroke;stroke:#030712;stroke-width:2.6px;stroke-linejoin:round;pointer-events:none}
+@media (max-width:980px){body{overflow:auto;height:auto;min-height:100%}main{flex-direction:column}.panel{width:auto}.ws{overflow:visible}#vt{max-height:none}.lists{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}.ar,.vib{animation:none}}
+</style></head><body>
+<header>
+  <div class="brand">
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10c0-4 3.6-7 8-7s8 3 8 7c0 2-1 3.6-2.4 4.6L18 21h-5l-1-3"/><path d="M8.5 11.5c1.2 1.4 2.4 2 3.6 2s2.2-.6 3-1.6"/><path d="M2 15.5h1.5M2 18.5h3"/></svg></div>
+    <h1><span class="grad">Linguistic Alphabet</span> <span class="badge-v">v1.5</span></h1>
+  </div>
+  <div class="hctl">
+    <div class="seg" role="group" aria-label="View" data-seg="mode"><button data-v="C">Consonants</button><button data-v="V">Vowels</button><button data-v="W">Word Builder</button></div>
+    <div class="seg" role="group" aria-label="Highlight" data-seg="eng" id="engSeg"><span class="lbl">Show</span><button data-v="0">All IPA</button><button data-v="1">English</button></div>
+    <div class="seg" role="group" aria-label="Audio source" data-seg="aud"><span class="lbl">Audio</span><button data-v="rec" title="Real recordings from Wikimedia Commons (needs internet)">Recordings</button><button data-v="syn" title="Built-in formant synthesizer (works offline)">Synth</button></div>
+    <div class="seg" role="group" aria-label="Synth voice" data-seg="voice"><span class="lbl">Synth voice</span><button data-v="lo">Low</button><button data-v="hi">High</button></div>
+  </div>
+</header>
+<main>
+<section class="ws" id="ws" aria-label="Workspace">
+  <!-- Consonants -->
+  <div class="view" id="vC">
+    <div class="hint">The <b>pulmonic consonant chart</b>: columns are the <b>place</b> of articulation (lips at the left, throat at the right), rows are the <b>manner</b>. In each cell the left symbol is <b>voiceless</b>, the right is <b>voiced</b>. Click a symbol to see and hear it; click a row or column heading to learn the term.</div>
+    <div class="chartwrap"><table class="ipa" id="cTable"></table></div>
+    <div class="sec" style="text-align:center">Non-pulmonic consonants — made without air from the lungs (or with a moving larynx)</div>
+    <div class="npwrap" id="cNP"></div>
+    <div class="others" id="cOthers"></div>
+    <div class="legend"><span><i class="sw" style="background:#0b1220"></i>possible, but no IPA symbol</span><span><i class="sw" style="background:repeating-linear-gradient(135deg,#1f2937 0 4px,#0f1623 4px 8px)"></i>judged impossible to make</span></div>
+  </div>
+  <!-- Vowels -->
+  <div class="view" id="vV" hidden>
+    <div class="hint">The <b>vowel trapezoid</b> is a map of the tongue: up = tongue <b>high</b> (close), down = jaw <b>open</b>; left = tongue <b>front</b>, right = <b>back</b>. In each pair the left vowel has <b>spread</b> lips, the right <b>rounded</b>. Click a symbol, or <b>press and drag inside the trapezoid</b> to glide your tongue anywhere.</div>
+    <div class="vwrap"><svg id="vsvg" viewBox="0 0 560 380" aria-label="Vowel chart"></svg></div>
+    <div class="dipr" id="vDiph"></div>
+    <div class="dipr"><span class="lab">Free-drag lips</span><div class="seg" data-seg="round"><button data-v="0">Spread</button><button data-v="1">Rounded</button></div></div>
+  </div>
+  <!-- Word builder -->
+  <div class="view" id="vW" hidden>
+    <div class="hint">Tap sounds to <b>string them into a word</b>. Each sound is sorted into a syllable as <b>onset</b>, <b>nucleus</b> or <b>coda</b>, and the builder checks the result against English: a <b>real word</b>, a <b>possible</b> word English just doesn't use (like “blick”), or a sequence English <b>can't</b> have. Add <b>ˈ</b> before a syllable to stress it. Switch the palette to <b>All IPA</b> to build with every sound in the alphabet.</div>
+    <div class="wtop">
+      <div class="trans" id="wTrans"></div>
+      <div class="sylrow" id="wSyl"></div>
+      <div class="rlegend"><span><i style="background:#1e3a8a55;border-color:#3b82f6"></i>onset</span><span><i style="background:#78350f55;border-color:#f59e0b"></i>nucleus</span><span><i style="background:#581c8755;border-color:#a855f7"></i>coda</span></div>
+    </div>
+    <div class="verdict" id="wVerdict" hidden></div>
+    <div class="lists" id="wLists" hidden>
+      <div><div class="sec">Change one sound → minimal pairs</div><div class="wl" id="wMin"></div></div>
+      <div><div class="sec">Keep going → words that start this way</div><div class="wl" id="wComp"></div></div>
+    </div>
+    <div class="pal" id="wPal"></div>
+  </div>
+</section>
+<aside class="panel" aria-label="Vocal tract and details">
+  <div class="vtwrap">
+    <span class="vtcap">Vocal tract · side view</span>
+    <label class="lbltog"><input type="checkbox" id="lblChk" checked> Labels</label>
+    <svg id="vt" viewBox="0 0 262 272" aria-label="Side view of the vocal tract">
+      <defs>
+        <marker id="ahA" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#fbbf24"/></marker>
+        <marker id="ahB" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#60a5fa"/></marker>
+        <radialGradient id="glowG"><stop offset="0" stop-color="#fbbf24" stop-opacity=".7"/><stop offset="1" stop-color="#fbbf24" stop-opacity="0"/></radialGradient>
+      </defs>
+      <path d="M72,8 C42,12 26,40 28,70 L30,80 C26,86 20,92 15,98 C14,103 19,107 27,108 L38,110 C38,114 36,118 36,122 L34,190 C34,201 44,208 60,213 C90,223 130,229 160,233 L172,272 L262,272 L262,8 Z" fill="#1a2334" stroke="#4b5563" stroke-width="1"/>
+      <path d="M36,110 L44,103 C70,88 120,79 170,79 C196,79 211,86 213,98 L214,272 L189,272 L186,222 C160,224 110,214 72,196 L57,186 L30,186 L30,118 Z" fill="#05080f"/>
+      <path d="M188,224 C186,214 190,204 197,198" fill="none" stroke="#2c374b" stroke-width="5" stroke-linecap="round"/>
+      <path id="vtTongue" fill="#d9637f" stroke="#f9a8bc" stroke-width=".8"/>
+      <path id="vtLowTeeth" fill="#e5e7eb"/>
+      <path d="M38,111 C70,104 120,96 160,97 L161,108 C156,106 148,104 135,104 C110,104 88,112 76,124 C72,128 66,128 62,124 L57,124 L57,118 L38,114 Z" fill="#1a2334" stroke="#4b5563" stroke-width=".8"/>
+      <path id="vtVel" fill="none" stroke="#1a2334" stroke-width="10" stroke-linecap="round"/>
+      <path id="vtVelO" fill="none" stroke="#4b5563" stroke-width="1" stroke-dasharray="2 2"/>
+      <path d="M57,121 L62,121 L62,148 Q60,153 57,149 Z" fill="#e5e7eb"/>
+      <path id="vtUL" fill="#9f5f74" stroke="#c98da0" stroke-width=".8"/>
+      <path id="vtLL" fill="#9f5f74" stroke="#c98da0" stroke-width=".8"/>
+      <rect x="186" y="243" width="28" height="7" fill="#05080f"/>
+      <path id="vtFoldF" fill="#c98da0"/>
+      <path id="vtFoldB" fill="#c98da0"/>
+      <path id="vtArO" class="ar" stroke="#fbbf24" marker-end="url(#ahA)"/>
+      <path id="vtArN" class="ar" stroke="#fbbf24" marker-end="url(#ahA)"/>
+      <circle id="vtGlow" r="11" fill="url(#glowG)"/>
+      <g id="vtLabels">
+        <text class="vlab" x="98" y="92">nasal cavity</text>
+        <text class="vlab" x="100" y="102">hard palate</text>
+        <text class="vlab" x="46" y="123" text-anchor="end">alveolar</text>
+        <text class="vlab" x="46" y="131" text-anchor="end">ridge</text>
+        <text class="vlab" x="176" y="102">velum</text>
+        <text class="vlab" x="25" y="146" text-anchor="end">lips</text>
+        <text class="vlab" x="66" y="149">teeth</text>
+        <text class="vlab" x="120" y="182">tongue</text>
+        <text class="vlab" x="218" y="196">pharynx</text>
+        <text class="vlab" x="218" y="249">vocal folds</text>
+        <text class="vlab" x="218" y="257">(larynx)</text>
+      </g>
+    </svg>
+  </div>
+  <div class="readout" id="ro"></div>
+  <div class="pbody" id="pinfo"></div>
+</aside>
+</main>
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const lerp=(a,b,t)=>a+(b-a)*t, clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const SVGNS='http://www.w3.org/2000/svg';
+const f1=x=>(+x).toFixed(1);
+
+/* ================= Phonetic data ================= */
+const PLACES={bl:['Bilabial','Both lips come together.'],ld:['Labiodental','The lower lip touches the upper front teeth.'],dn:['Dental','The tongue tip touches the back of, or slips between, the upper teeth.'],al:['Alveolar','The tongue tip touches the alveolar ridge, the bump just behind the upper teeth.'],pa:['Postalveolar','The tongue blade rises just behind the alveolar ridge.'],rf:['Retroflex','The tongue tip curls up and back toward the hard palate.'],pl:['Palatal','The body of the tongue rises to the hard palate.'],vl:['Velar','The back of the tongue rises to the soft palate (velum).'],uv:['Uvular','The back of the tongue rises toward the uvula, at the very end of the soft palate.'],ph:['Pharyngeal','The tongue root pulls back toward the throat wall.'],gl:['Glottal','The vocal folds themselves make the sound.'],lv:['Labial-velar','The lips round while the back of the tongue rises, both at once.'],ep:['Epiglottal','The epiglottis squeezes back against the throat wall, low in the pharynx.'],alp:['Alveolo-palatal','The tongue blade and the front of the tongue body rise together just behind the alveolar ridge.'],lp:['Labial-palatal','The lips round while the tongue body rises to the hard palate, both at once.'],sx:['Postalveolar-velar','Two narrowings at once: behind the alveolar ridge and at the velum.']};
+const MANNERS={pl:['Plosive','The airflow is blocked completely, pressure builds behind the closure, and it is released in a small burst. (Also called a stop.)'],na:['Nasal','The mouth is blocked but the velum is lowered, so air flows out through the nose.'],tr:['Trill','One articulator vibrates rapidly against another in the airstream.'],tp:['Tap or flap','One very quick tap of one articulator against another.'],fr:['Fricative','Two articulators come so close that the air becomes turbulent and hissy.'],lf:['Lateral fricative','The tongue blocks the middle of the mouth and air hisses out over the sides.'],ap:['Approximant','The articulators approach each other, but not closely enough to cause turbulence. Smooth and vowel-like.'],la:['Lateral approximant','The tongue touches the middle of the mouth while air flows smoothly around its sides.'],af:['Affricate','A plosive released slowly into a fricative at the same place, like “ch” = t + sh.'],ck:['Click','No air from the lungs. The tongue makes two closures, pulls down to rarefy the air trapped between them, then the front closure pops open with a sharp snap.'],im:['Implosive','A voiced stop where the larynx drops during the closure, so air is sucked slightly inward before the release.'],ej:['Ejective','No air from the lungs. The glottis shuts, the larynx rises like a piston, and the squeezed air pops out sharply.'],lt:['Lateral flap','One quick tap of the tongue while air slips over its sides.']};
+const PORDER=['bl','ld','dn','al','pa','rf','pl','vl','uv','ph','gl'];
+const MORDER=['pl','na','tr','tp','fr','lf','ap','la'];
+const IMP=new Set(['pl-ph-l','pl-ph-r','pl-gl-r','na-ph-l','na-ph-r','na-gl-l','na-gl-r','tr-vl-l','tr-vl-r','tr-gl-l','tr-gl-r','tp-vl-l','tp-vl-r','tp-gl-l','tp-gl-r','lf-bl-l','lf-bl-r','lf-ld-l','lf-ld-r','lf-ph-l','lf-ph-r','lf-gl-l','lf-gl-r','la-bl-l','la-bl-r','la-ld-l','la-ld-r','la-ph-l','la-ph-r','la-gl-l','la-gl-r','ap-gl-l','ap-gl-r']);
+
+const CDATA=`p|0|bl|pl|1|English “<b>p</b>in”
+b|1|bl|pl|1|English “<b>b</b>in”
+t|0|al|pl|1|English “<b>t</b>in”
+d|1|al|pl|1|English “<b>d</b>in”
+ʈ|0|rf|pl|0|Hindi <b>ṭ</b>opī “hat”
+ɖ|1|rf|pl|0|Hindi <b>ḍ</b>ibbā “box”
+c|0|pl|pl|0|Hungarian <b>ty</b>úk “hen”
+ɟ|1|pl|pl|0|Hungarian <b>gy</b>ár “factory”
+k|0|vl|pl|1|English “<b>c</b>at”
+ɡ|1|vl|pl|1|English “<b>g</b>o”
+q|0|uv|pl|0|Arabic <b>q</b>alb “heart”
+ɢ|1|uv|pl|0|Rare; heard in some Persian speech
+ʔ|0|gl|pl|0|English “uh<b>-</b>oh” — the catch in the middle (a <b>glottal stop</b>)
+m|1|bl|na|1|English “<b>m</b>an”
+ɱ|1|ld|na|0|English “co<b>m</b>fort” (an m right before f)
+n|1|al|na|1|English “<b>n</b>o”
+ɳ|1|rf|na|0|Tamil and Marathi <b>ṇ</b>
+ɲ|1|pl|na|0|Spanish a<b>ñ</b>o “year”
+ŋ|1|vl|na|1|English “si<b>ng</b>”
+ɴ|1|uv|na|0|Japanese sa<b>n</b> (word-final ん)
+ʙ|1|bl|tr|0|Rare; Kele (Papua New Guinea) — also the “brrr” shiver
+r|1|al|tr|0|Spanish pe<b>rr</b>o “dog”
+ʀ|1|uv|tr|0|Some German speakers’ <b>r</b>ot “red”
+ⱱ|1|ld|tp|0|Rare; Mono (Central Africa)
+ɾ|1|al|tp|0|American English “bu<b>tt</b>er”, Spanish pe<b>r</b>o “but”
+ɽ|1|rf|tp|0|Hindi ba<b>ṛ</b>ā “big”
+ɸ|0|bl|fr|0|Japanese <b>F</b>uji
+β|1|bl|fr|0|Spanish lo<b>b</b>o “wolf”
+f|0|ld|fr|1|English “<b>f</b>an”
+v|1|ld|fr|1|English “<b>v</b>an”
+θ|0|dn|fr|1|English “<b>th</b>in”
+ð|1|dn|fr|1|English “<b>th</b>is”
+s|0|al|fr|1|English “<b>s</b>ip”
+z|1|al|fr|1|English “<b>z</b>ip”
+ʃ|0|pa|fr|1|English “<b>sh</b>ip”
+ʒ|1|pa|fr|1|English “mea<b>s</b>ure”
+ʂ|0|rf|fr|0|Mandarin <b>sh</b>ū “book”
+ʐ|1|rf|fr|0|Mandarin <b>r</b>è “hot” (for many speakers)
+ç|0|pl|fr|0|German i<b>ch</b> “I”
+ʝ|1|pl|fr|0|Spanish ma<b>y</b>o (many accents)
+x|0|vl|fr|0|Scottish “lo<b>ch</b>”, Spanish <b>j</b>ota
+ɣ|1|vl|fr|0|Spanish la<b>g</b>o “lake”
+χ|0|uv|fr|0|Arabic and Hebrew “kh” in many dialects
+ʁ|1|uv|fr|0|French <b>r</b>ouge “red”
+ħ|0|ph|fr|0|Arabic <b>ḥ</b> in ḥabībī
+ʕ|1|ph|fr|0|Arabic ʿayn in <b>ʿ</b>arabī
+h|0|gl|fr|1|English “<b>h</b>at”
+ɦ|1|gl|fr|0|Czech <b>h</b>rad “castle”; English “a<b>h</b>ead” (often)
+ɬ|0|al|lf|0|Welsh <b>Ll</b>anelli
+ɮ|1|al|lf|0|Zulu <b>dl</b>ala “play”
+ʋ|1|ld|ap|0|Dutch <b>w</b>at “what”; Hindi v/w
+ɹ|1|al|ap|1|English “<b>r</b>ed”
+ɻ|1|rf|ap|0|Tamil <b>ḻ</b> in Tami<b>ḻ</b>
+j|1|pl|ap|1|English “<b>y</b>es”
+ɰ|1|vl|ap|0|Spanish a<b>g</b>ua (soft g, often)
+l|1|al|la|1|English “<b>l</b>eaf”
+ɭ|1|rf|la|0|Tamil and Marathi <b>ḷ</b>
+ʎ|1|pl|la|0|Italian fi<b>gl</b>io “son”
+ʟ|1|vl|la|0|Rare; Mid-Waghi (Papua New Guinea)
+w|1|lv|ap|1|English “<b>w</b>e”
+ʍ|0|lv|fr|0|“<b>wh</b>ich” in Scottish accents
+tʃ|0|pa|af|1|English “<b>ch</b>urch”
+dʒ|1|pa|af|1|English “<b>j</b>u<b>dg</b>e”
+ts|0|al|af|0|German <b>Z</b>eit “time”
+dz|1|al|af|0|Italian <b>z</b>ero (often)
+ʘ|0|bl|ck|0|Rare; ǂHõã and Taa (Botswana) — a “kiss” sound
+ǀ|0|dn|ck|0|Zulu <b>c</b>ela “ask”; English “tsk-tsk”
+ǃ|0|al|ck|0|Zulu i<b>q</b>anda “egg”
+ǂ|0|pl|ck|0|Nama (Namibia) — a sharp “pop” off the palate
+ǁ|0|al|ck|0|Zulu i<b>x</b>oxo “frog”; the “giddy-up” click to a horse
+ɓ|1|bl|im|0|Hausa <b>ɓ</b>arawo “thief”
+ɗ|1|al|im|0|Hausa <b>ɗ</b>aki “room”
+ʄ|1|pl|im|0|Sindhi; Serer (West Africa)
+ɠ|1|vl|im|0|Sindhi (Pakistan and India)
+ʛ|1|uv|im|0|Rare; Mam (Guatemala)
+pʼ|0|bl|ej|0|Georgian <b>პ</b>ური pʼuri “bread”
+tʼ|0|al|ej|0|Georgian <b>ტ</b>ყე tʼqʼe “forest”
+kʼ|0|vl|ej|0|Georgian <b>კ</b>ატა kʼatʼa “cat”
+sʼ|0|al|ej|0|Amharic <b>ጸ</b> — an ejective s
+ɥ|1|lp|ap|0|French <b>hu</b>it “eight”
+ʜ|0|ep|fr|0|Rare; Agul (Caucasus) and some Arabic dialects
+ʢ|1|ep|fr|0|Rare; Agul (Caucasus) and some Arabic dialects
+ʡ|0|ep|pl|0|Rare; Agul (Caucasus) — a stop made with the epiglottis
+ɕ|0|alp|fr|0|Mandarin <b>x</b>iè “thanks”; Polish <b>ś</b>
+ʑ|1|alp|fr|0|Polish <b>ź</b>le “badly”
+ɺ|1|al|lt|0|Japanese <b>r</b> in sora “sky” (often)
+ɧ|0|sx|fr|0|Swedish <b>sj</b>ö “lake”`;
+const CN={};
+CDATA.split('\n').forEach(l=>{const[s,v,place,manner,eng,ex]=l.split('|');CN[s]={s,type:'C',v:v==='1',place,manner,eng:eng==='1',ex}});
+
+const VDATA=`i|1|0|0|1|280 2250 2900|English “s<b>ee</b>”
+y|1|0|1|0|280 1850 2200|French t<b>u</b> “you”; German <b>ü</b>ber
+ɨ|1|.5|0|0|300 1650 2400|Russian т<b>ы</b> “you”; Polish <b>y</b>
+ʉ|1|.5|1|0|300 1450 2250|Norwegian h<b>u</b>s “house”
+ɯ|1|1|0|0|300 1250 2400|Turkish k<b>ı</b>z “girl”
+u|1|1|1|1|300 850 2250|English “f<b>oo</b>d”
+ɪ|.85|.15|0|1|400 1950 2550|English “s<b>i</b>t”
+ʏ|.85|.15|1|0|400 1650 2300|German h<b>ü</b>bsch “pretty”
+ʊ|.85|.85|1|1|450 1050 2350|English “b<b>oo</b>k”
+e|.667|0|0|1|400 2100 2700|Spanish m<b>e</b>sa; start of English “d<b>a</b>y” /eɪ/
+ø|.667|0|1|0|400 1600 2300|French p<b>eu</b> “little”; German sch<b>ö</b>n
+ɘ|.667|.5|0|0|420 1650 2450|New Zealand English “k<b>i</b>t”
+ɵ|.667|.5|1|0|420 1350 2350|Swedish f<b>u</b>ll “full”
+ɤ|.667|1|0|0|450 1200 2450|Mandarin <b>è</b> 饿 “hungry”
+o|.667|1|1|1|430 850 2400|Spanish n<b>o</b>; start of English “g<b>o</b>” /oʊ/
+ə|.5|.5|0|1|500 1500 2500|English “<b>a</b>bout” — the unstressed “schwa”
+ɛ|.333|0|0|1|580 1800 2550|English “b<b>e</b>d”
+œ|.333|0|1|0|580 1550 2400|French p<b>eu</b>r “fear”
+ɜ|.333|.5|0|0|580 1500 2450|British English “n<b>ur</b>se”
+ɞ|.333|.5|1|0|580 1300 2400|Rare; some Irish English
+ʌ|.333|1|0|1|620 1200 2450|English “c<b>u</b>p”
+ɔ|.333|1|1|1|580 880 2450|English “th<b>ough</b>t” (many accents)
+æ|.15|0|0|1|700 1650 2500|English “c<b>a</b>t”
+ɐ|.17|.5|0|0|700 1400 2500|German Butt<b>er</b> (final -er)
+a|0|0|0|0|800 1500 2600|French p<b>a</b>tte; Spanish c<b>a</b>sa
+ɶ|0|0|1|0|780 1350 2450|Rare; some Danish varieties
+ɑ|0|1|0|1|750 1100 2500|English “f<b>a</b>ther”, “sp<b>a</b>”
+ɒ|0|1|1|0|700 950 2450|British English “l<b>o</b>t”
+ɝ|.5|.55|0|1|480 1350 1650|English “b<b>ir</b>d” — an r-colored vowel (stressed)
+ɚ|.5|.5|0|1|480 1350 1650|English “butt<b>er</b>” — an r-colored vowel (unstressed)`;
+const VW={};
+VDATA.split('\n').forEach(l=>{const[s,h,b,r,eng,F,ex]=l.split('|');VW[s]={s,type:'V',h:+h,b:+b,rd:r==='1',eng:eng==='1',F:F.split(' ').map(Number),ex,rc:s==='ɝ'||s==='ɚ'}});
+const DIPH={eɪ:['e','ɪ','English “d<b>ay</b>”'],aɪ:['a','ɪ','English “m<b>y</b>”'],aʊ:['a','ʊ','English “n<b>ow</b>”'],ɔɪ:['ɔ','ɪ','English “b<b>oy</b>”'],oʊ:['o','ʊ','English “g<b>o</b>”']};
+for(const k in DIPH)VW[k]={s:k,type:'D',parts:[DIPH[k][0],DIPH[k][1]],eng:true,ex:DIPH[k][2],F:VW[DIPH[k][0]].F,h:VW[DIPH[k][0]].h,b:VW[DIPH[k][0]].b,rd:VW[DIPH[k][0]].rd};
+const PH=Object.assign({},CN,VW);
+const ALLO={'ʔ':'In English the glottal stop is not a separate phoneme, but it is everywhere: “uh-oh”, and many speakers say “button” as [ˈbʌʔn̩] — an <b>allophone</b> of /t/.','ɾ':'In American English the flap is how /t/ and /d/ are usually said between vowels: “butter” [ˈbʌɾɚ], “city”, “ladder” — an <b>allophone</b>, not a separate phoneme.'};
+const AIR={ck:['Velaric','No lung air: the tongue traps and rarefies a pocket of air.'],ej:['Glottalic ↑','No lung air: the closed glottis rises and pushes the air out.'],im:['Glottalic ↓','The larynx lowers during the closure while the folds keep vibrating.']};
+const isV=s=>!!VW[s];
+const MARKS=new Set(['ˈ','ˌ','.']);
+
+function hName(h){return h>=.95?'close':h>=.8?'near-close':h>=.6?'close-mid':h>=.45?'mid':h>=.3?'open-mid':h>=.1?'near-open':'open'}
+function bName(b){return b<=.05?'front':b<=.3?'near-front':b<=.6?'central':b<=.9?'near-back':'back'}
+function phName(p){
+  if(p.type==='C'){
+    const NM={'w':'voiced labial-velar approximant','ʍ':'voiceless labial-velar fricative','ʘ':'bilabial click','ǀ':'dental click','ǃ':'(post)alveolar click','ǂ':'palatoalveolar click','ǁ':'alveolar lateral click','ɧ':'voiceless postalveolar-velar fricative','sʼ':'alveolar ejective fricative'};
+    if(NM[p.s])return NM[p.s];
+    if(p.manner==='ej')return PLACES[p.place][0].toLowerCase()+' ejective';
+    return (p.v?'voiced ':'voiceless ')+PLACES[p.place][0].toLowerCase()+' '+(MANNERS[p.manner][0].toLowerCase().replace('tap or flap','tap'));
+  }
+  if(p.type==='D')return 'diphthong: '+p.parts[0]+' gliding to '+p.parts[1];
+  if(p.rc)return 'r-colored mid central vowel';
+  return hName(p.h)+' '+bName(p.b)+' '+(p.rd?'rounded':'unrounded')+' vowel';
+}
+function shortName(p){
+  if(!p)return '';
+  if(p.type==='C'){const m={pl:'stop',na:'nasal',tr:'trill',tp:'tap',fr:'fric.',lf:'lat. fric.',ap:'approx.',la:'lateral',af:'affric.',ck:'click',im:'implos.',ej:'eject.',lt:'lat. flap'}[p.manner];
+    return (p.manner==='ck'||p.manner==='ej'?'':p.v?'vd ':'vl ')+(p.s==='w'||p.s==='ʍ'?'lab-vel':PLACES[p.place][0].slice(0,4).toLowerCase()+'.')+' '+m}
+  if(p.type==='D')return 'diphthong';
+  return p.rc?'r-colored':(hName(p.h)+' '+bName(p.b));
+}
+
+/* ================= Dictionary (General American, broad) ================= */
+const DTXT=`cat:kæt,bat:bæt,hat:hæt,mat:mæt,sat:sæt,rat:ɹæt,fat:fæt,pat:pæt,cap:kæp,map:mæp,nap:næp,tap:tæp,bad:bæd,sad:sæd,mad:mæd,dad:dæd,man:mæn,pan:pæn,fan:fæn,can:kæn,ran:ɹæn,van:væn,jam:dʒæm,bag:bæg,back:bæk,black:blæk,snack:snæk,track:tɹæk,hand:hænd,and:ænd,ask:æsk,laugh:læf,half:hæf,class:klæs,glass:glæs,grass:gɹæs,path:pæθ,math:mæθ,bath:bæθ,that:ðæt,than:ðæn,thank:θæŋk,splash:splæʃ,
+bit:bɪt,sit:sɪt,hit:hɪt,fit:fɪt,pit:pɪt,kit:kɪt,big:bɪg,pig:pɪg,dig:dɪg,fish:fɪʃ,dish:dɪʃ,wish:wɪʃ,ship:ʃɪp,chip:tʃɪp,lip:lɪp,hip:hɪp,tip:tɪp,sip:sɪp,win:wɪn,pin:pɪn,tin:tɪn,thin:θɪn,sing:sɪŋ,ring:ɹɪŋ,king:kɪŋ,thing:θɪŋ,think:θɪŋk,drink:dɹɪŋk,spring:spɹɪŋ,this:ðɪs,milk:mɪlk,give:gɪv,live:lɪv,is:ɪz,it:ɪt,in:ɪn,with:wɪð,sixth:sɪksθ,
+beat:bit,seat:sit,heat:hit,feet:fit,meet:mit,meat:mit,eat:it,bead:bid,read:ɹid,reed:ɹid,need:nid,knead:nid,seed:sid,see:si,sea:si,me:mi,be:bi,bee:bi,tea:ti,key:ki,three:θɹi,tree:tɹi,free:fɹi,green:gɹin,queen:kwin,teeth:tiθ,cheese:tʃiz,jeans:dʒinz,leaf:lif,sheep:ʃip,sleep:slip,deep:dip,keep:kip,peace:pis,piece:pis,street:stɹit,scream:skɹim,breathe:bɹið,
+bet:bɛt,set:sɛt,get:gɛt,net:nɛt,pet:pɛt,wet:wɛt,let:lɛt,met:mɛt,bed:bɛd,red:ɹɛd,head:hɛd,said:sɛd,bread:bɹɛd,breath:bɹɛθ,egg:ɛg,leg:lɛg,ten:tɛn,hen:hɛn,pen:pɛn,men:mɛn,then:ðɛn,when:wɛn,best:bɛst,nest:nɛst,rest:ɹɛst,vest:vɛst,desk:dɛsk,help:hɛlp,friend:fɹɛnd,yes:jɛs,check:tʃɛk,neck:nɛk,texts:tɛksts,strength:stɹɛŋθ,
+bait:beɪt,gate:geɪt,late:leɪt,eight:eɪt,ate:eɪt,wait:weɪt,weight:weɪt,date:deɪt,made:meɪd,maid:meɪd,day:deɪ,say:seɪ,play:pleɪ,rain:ɹeɪn,train:tɹeɪn,name:neɪm,game:geɪm,same:seɪm,take:teɪk,make:meɪk,cake:keɪk,lake:leɪk,snake:sneɪk,face:feɪs,place:pleɪs,wave:weɪv,tail:teɪl,tale:teɪl,mail:meɪl,male:meɪl,sail:seɪl,sale:seɪl,great:gɹeɪt,grate:gɹeɪt,they:ðeɪ,bathe:beɪð,
+hot:hɑt,not:nɑt,knot:nɑt,pot:pɑt,got:gɑt,lot:lɑt,dot:dɑt,top:tɑp,stop:stɑp,shop:ʃɑp,mop:mɑp,box:bɑks,fox:fɑks,rock:ɹɑk,sock:sɑk,clock:klɑk,car:kɑɹ,star:stɑɹ,far:fɑɹ,park:pɑɹk,dark:dɑɹk,heart:hɑɹt,part:pɑɹt,arm:ɑɹm,yard:jɑɹd,spa:spɑ,
+dog:dɔg,law:lɔ,saw:sɔ,thought:θɔt,caught:kɔt,talk:tɔk,walk:wɔk,call:kɔl,ball:bɔl,tall:tɔl,fall:fɔl,all:ɔl,small:smɔl,long:lɔŋ,song:sɔŋ,strong:stɹɔŋ,wrong:ɹɔŋ,off:ɔf,cross:kɹɔs,boss:bɔs,more:mɔɹ,door:dɔɹ,four:fɔɹ,for:fɔɹ,horse:hɔɹs,north:nɔɹθ,born:bɔɹn,corn:kɔɹn,
+boat:boʊt,coat:koʊt,goat:goʊt,road:ɹoʊd,rode:ɹoʊd,rowed:ɹoʊd,home:hoʊm,phone:foʊn,bone:boʊn,stone:stoʊn,snow:snoʊ,go:goʊ,no:noʊ,know:noʊ,so:soʊ,sew:soʊ,show:ʃoʊ,slow:sloʊ,grow:gɹoʊ,nose:noʊz,knows:noʊz,rose:ɹoʊz,rows:ɹoʊz,hole:hoʊl,whole:hoʊl,cold:koʊld,old:oʊld,clothes:kloʊðz,
+book:bʊk,look:lʊk,cook:kʊk,good:gʊd,wood:wʊd,would:wʊd,foot:fʊt,put:pʊt,full:fʊl,pull:pʊl,push:pʊʃ,could:kʊd,should:ʃʊd,
+boot:but,food:fud,mood:mud,moon:mun,soon:sun,spoon:spun,room:ɹum,school:skul,cool:kul,pool:pul,rule:ɹul,blue:blu,blew:blu,new:nu,knew:nu,two:tu,too:tu,to:tu,shoe:ʃu,true:tɹu,you:ju,zoo:zu,juice:dʒus,cute:kjut,few:fju,
+but:bʌt,cut:kʌt,nut:nʌt,shut:ʃʌt,hut:hʌt,bus:bʌs,fun:fʌn,sun:sʌn,son:sʌn,run:ɹʌn,one:wʌn,won:wʌn,bug:bʌg,rug:ɹʌg,cup:kʌp,up:ʌp,love:lʌv,come:kʌm,some:sʌm,sum:sʌm,jump:dʒʌmp,duck:dʌk,luck:lʌk,truck:tɹʌk,judge:dʒʌdʒ,thumb:θʌm,young:jʌŋ,
+bird:bɝd,word:wɝd,girl:gɝl,turn:tɝn,learn:lɝn,work:wɝk,first:fɝst,her:hɝ,fur:fɝ,nurse:nɝs,shirt:ʃɝt,church:tʃɝtʃ,
+bite:baɪt,kite:kaɪt,night:naɪt,knight:naɪt,light:laɪt,right:ɹaɪt,write:ɹaɪt,white:waɪt,time:taɪm,nine:naɪn,line:laɪn,fine:faɪn,five:faɪv,my:maɪ,eye:aɪ,I:aɪ,buy:baɪ,by:baɪ,bye:baɪ,fly:flaɪ,sky:skaɪ,why:waɪ,high:haɪ,ice:aɪs,nice:naɪs,rice:ɹaɪs,mice:maɪs,like:laɪk,bike:baɪk,side:saɪd,ride:ɹaɪd,
+house:haʊs,mouse:maʊs,out:aʊt,now:naʊ,cow:kaʊ,how:haʊ,down:daʊn,town:taʊn,brown:bɹaʊn,loud:laʊd,cloud:klaʊd,round:ɹaʊnd,sound:saʊnd,mouth:maʊθ,south:saʊθ,our:aʊɚ,hour:aʊɚ,
+boy:bɔɪ,toy:tɔɪ,joy:dʒɔɪ,coin:kɔɪn,oil:ɔɪl,noise:nɔɪz,voice:vɔɪs,choice:tʃɔɪs,point:pɔɪnt,
+there:ðɛɹ,their:ðɛɹ,where:wɛɹ,wear:wɛɹ,hair:hɛɹ,hare:hɛɹ,bear:bɛɹ,bare:bɛɹ,pair:pɛɹ,pear:pɛɹ,care:kɛɹ,chair:tʃɛɹ,here:hɪɹ,hear:hɪɹ,near:nɪɹ,ear:ɪɹ,deer:dɪɹ,dear:dɪɹ,year:jɪɹ,
+apple:ˈæ.pəl,happy:ˈhæ.pi,father:ˈfɑ.ðɚ,mother:ˈmʌ.ðɚ,brother:ˈbɹʌ.ðɚ,money:ˈmʌ.ni,open:ˈoʊ.pən,music:ˈmju.zɪk,water:ˈwɑ.tɚ,better:ˈbɛ.tɚ,butter:ˈbʌ.tɚ,letter:ˈlɛ.tɚ,sister:ˈsɪs.tɚ,teacher:ˈti.tʃɚ,doctor:ˈdɑk.tɚ,paper:ˈpeɪ.pɚ,tiger:ˈtaɪ.gɚ,summer:ˈsʌ.mɚ,winter:ˈwɪn.tɚ,number:ˈnʌm.bɚ,color:ˈkʌ.lɚ,sugar:ˈʃʊ.gɚ,measure:ˈmɛ.ʒɚ,treasure:ˈtɹɛ.ʒɚ,vision:ˈvɪ.ʒən,nation:ˈneɪ.ʃən,ocean:ˈoʊ.ʃən,flower:ˈflaʊ.ɚ,flour:ˈflaʊ.ɚ,about:əˈbaʊt,banana:bəˈnæ.nə,tomato:təˈmeɪ.toʊ,potato:pəˈteɪ.toʊ,elephant:ˈɛ.lə.fənt,animal:ˈæ.nə.məl,family:ˈfæ.mə.li,computer:kəmˈpju.tɚ,telephone:ˈtɛ.lə.foʊn,alphabet:ˈæl.fə.bɛt,language:ˈlæŋ.gwɪdʒ,English:ˈɪŋ.glɪʃ,phonetics:fəˈnɛ.tɪks,science:ˈsaɪ.əns,garden:ˈgɑɹ.dən,window:ˈwɪn.doʊ,yellow:ˈjɛ.loʊ,purple:ˈpɝ.pəl,orange:ˈɔɹ.ɪndʒ,rabbit:ˈɹæ.bɪt,monkey:ˈmʌŋ.ki,zebra:ˈzi.bɹə,pizza:ˈpit.sə,chicken:ˈtʃɪ.kən,kitchen:ˈkɪ.tʃən,button:ˈbʌ.tən,baby:ˈbeɪ.bi,city:ˈsɪ.ti,pretty:ˈpɹɪ.ti,little:ˈlɪ.təl,people:ˈpi.pəl,table:ˈteɪ.bəl,candle:ˈkæn.dəl,giant:ˈdʒaɪ.ənt,zero:ˈzɪ.ɹoʊ,very:ˈvɛ.ɹi,squirrel:ˈskwɝ.əl,thirsty:ˈθɝs.ti`;
+
+/* English inventory used to read transcriptions */
+const ENG_C=['p','b','t','d','k','ɡ','tʃ','dʒ','f','v','θ','ð','s','z','ʃ','ʒ','h','m','n','ŋ','l','ɹ','w','j'];
+const ENG_V=['i','ɪ','ɛ','æ','ɑ','ɔ','ʊ','u','ʌ','ə','ɝ','ɚ','eɪ','aɪ','aʊ','ɔɪ','oʊ'];
+const ENG_SET=new Set(ENG_C.concat(ENG_V));
+const TOKSYM=ENG_C.concat(ENG_V).concat(['ˈ','ˌ','.']).sort((a,b)=>b.length-a.length);
+function tokenize(str){
+  str=String(str).replace(/g/g,'ɡ').replace(/r/g,'ɹ').replace(/[\/\[\]\s]/g,'').replace(/'/g,'ˈ');
+  const out=[];let i=0;
+  while(i<str.length){const m=TOKSYM.find(s=>str.startsWith(s,i));if(!m){i++;continue}out.push(m);i+=m.length}
+  return out;
+}
+const segsOf=t=>t.filter(x=>!MARKS.has(x));
+const keyOf=t=>segsOf(t).join(' ');
+const DICT=[],BYKEY=new Map(),BYWORD=new Map();
+DTXT.replace(/\n/g,'').split(',').forEach(e=>{const i=e.indexOf(':');const w=e.slice(0,i),ipa=e.slice(i+1);if(!w)return;
+  const toks=tokenize(ipa),key=keyOf(toks),d={w,toks,key,segs:segsOf(toks)};DICT.push(d);
+  if(!BYKEY.has(key))BYKEY.set(key,[]);BYKEY.get(key).push(d);BYWORD.set(w.toLowerCase(),d)});
+
+/* ================= Phonotactics ================= */
+const VOICELESS=new Set(['p','t','k','f','θ','s','ʃ','tʃ','h']);
+const SONOR=new Set(['m','n','ŋ','l','ɹ']);
+const ONS2=new Set('pl bl kl ɡl fl sl pɹ bɹ tɹ dɹ kɹ ɡɹ fɹ θɹ ʃɹ tw dw kw ɡw sw θw sp st sk sm sn sf pj bj kj ɡj fj vj mj hj spl spɹ stɹ skɹ skw spj skj'.split(' '));
+const CODA2=new Set('mp nt nd ŋk ns nz ntʃ ndʒ ŋθ nθ mθ ft pt kt st sk sp ks ps fθ'.split(' '));
+const LAX=new Set(['ɪ','ɛ','æ','ʊ','ʌ']);
+const sl=a=>'/'+a.join('')+'/';
+function onsetCheck(c,nuc){
+  if(!c.length)return null;
+  if(c.length===1)return c[0]==='ŋ'?'/ŋ/ never begins an English syllable (it only comes after a vowel, as in “sing”).':null;
+  for(let i=0;i<c.length-1;i++)if(c[i]===c[i+1])return 'English doesn’t double a consonant inside one syllable ('+sl(c)+').';
+  if(!ONS2.has(c.join('')))return sl(c)+' isn’t an English onset — no English word begins a syllable with that cluster.';
+  if(c[c.length-1]==='j'&&!['u','ʊ','ɚ','ɝ'].includes(nuc))return 'A consonant + /j/ cluster only comes before /u/ (as in “cute”, “music”), not before '+sl([nuc])+'.';
+  return null;
+}
+function codaCore(r){
+  if(r.length<=1)return true;
+  if(CODA2.has(r.join('')))return true;
+  const last=r[r.length-1],prev=r[r.length-2];
+  if(last==='θ')return codaCore(r.slice(0,-1));
+  if((last==='s'||last==='t')&&(VOICELESS.has(prev)||(last==='t'&&SONOR.has(prev))))return codaCore(r.slice(0,-1));
+  if((last==='z'||last==='d')&&!VOICELESS.has(prev))return codaCore(r.slice(0,-1));
+  return false;
+}
+function codaCheck(c){
+  if(!c.length)return null;
+  for(const x of c)if(x==='h'||x==='j'||x==='w')return '/'+x+'/ never ends an English syllable — it only appears before a vowel.';
+  for(let i=0;i<c.length-1;i++)if(c[i]===c[i+1])return 'English doesn’t double a consonant inside one syllable ('+sl(c)+').';
+  let r=c.slice();if(r[0]==='ɹ')r.shift();if(r[0]==='l')r.shift();
+  if(!codaCore(r))return sl(c)+' isn’t a possible English coda — no English syllable ends with that cluster.';
+  return null;
+}
+/* split a cluster between two vowels: maximal legal onset with a legal coda */
+const ALT=x=>x==='ɾ'||x==='ʔ'?'t':x;
+function splitCluster(c,nextNuc){
+  c=c.map(ALT);
+  for(let k=0;k<=c.length;k++){const co=c.slice(0,k),on=c.slice(k);if(!onsetCheck(on,nextNuc)&&!codaCheck(co))return k}
+  return -1;
+}
+function autoSyl(segs){
+  const nuc=[];segs.forEach((s,i)=>{if(isV(s))nuc.push(i)});
+  if(!nuc.length)return [{on:segs.slice(),nu:[],co:[],bad:true}];
+  const syls=nuc.map(n=>({on:[],nu:[segs[n]],co:[]}));
+  syls[0].on=segs.slice(0,nuc[0]);
+  syls[syls.length-1].co=segs.slice(nuc[nuc.length-1]+1);
+  for(let k=0;k<nuc.length-1;k++){
+    const c=segs.slice(nuc[k]+1,nuc[k+1]);let s=splitCluster(c,segs[nuc[k+1]]);
+    if(s<0){const eng=c.every(x=>ENG_SET.has(x)||x==='ɾ'||x==='ʔ');s=Math.max(0,c.length-1);if(eng)syls[k+1].bad=true}
+    syls[k].co=c.slice(0,s);syls[k+1].on=c.slice(s);
+  }
+  return syls;
+}
+/* tokens -> syllables (respects user's ˈ ˌ . marks), each item keeps token index */
+function syllabify(tok){
+  const chunks=[];let cur={st:0,items:[]};
+  tok.forEach((t,i)=>{
+    if(t==='.'||t==='ˈ'||t==='ˌ'){if(cur.items.length)chunks.push(cur);cur={st:t==='ˈ'?1:t==='ˌ'?2:0,items:[]};return}
+    cur.items.push({s:t,i});
+  });
+  if(cur.items.length||!chunks.length)chunks.push(cur);
+  const out=[];
+  chunks.forEach(ch=>{
+    const segs=ch.items.map(x=>x.s);if(!segs.length)return;
+    const syl=autoSyl(segs);let p=0;
+    syl.forEach((sy,k)=>{
+      const mk=arr=>arr.map(()=>ch.items[p++]);
+      out.push({st:k===0?ch.st:0,on:mk(sy.on),nu:mk(sy.nu),co:mk(sy.co),bad:!!sy.bad});
+    });
+  });
+  return out;
+}
+function judge(tok){
+  const segs=segsOf(tok);if(!segs.length)return null;
+  const key=segs.join(' ');
+  if(BYKEY.has(key))return {kind:'real',words:BYKEY.get(key)};
+  const foreign=[...new Set(segs.filter(x=>!ENG_SET.has(x)&&x!=='ɾ'&&x!=='ʔ'))];
+  if(foreign.length)return {kind:'frn',list:foreign};
+  for(let k=0;k<segs.length;k++)if(segs[k]==='ɾ'){const a=segs[k-1],b=segs[k+1];if(!(a&&(isV(a)||a==='ɹ')&&b&&isV(b)))return {kind:'imp',why:'The flap [ɾ] only happens <b>between vowels</b> in English, as in “butter” [ˈbʌɾɚ] and “city” [ˈsɪɾi].'}}
+  if(segs.some(x=>x==='ɾ'||x==='ʔ')){
+    let vars=[[]];segs.forEach(x=>{const opts=x==='ɾ'?['t','d']:x==='ʔ'?['t']:[x];const nv=[];vars.forEach(v=>opts.forEach(o=>nv.push(v.concat(o))));vars=nv.slice(0,64)});
+    for(const v of vars){const k=v.join(' ');if(BYKEY.has(k))return {kind:'real',words:BYKEY.get(k),allo:true}}
+  }
+  tok=tok.map(ALT);
+  const syl=syllabify(tok);
+  if(!segs.some(isV))return {kind:'imp',why:'Every English syllable needs a <b>nucleus</b> — a vowel at its center. (Interjections like “shh” and “hmm” are the rare exceptions.)'};
+  for(let k=0;k<syl.length;k++){
+    const sy=syl[k],on=sy.on.map(x=>x.s),co=sy.co.map(x=>x.s),nu=sy.nu.map(x=>x.s);
+    if(!nu.length)return {kind:'imp',why:'One of your syllables has no vowel. Every syllable needs a <b>nucleus</b>.'};
+    const a=onsetCheck(on,nu[0]);if(a)return {kind:'imp',why:a};
+    const b=codaCheck(co);if(b)return {kind:'imp',why:b};
+  }
+  const last=segs[segs.length-1];
+  if(LAX.has(last))return {kind:'imp',why:'English words never end in the short (“lax”) vowel /'+last+'/ — compare “see” /si/ with the impossible /sɪ/.'};
+  return {kind:'poss'};
+}
+
+/* ================= Vocal tract model ================= */
+const NEUT={Tx:70,Ty:160,Bx:90,By:146,Dx:130,Dy:134,Kx:168,Ky:148,Rx:190,Ry:190,j:3,lo:6,r:0,ld:0,v:0};
+const NUMK=Object.keys(NEUT);
+function cState(c){
+  const s=Object.assign({},NEUT),m=c.manner,pl=c.place;
+  const gap=(m==='fr'||c.s==='sʼ')?3:m==='ap'?8:-1;
+  const set=o=>Object.assign(s,o);let cp=null;
+  switch(pl){
+    case 'bl':set({lo:gap<0?0:gap<5?2:5});cp=[40,152];break;
+    case 'ld':set({ld:1,lo:gap<0?0:2});cp=[59,150];break;
+    case 'dn':set({Tx:61,Ty:152+gap,Bx:84,By:150});cp=[61,150];break;
+    case 'al':set({Tx:72,Ty:128+gap,Bx:88,By:139,Dx:126,Dy:137});cp=[72,127];break;
+    case 'pa':set({Tx:78,Ty:130+gap*.6,Bx:92,By:116+gap,Dx:124,Dy:126});cp=[92,114];break;
+    case 'rf':set({Tx:96,Ty:112+gap,Bx:101,By:134,Dx:130,Dy:138});cp=[96,110];break;
+    case 'pl':set({Tx:70,Ty:162,Bx:92,By:128,Dx:118,Dy:108+gap,Kx:162,Ky:136});cp=[118,106];break;
+    case 'vl':set({Tx:70,Ty:162,Bx:92,By:150,Dx:136,Dy:126,Kx:170,Ky:115+gap});cp=[170,112];break;
+    case 'uv':set({Tx:70,Ty:162,Bx:94,By:150,Dx:142,Dy:132,Kx:190,Ky:116+gap,Rx:200,Ry:178});cp=[190,112];break;
+    case 'ph':set({Kx:176,Ky:150,Rx:206-gap,Ry:178});cp=[208,178];break;
+    case 'gl':cp=[200,246];break;
+    case 'lv':set({r:1,lo:3,Dx:140,Dy:124,Kx:170,Ky:115+gap});cp=[170,112];break;
+    case 'ep':set({Kx:178,Ky:158,Rx:204-gap,Ry:202});cp=[206,206];break;
+    case 'alp':set({Tx:74,Ty:140,Bx:92,By:116+gap,Dx:116,Dy:110+gap,Kx:162,Ky:138});cp=[100,112];break;
+    case 'lp':set({r:1,lo:3,Tx:70,Ty:162,Bx:92,By:128,Dx:118,Dy:108+gap,Kx:162,Ky:136});cp=[118,106];break;
+    case 'sx':set({Tx:76,Ty:136,Bx:92,By:116+gap,Dx:130,Dy:124,Kx:170,Ky:115+gap});cp=[170,112];break;
+  }
+  if(m==='ck'){s.Kx=170;s.Ky=113;if(pl==='bl'||pl==='dn'||pl==='al'){s.Dx=130;s.Dy=128}}
+  if(m==='na')s.v=1;
+  s.g=pl==='gl'?(c.s==='ʔ'?0:c.s==='h'?2:3):m==='ej'?0:(c.v?1:2);
+  s.cp=cp;s.closed=gap<0&&m!=='la'&&m!=='lf'&&m!=='lt';s.nasal=m==='na';s.lat=m==='la'||m==='lf'||m==='lt'||c.s==='ǁ';s.noflow=m==='ck';s.ph=c;
+  return s;
+}
+function vState(h,b,rd){
+  const s=Object.assign({},NEUT),o=1-h;
+  s.Dx=lerp(112,138,b);s.Dy=lerp(111+o*30,126+o*22,b);
+  s.Kx=lerp(165,172,b);s.Ky=lerp(145+o*8,120+o*30,b);
+  s.Rx=188+b*o*14;s.Ry=192;
+  s.Tx=68+b*4;s.Ty=162+o*4;
+  s.Bx=90;s.By=146-(1-b)*h*18+o*6;
+  s.j=2+o*14;s.lo=4+o*12;if(rd){s.lo=Math.max(3,s.lo*.45);s.r=1}
+  s.g=1;s.cp=null;s.closed=false;s.nasal=false;s.lat=false;
+  return s;
+}
+function stateFor(p,part){
+  if(!p)return Object.assign({},NEUT,{g:2,cp:null,quiet:true});
+  if(p.type==='C')return cState(p);
+  if(p.type==='D'){const q=VW[p.parts[part?1:0]];const s=vState(q.h,q.b,q.rd);s.ph=p;return s}
+  const s=vState(p.h,p.b,p.rd);s.ph=p;return s;
+}
+function crClosed(p){const n=p.length;let d=`M${f1(p[0][0])},${f1(p[0][1])}`;
+  for(let i=0;i<n;i++){const p0=p[(i-1+n)%n],a=p[i],b=p[(i+1)%n],p3=p[(i+2)%n];
+    d+=`C${f1(a[0]+(b[0]-p0[0])/6)},${f1(a[1]+(b[1]-p0[1])/6)} ${f1(b[0]-(p3[0]-a[0])/6)},${f1(b[1]-(p3[1]-a[1])/6)} ${f1(b[0])},${f1(b[1])}`}
+  return d+'Z'}
+const ORAL=[[200,268],[200,190],[199,150],[186,126],[150,121],[110,122],[84,134],[66,152],[18,152]];
+const NASAL=[[200,268],[200,150],[203,104],[190,88],[150,86],[100,90],[56,102],[30,110]];
+const pl2d=p=>'M'+p.map(q=>f1(q[0])+','+f1(q[1])).join('L');
+function cutAt(path,cp){
+  // keep the path from the larynx up to just before the constriction
+  if(!cp)return path;
+  let best=0,bd=1e9;path.forEach((q,i)=>{const d=Math.hypot(q[0]-cp[0],q[1]-cp[1]);if(d<bd){bd=d;best=i}});
+  const out=path.slice(0,best);out.push([lerp(path[Math.max(0,best-1)][0],cp[0],.75),lerp(path[Math.max(0,best-1)][1],cp[1],.75)]);
+  return out;
+}
+const VT={cur:Object.assign({},NEUT,{g:2,cp:null,quiet:true}),tgt:null,raf:0};
+function vtRender(s){
+  const j=s.j,dj=j-3;
+  const T=[s.Tx,s.Ty+dj*.9],B=[s.Bx,s.By+dj*.5];
+  $('vtTongue').setAttribute('d',crClosed([T,B,[s.Dx,s.Dy],[s.Kx,s.Ky],[s.Rx,s.Ry],[188,219],[150,217+j*.3],[100,201+j*.8],[72,179+j]]));
+  $('vtLowTeeth').setAttribute('d',`M57,${180+dj} L62,${180+dj} L61,${160+dj} Q59,${155+dj} 57,${159+dj} Z`);
+  const v=s.v;
+  const vel=`M158,107 Q${f1(lerp(182,176,v))},${f1(lerp(112,128,v))} ${f1(lerp(207,188,v))},${f1(lerp(100,142,v))}`;
+  $('vtVel').setAttribute('d',vel);$('vtVelO').setAttribute('d',vel);
+  const x0=31-9*s.r,yU=152-s.lo*.35,yL0=152+s.lo*.65,yL=lerp(yL0,149,s.ld),xr=57+5*s.ld;
+  $('vtUL').setAttribute('d',`M40,116 C36,124 ${f1(x0)},130 ${f1(x0)},138 C${f1(x0)},${f1(yU-3)} ${f1(x0+3)},${f1(yU)} ${f1(x0+9)},${f1(yU)} L57,${f1(yU)} L57,118 Z`);
+  $('vtLL').setAttribute('d',`M${f1(xr)},${f1(yL+14)} L${f1(xr)},${f1(yL)} L${f1(x0+9)},${f1(yL)} C${f1(x0+3)},${f1(yL)} ${f1(x0)},${f1(yL+3)} ${f1(x0)},${f1(yL+10)} C${f1(x0)},${f1(yL+22)} 38,${f1(yL+30)} 46,${f1(yL+33)} L57,${f1(yL+34)} Z`);
+  // glottis
+  const g=s.g,gap=g===0?0:g===1?1.5:g===2?7:4;
+  $('vtFoldF').setAttribute('d',`M186,243 L${f1(200-gap/2)},246.5 L186,250 Z`);
+  $('vtFoldB').setAttribute('d',`M214,243 L${f1(200+gap/2)},246.5 L214,250 Z`);
+  const vib=g===1||g===3;$('vtFoldF').classList.toggle('vib',vib&&!!PLAY);$('vtFoldB').classList.toggle('vib',vib&&!!PLAY);
+  // airflow
+  const voiced=g===1||g===3,col=voiced?'#fbbf24':'#60a5fa',mk=voiced?'url(#ahA)':'url(#ahB)';
+  const aO=$('vtArO'),aN=$('vtArN');
+  [aO,aN].forEach(a=>{a.setAttribute('stroke',col);a.setAttribute('marker-end',mk)});
+  if(s.quiet||g===0||s.noflow){aO.setAttribute('d','');aN.setAttribute('d','')}
+  else{
+    aN.setAttribute('d',s.nasal||v>.5?pl2d(NASAL):'');
+    aO.setAttribute('d',s.closed?pl2d(cutAt(ORAL,s.cp)):pl2d(ORAL));
+    aO.setAttribute('marker-end',s.closed?'':mk);
+    aO.style.opacity=s.lat?.55:1;
+  }
+  const gl=$('vtGlow');
+  if(s.cp&&!s.quiet){gl.setAttribute('cx',s.cp[0]);gl.setAttribute('cy',s.cp[1]);gl.style.display=''}else gl.style.display='none';
+}
+function readout(s){
+  const g=s.g,p=s.ph;
+  const voi=s.quiet?['—','resting']:(p&&p.manner==='ck')?['not used','clicks use no lung air']:g===0?['closed','glottal stop: folds pressed shut']:g===1?['voiced','vocal folds vibrate']:g===3?['breathy','folds vibrate loosely']:['voiceless','folds held apart'];
+  const gsv=(p&&p.manner==='ck')?'<path d="M2,7Q6,3 11,7T20,7" stroke="#4b5563" stroke-width="1.4" fill="none" stroke-dasharray="2 2"/>':g===0?'<path d="M2,7H20" stroke="#fb7185" stroke-width="2"/>':g===2?'<path d="M2,3L11,7L2,11M20,3L11,7L20,11" stroke="#60a5fa" stroke-width="1.5" fill="none"/>':'<path d="M2,7Q6,3 11,7T20,7" stroke="#fbbf24" stroke-width="1.6" fill="none"/>';
+  let air='mouth';if(s.quiet)air='—';else if(p&&p.manner==='ck')air='no lung air (click)';else if(p&&p.manner==='ej')air='glottis shut, pop';else if(p&&p.manner==='im')air='stop, larynx drops';else if(g===0)air='blocked';else if(s.nasal)air='through nose';else if(s.closed&&p&&p.manner==='af')air='stop + hiss';else if(s.closed)air='stop + burst';else if(s.lat)air='over tongue sides';else if(p&&p.type==='C'&&(p.manner==='fr'))air='hissy (turbulent)';else air='smooth, oral';
+  let lips='neutral';if(s.ld>.5)lips='lip to teeth';else if(s.lo<1)lips='closed';else if(s.r>.5)lips='rounded';else if(p&&p.type!=='C')lips='spread';
+  $('ro').innerHTML=`<div><span class="k">Voicing</span><span class="v" title="${voi[1]}"><svg viewBox="0 0 22 14">${gsv}</svg>${voi[0]}</span></div><div><span class="k">Airflow</span><span class="v" title="${air}">${air}</span></div><div><span class="k">Lips</span><span class="v">${lips}</span></div>`;
+}
+function vtSet(s,instant){VT.tgt=s;readout(s);if(instant){VT.cur=Object.assign({},s);vtRender(VT.cur)}if(!VT.raf)VT.raf=requestAnimationFrame(vtTick)}
+function vtTick(){
+  VT.raf=0;
+  if(PLAY)playTick();
+  const c=VT.cur,t=VT.tgt;if(!t)return;
+  let moving=false;
+  NUMK.forEach(k=>{const d=t[k]-c[k];if(Math.abs(d)>.05){c[k]+=d*.32;moving=true}else c[k]=t[k]});
+  ['g','cp','closed','nasal','lat','ph','quiet'].forEach(k=>c[k]=t[k]);
+  vtRender(c);
+  if(moving||PLAY)VT.raf=requestAnimationFrame(vtTick);
+}
+
+/* ================= Formant synthesizer (Web Audio) ================= */
+const AU={ctx:null,P:null};
+let VOICE='lo';
+const F0B=()=>VOICE==='hi'?205:112, FSC=()=>VOICE==='hi'?1.16:1;
+function audioInit(){
+  if(AU.ctx){if(AU.ctx.state!=='running')AU.ctx.resume();return AU.ctx}
+  const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;
+  const ctx=new AC();AU.ctx=ctx;
+  const nb=ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate),d=nb.getChannelData(0);let lp=0;for(let i=0;i<d.length;i++){lp=lp*.35+(Math.random()*2-1)*.65;d[i]=lp*1.3}
+  const fd=Math.round(ctx.sampleRate*.02);for(let i=0;i<fd;i++){const w=i/fd;d[i]=d[i]*w+d[d.length-fd+i]*(1-w)} /* seamless loop: no click each time the noise buffer wraps */
+  const noise=()=>{const s=ctx.createBufferSource();s.buffer=nb;s.loop=true;s.start();return s};
+  const comp=ctx.createDynamicsCompressor();comp.threshold.value=-20;comp.knee.value=12;comp.ratio.value=8;comp.attack.value=.002;comp.release.value=.15;
+  const out=ctx.createGain();out.gain.value=.85;comp.connect(out);out.connect(ctx.destination);
+  const tone=ctx.createBiquadFilter();tone.type='lowpass';tone.frequency.value=8500;tone.Q.value=.5;tone.connect(comp);
+  const master=ctx.createGain();master.gain.value=1.1;master.connect(tone);AU.dest=ctx.destination;
+  const osc=ctx.createOscillator();osc.type='sawtooth';osc.frequency.value=112;osc.start();
+  const vG=ctx.createGain();vG.gain.value=0;osc.connect(vG);
+  const aG=ctx.createGain();aG.gain.value=0;noise().connect(aG);
+  const fin=ctx.createGain();vG.connect(fin);aG.connect(fin);
+  const bp=[500,1500,2500].map(f=>{const b=ctx.createBiquadFilter();b.type='bandpass';b.frequency.value=f;fin.connect(b);const g=ctx.createGain();g.gain.value=1;b.connect(g);g.connect(master);return [b,g]});
+  const nf=ctx.createBiquadFilter();nf.type='bandpass';nf.frequency.value=260;nf.Q.value=4;const nG=ctx.createGain();nG.gain.value=0;fin.connect(nf);nf.connect(nG);nG.connect(master);
+  const nz=noise(),fF=ctx.createBiquadFilter(),fF2=ctx.createBiquadFilter();fF.type=fF2.type='bandpass';fF.frequency.value=4000;fF2.frequency.value=7000;
+  const fG=ctx.createGain(),fG2=ctx.createGain();fG.gain.value=fG2.gain.value=0;nz.connect(fF);nz.connect(fF2);fF.connect(fG);fF2.connect(fG2);
+  /* mG: frication amplitude-modulated by the glottal pulses (voiced fricatives buzz *through* the hiss, as in real speech) */
+  const mG=ctx.createGain();mG.gain.value=1;const dG=ctx.createGain();dG.gain.value=0;osc.connect(dG);dG.connect(mG.gain);
+  fG.connect(mG);fG2.connect(mG);const fMix=ctx.createGain();fMix.gain.value=.45;mG.connect(fMix);fMix.connect(comp);
+  AU.P={f0:osc.frequency,vA:vG.gain,aA:aG.gain,fA:fG.gain,fF:fF.frequency,fQ:fF.Q,fB:fG2.gain,fF2:fF2.frequency,fQ2:fF2.Q,fM:dG.gain,F1:bp[0][0].frequency,F2:bp[1][0].frequency,F3:bp[2][0].frequency,Q1:bp[0][0].Q,Q2:bp[1][0].Q,Q3:bp[2][0].Q,A1:bp[0][1].gain,A2:bp[1][1].gain,A3:bp[2][1].gain,nA:nG.gain};
+  return ctx;
+}
+const pval=(p,k)=>k==='Q1'?p.F1/80:k==='Q2'?p.F2/100:k==='Q3'?p.F3/150:p[k];
+const baseP=()=>({f0:F0B(),vA:0,aA:0,fA:0,fF:4000,fQ:1,fB:0,fF2:7000,fQ2:1,fM:0,F1:500,F2:1500,F3:2500,A1:1,A2:.9,A3:.6,nA:0});
+const CLICK={'ʘ':[1100,1.2,2.75,.012],'ǀ':[4200,1,2.75,.03],'ǃ':[2000,5,3.75,.008],'ǂ':[3000,3,3.5,.008],'ǁ':[3600,1,2.75,.03]};
+const BURST={ep:[900,1,1.5],bl:[900,.8,2.5],ld:[1200,.7,1.5],dn:[4500,1,2.0],al:[4200,1.3,2.5],pa:[3000,2,2.5],rf:[2800,2,2.25],pl:[3300,2,2.25],vl:[1900,3,2.75],uv:[1300,2.5,2.25],ph:[1100,1.5,1.5]};
+const FRIC={bl:[1000,.7,.06,3000,.6,.03],ld:[1800,.6,.035,7000,.8,.05],dn:[2600,.6,.025,7500,.8,.04],al:[5600,1.7,.21,8200,1.3,.11],pa:[2700,1.9,.23,4800,1.3,.10],rf:[2300,1.9,.20,4200,1.3,.08],alp:[3800,1.9,.20,6000,1.3,.08],pl:[3600,2.2,.18,5600,1.3,.06],vl:[1600,2.6,.30,3200,1.6,.10],uv:[1100,2.6,.30,2500,1.6,.10],ph:[1000,1.3,.24,2200,1,.10],ep:[900,1.1,.28,2000,1,.10],lv:[1200,1.1,.18,3000,1,.06],sx:[2000,1.6,.34,3600,1.5,.14],lat:[4300,1.4,.2,6500,1.1,.08]};
+const fz2=(z,v,fs)=>({fA:z[2]*(v?.6:1),fF:z[0]*fs,fQ:z[1],fB:z[5]*(v?.6:1),fF2:z[3]*fs,fQ2:z[4],fM:v?.8:0});
+const NAS={bl:1000,ld:1100,al:1500,rf:1450,pl:2100,vl:1950,uv:1300};
+const APX={'ɥ':[280,1800,2200],w:[300,700,2200],'ʍ':[300,700,2200],j:[280,2250,2900],'ɹ':[350,1150,1550],'ɻ':[350,1300,1700],l:[380,1000,2700],'ɭ':[360,1200,2300],'ʎ':[300,2100,2800],'ʟ':[350,1100,2400],'ʋ':[350,1200,2300],'ɰ':[320,1250,2400]};
+function locus(place,nv,fs){
+  const L={ep:[1100,2500],alp:[2200,2800],lp:[1800,2200],sx:[1900,2400],bl:[900,2200],ld:[950,2200],dn:[1700,2600],al:[1700,2600],pa:[2000,2500],rf:[1600,1800],pl:[2300,3000],uv:[1300,2400],ph:[1100,2500],lv:[700,2200]};
+  if(place==='vl')return nv&&nv.F2>1600*fs?[2300*fs,2500*fs]:[1300*fs,2100*fs];
+  if(place==='gl')return nv?[nv.F2,nv.F3]:[1500*fs,2500*fs];
+  const r=L[place]||[1500,2500];return [r[0]*fs,r[1]*fs];
+}
+/* segs: [{ph, stress, i, dur}] -> keyframes */
+function buildFrames(segs,slow){
+  const fs=FSC(),F0=F0B(),fr=[],segT=[];let t=0,cur=baseP();
+  const key=(dt,o)=>{t+=dt*slow;cur=Object.assign({},cur,o||{});fr.push({t,p:cur})};
+  key(0);
+  const N=segs.length;
+  const fv=ph=>{const q=ph.type==='D'?VW[ph.parts[0]]:ph;return {F1:q.F[0]*fs,F2:q.F[1]*fs,F3:q.F[2]*fs}};
+  const nextV=i=>{for(let k=i+1;k<N;k++)if(segs[k].ph.type!=='C')return fv(segs[k].ph);return null};
+  segs.forEach((sg,i)=>{
+    const ph=sg.ph,prog=N>1?i/(N-1):0,f0=F0*(1.1-.22*prog)*(sg.stress?1.13:1);
+    const t0=t;let tmid=null;
+    if(ph.type!=='C'){
+      const A=ph.type==='D'?VW[ph.parts[0]]:ph,B=ph.type==='D'?VW[ph.parts[1]]:null;
+      let dur=sg.dur||(sg.stress?.2:.14);if(i===N-1)dur+=.07;if(B)dur+=.08;
+      key(.035,Object.assign(fv(A),{vA:1,aA:0,fA:0,fB:0,fM:0,nA:0,A2:.9,A3:.6,f0}));
+      if(B){key(dur*.3);tmid=t;key(dur*.5,Object.assign(fv(B),{f0:f0*.95}));key(Math.max(.001,dur*.2-.035))}
+      else key(dur-.035,{f0:f0*.96});
+    }else{
+      const c=ph,v=c.v,m=c.manner,nv=nextV(i)||{F1:500*fs,F2:1500*fs,F3:2500*fs},L=locus(c.place,nextV(i),fs);
+      if(m==='pl'||m==='af'){
+        key(.02,{vA:v?.12:0,aA:0,fA:0,nA:0,F1:220*fs,F2:L[0],F3:L[1],f0});key(.05);
+        if(c.s!=='ʔ'){
+          const b=BURST[c.place]||BURST.al;
+          key(.003,{fA:b[2],fF:b[0]*fs,fQ:b[1]});key(.012,{fA:b[2]*.5});
+          if(m==='af'){const z=FRIC[c.place];key(.012,Object.assign(fz2(z,v,fs),{vA:v?.3:0}));key(.07);key(.02,{fA:0,fB:0,fM:0})}
+          else{key(.006,{fA:0});
+            const prevS=i>0&&segs[i-1].ph.s==='s';
+            if(!v&&nextV(i)&&!prevS&&(i===N-1||segs[i+1].ph.type!=='C'||segs[i+1].ph.manner==='ap'||segs[i+1].ph.manner==='la')){key(.004,Object.assign({aA:2.2,vA:0},nv));key(.035,{aA:1.4});key(.008,{aA:0})}
+          }
+        }else key(.01);
+      }else if(m==='ck'){
+        const z=CLICK[c.s]||CLICK['ǃ'];
+        key(.02,{vA:0,aA:0,fA:0,nA:0,f0});key(.05);key(.004,{fA:z[2],fF:z[0]*fs,fQ:z[1]});key(z[3],{fA:z[2]*.4});key(.008,{fA:0});key(.035);
+      }else if(m==='im'){
+        const b=BURST[c.place]||BURST.al;
+        key(.02,{vA:.45,aA:0,fA:0,nA:0,F1:220*fs,F2:L[0],F3:L[1],f0:f0*.95});key(.05,{f0:f0*.8});key(.003,{fA:.5,fF:b[0]*fs,fQ:b[1]});key(.01,{fA:0,f0});
+      }else if(m==='ej'){
+        if(c.s==='sʼ'){key(.02,{vA:0,aA:0,fA:0,nA:0,f0});key(.03);key(.008,Object.assign(fz2(FRIC.al,0,fs),{fA:.9}));key(.065);key(.012,{fA:0,fB:0});key(.05)}
+        else{const b=BURST[c.place]||BURST.al;key(.02,{vA:0,aA:0,fA:0,nA:0,F1:220*fs,F2:L[0],F3:L[1],f0});key(.05);key(.004,{fA:b[2]*1.2,fF:b[0]*fs,fQ:b[1]});key(.01,{fA:b[2]*.6});key(.005,{fA:0});key(.055)}
+      }else if(m==='lt'){key(.015,{vA:.25,F1:280*fs,F2:1000*fs,F3:L[1],fA:0,aA:0,nA:0,f0});key(.015);
+      }else if(m==='na'){
+        key(.03,{vA:.6,nA:.6,F1:260*fs,F2:(NAS[c.place]||1500)*fs,F3:2400*fs,A2:.25,A3:.15,fA:0,aA:0,f0});key(.07);key(.01,{nA:0,A2:.9,A3:.6});
+      }else if(m==='fr'||m==='lf'){
+        if(c.place==='gl'){key(.03,Object.assign({aA:v?1.6:2.6,vA:v?.35:0,fA:0,nA:0,f0},nv));key(.08)}
+        else{const z=(m==='lf'?FRIC.lat:FRIC[c.place])||FRIC.al,ap=APX[c.s];
+          const o=Object.assign(fz2(z,v,fs),{vA:v?.32:0,aA:0,nA:0,F1:300*fs,F2:L[0],F3:L[1],f0});
+          if(ap)Object.assign(o,{F1:ap[0]*fs,F2:ap[1]*fs,F3:ap[2]*fs});
+          key(.035,o);key(v?.075:.095);key(.03,{fA:0,fB:0,fM:0});}
+      }else if(m==='ap'||m==='la'){
+        const ap=APX[c.s]||[350,1200,2400];
+        key(.04,{vA:.75,aA:0,fA:0,nA:0,F1:ap[0]*fs,F2:ap[1]*fs,F3:ap[2]*fs,A3:(c.s==='ɹ'||c.s==='ɻ')?.4:.5,f0});key(.05);key(.001,{A3:.6});
+      }else if(m==='tp'){key(.015,{vA:.2,F1:250*fs,F2:L[0],F3:L[1],fA:0,aA:0,nA:0,f0});key(.015)}
+      else if(m==='tr'){key(.01,{fA:0,aA:0,nA:0,f0,F2:L[0],F3:L[1]});for(let r=0;r<3;r++){key(.012,{vA:.15,F1:250*fs});key(.01);key(.012,{vA:.75,F1:450*fs});key(.01)}}
+    }
+    segT.push({i:sg.i,t0,t1:t,tmid,ph});
+  });
+  key(.06,{vA:0,aA:0,fA:0,nA:0});
+  return {fr,segT};
+}
+let PLAY=null;
+function playSegs(segs,opt){
+  opt=opt||{};
+  const ctx=audioInit();if(!ctx||!segs.length)return;
+  const {fr,segT}=buildFrames(segs,opt.slow?2.3:1);
+  const t0=ctx.currentTime+.05;
+  for(const k in AU.P){const pr=AU.P[k];pr.cancelScheduledValues(0);pr.setValueAtTime(pval(fr[0].p,k),ctx.currentTime);
+    for(const f of fr)pr.linearRampToValueAtTime(pval(f.p,k),t0+f.t)}
+  PLAY={t0,segT,end:t0+fr[fr.length-1].t,onSeg:opt.onSeg,last:-1,rest:opt.rest||null};
+  vtSet(VT.tgt||VT.cur);
+}
+function playTick(){
+  const ctx=AU.ctx,P=PLAY;if(!ctx||!P)return;
+  const tt=ctx.currentTime-P.t0;
+  if(ctx.currentTime>P.end+.05){PLAY=null;if(P.onSeg)P.onSeg(-1);$('vtFoldF').classList.remove('vib');$('vtFoldB').classList.remove('vib');if(P.rest){VT.tgt=P.rest;readout(P.rest)}return}
+  let k=-1;for(let n=0;n<P.segT.length;n++){if(tt>=P.segT[n].t0-.01)k=n}
+  if(k>=0){const sg=P.segT[k],part=sg.tmid!=null&&tt>sg.tmid?1:0,id=k*2+part;
+    if(id!==P.last){P.last=id;const s=stateFor(sg.ph,part);VT.tgt=s;readout(s);if(P.onSeg)P.onSeg(sg.i)}}
+}
+function sustain(p){
+  const ctx=audioInit();if(!ctx)return;const t=ctx.currentTime;
+  for(const k in AU.P){const pr=AU.P[k];pr.cancelScheduledValues(t);pr.setTargetAtTime(pval(p,k),t,.03)}
+}
+function hush(){if(!AU.ctx)return;const p=Object.assign(baseP(),{F1:AU.P.F1.value,F2:AU.P.F2.value,F3:AU.P.F3.value});sustain(p)}
+function sayNatural(word){
+  if(!('speechSynthesis' in window))return false;
+  const u=new SpeechSynthesisUtterance(word);u.lang='en-US';u.rate=.85;
+  const vs=speechSynthesis.getVoices();const v=vs.find(x=>/^en[-_]US/i.test(x.lang))||vs.find(x=>/^en/i.test(x.lang));if(v)u.voice=v;
+  speechSynthesis.cancel();speechSynthesis.speak(u);return true;
+}
+
+/* ================= Recordings (Wikimedia Commons) ================= */
+/* symbol|Commons file name|md5 prefix of the file name (Commons storage path) */
+const RECTXT=`p|Voiceless bilabial plosive.ogg|51
+b|Voiced bilabial plosive.ogg|2c
+t|Voiceless alveolar plosive.ogg|02
+d|Voiced alveolar plosive.ogg|01
+ʈ|Voiceless retroflex stop.oga|b0
+ɖ|Voiced retroflex stop.oga|27
+c|Voiceless palatal plosive.ogg|5d
+ɟ|Voiced palatal plosive.ogg|1d
+k|Voiceless velar plosive.ogg|e3
+ɡ|Voiced velar plosive 02.ogg|12
+q|Voiceless uvular plosive.ogg|19
+ɢ|Voiced uvular stop.oga|b6
+ʡ|Epiglottal stop.ogg|b2
+ʔ|Glottal stop.ogg|4d
+m|Bilabial nasal.ogg|a9
+ɱ|Labiodental nasal.ogg|18
+n|Alveolar nasal.ogg|29
+ɳ|Retroflex nasal.ogg|af
+ɲ|Palatal nasal.ogg|46
+ŋ|Velar nasal.ogg|39
+ɴ|Uvular nasal.ogg|3e
+ts|Voiceless alveolar sibilant affricate.oga|9d
+dz|Voiced alveolar sibilant affricate.oga|d8
+tʃ|Voiceless palato-alveolar affricate.ogg|97
+dʒ|Voiced palato-alveolar affricate.ogg|e6
+ɸ|Voiceless bilabial fricative.ogg|41
+β|Voiced bilabial fricative.ogg|37
+f|Voiceless labio-dental fricative.ogg|c7
+v|Voiced labio-dental fricative.ogg|42
+θ|Voiceless dental fricative.ogg|80
+ð|Voiced dental fricative.ogg|6a
+s|Voiceless alveolar sibilant.ogg|ac
+z|Voiced alveolar sibilant.ogg|c0
+ʃ|Voiceless palato-alveolar sibilant.ogg|cc
+ʒ|Voiced palato-alveolar sibilant.ogg|30
+ʂ|Voiceless retroflex sibilant.ogg|b1
+ʐ|Voiced retroflex sibilant.ogg|7f
+ɕ|Voiceless alveolo-palatal sibilant.ogg|0b
+ʑ|Voiced alveolo-palatal sibilant.ogg|15
+ç|Voiceless palatal fricative.ogg|ab
+ʝ|Voiced palatal fricative.ogg|ac
+x|Voiceless velar fricative.ogg|0f
+ɣ|Voiced velar fricative.ogg|47
+χ|Voiceless uvular fricative.ogg|c8
+ʁ|Voiced uvular fricative.ogg|af
+ħ|Voiceless pharyngeal fricative.ogg|b2
+ʕ|Voiced pharyngeal fricative.ogg|cd
+h|Voiceless glottal fricative.ogg|da
+ɦ|Voiced glottal fricative.ogg|e2
+ʋ|Labiodental approximant.ogg|ee
+ɹ|Alveolar approximant.ogg|1f
+ɻ|Retroflex Approximant2.oga|bf
+j|Palatal approximant.ogg|e8
+ɰ|Voiced velar approximant.ogg|5c
+ⱱ|Labiodental flap.ogg|2c
+ɾ|Alveolar tap.ogg|a0
+ɽ|Retroflex flap.ogg|87
+ɺ|Voiced alveolar lateral flap.wav|c9
+ʙ|Bilabial trill.ogg|e7
+r|Alveolar trill.ogg|ce
+ʀ|Uvular trill.ogg|cb
+ʜ|Voiceless epiglottal trill.ogg|7b
+ʢ|Voiced epiglottal trill 2.ogg|18
+ɬ|Voiceless alveolar lateral fricative.ogg|ea
+ɮ|Voiced alveolar lateral fricative.ogg|6f
+l|Alveolar lateral approximant.ogg|bc
+ɭ|Retroflex lateral approximant.ogg|d1
+ʎ|Palatal lateral approximant.ogg|d9
+ʟ|Velar lateral approximant.ogg|d3
+pʼ|Bilabial ejective plosive.ogg|64
+tʼ|Alveolar ejective plosive.ogg|d7
+kʼ|Velar ejective plosive.ogg|a0
+sʼ|Alveolar ejective fricative.ogg|7c
+ʘ|Clic bilabial sourd.ogg|2b
+ǀ|Dental click.ogg|1f
+ǃ|Postalveolar click.ogg|3c
+ǂ|Palatoalveolar click.ogg|89
+ǁ|Alveolar lateral click.ogg|f4
+ɓ|Voiced bilabial implosive.ogg|31
+ɗ|Voiced alveolar implosive.ogg|c3
+ʄ|Voiced palatal implosive.ogg|2c
+ɠ|Voiced velar implosive.ogg|a8
+ʛ|Voiced uvular implosive.ogg|00
+ɥ|LL-Q150 (fra)-WikiLucas00-IPA ɥ.wav|32
+ʍ|Voiceless labio-velar fricative.ogg|a7
+w|Voiced labio-velar approximant.ogg|f2
+ɧ|Voiceless dorso-palatal velar fricative.ogg|42
+i|Close front unrounded vowel.ogg|91
+y|Close front rounded vowel.ogg|ea
+ɨ|Close central unrounded vowel.ogg|53
+ʉ|Close central rounded vowel.ogg|66
+ɯ|Close back unrounded vowel.ogg|e8
+u|Close back rounded vowel.ogg|5d
+ɪ|Near-close near-front unrounded vowel.ogg|4c
+ʏ|Near-close near-front rounded vowel.ogg|e3
+ʊ|Near-close near-back rounded vowel.ogg|d5
+e|Close-mid front unrounded vowel.ogg|6c
+ø|Close-mid front rounded vowel.ogg|53
+ɘ|Close-mid central unrounded vowel.ogg|60
+ɵ|Close-mid central rounded vowel.ogg|b5
+ɤ|Close-mid back unrounded vowel.ogg|26
+o|Close-mid back rounded vowel.ogg|84
+ə|Mid-central vowel.ogg|d9
+ɛ|Open-mid front unrounded vowel.ogg|71
+œ|Open-mid front rounded vowel (2).ogg|9f
+ɜ|Open-mid central unrounded vowel.ogg|01
+ɞ|Open-mid central rounded vowel.ogg|d9
+ʌ|PR-open-mid back unrounded vowel2.ogg|80
+ɔ|PR-open-mid back rounded vowel.ogg|d0
+æ|Near-open front unrounded vowel.ogg|c9
+ɐ|Near-open central unrounded vowel.ogg|22
+a|PR-open front unrounded vowel.ogg|0e
+ɶ|Open front rounded vowel.ogg|c1
+ɑ|Open back unrounded vowel.ogg|e5
+ɒ|PR-open back rounded vowel.ogg|31
+ɝ|En-us-er.ogg|e1
+ɚ|En-us-er.ogg|e1`;
+const REC={};RECTXT.split('\n').forEach(l=>{const[s,name,h]=l.split('|');REC[s]={name,h}});
+/* English word pronunciations: En-us-<word>.ogg on Commons (not every word has one) */
+const WREC={};`cat:46,bat:bb,hat:8b,mat:8b,sat:d6,rat:96,fat:27,pat:5b,cap:05,map:e0,nap:45,tap:9b,bad:f2,sad:51,mad:b6,dad:56,man:45,pan:cf,fan:62,can:c5,ran:c1,van:0a,jam:dc,bag:e1,back:ec,black:30,snack:64,track:33,hand:d2,and:26,ask:f6,laugh:a8,half:32,class:5c,glass:5f,grass:c6,path:79,math:d8,bath:f9,that:e8,than:7d,thank:14,splash:c2,bit:de,sit:40,hit:79,fit:d9,pit:e8,kit:85,big:96,pig:e4,dig:79,fish:3e,dish:56,wish:7e,ship:a9,chip:6d,lip:47,hip:c7,tip:f8,sip:88,win:df,pin:cc,tin:95,thin:5d,sing:36,ring:c0,king:b2,thing:b1,think:80,drink:35,spring:07,this:f8,milk:64,give:69,live:47,is:5d,it:06,in:fb,with:42,sixth:56,beat:11,seat:21,heat:05,feet:b5,meet:a8,meat:2b,eat:4a,bead:73,read:50,reed:5c,need:57,knead:6f,seed:70,see:a2,sea:6e,me:ca,be:55,bee:8b,tea:12,key:aa,three:d4,tree:d2,free:a0,green:c0,queen:d0,teeth:6c,cheese:bc,jeans:7a,leaf:d3,sheep:82,sleep:0b,deep:8a,keep:13,peace:61,piece:2d,street:6e,scream:0e,breathe:4b,bet:98,set:50,get:2f,net:28,pet:42,wet:04,let:21,met:f9,bed:14,red:c9,head:5c,said:dc,bread:dc,breath:9d,egg:88,leg:62,ten:4c,hen:38,pen:86,men:7c,then:a5,when:7a,best:3a,nest:f1,rest:ae,vest:18,desk:f1,help:b7,friend:89,yes:b1,check:ff,neck:c7,texts:cd,strength:45,bait:9e,gate:c0,late:b2,eight:16,ate:af,wait:c6,weight:25,date:4a,made:57,maid:8d,day:58,say:40,play:8e,rain:95,train:f0,name:ce,game:62,same:64,take:9b,make:03,cake:89,lake:17,snake:d7,face:73,place:a0,wave:0b,tail:88,tale:97,mail:06,male:b9,sail:46,sale:5b,great:ff,grate:8d,they:41,bathe:bb,hot:28,not:f9,knot:ed,pot:fe,got:07,lot:20,dot:2a,top:32,stop:43,shop:ba,mop:68,box:95,fox:99,rock:25,sock:ab,clock:97,car:01,star:a6,far:ef,park:82,dark:24,heart:c7,part:33,arm:b9,yard:12,spa:7a,dog:06,law:17,saw:3e,thought:d4,caught:69,talk:6f,walk:bb,call:a1,ball:a8,tall:d1,fall:33,all:35,small:b5,long:f8,song:f1,strong:95,wrong:b9,off:06,cross:4b,boss:d4,more:a7,door:82,four:88,for:67,horse:fb,north:39,born:6f,corn:88,boat:cb,coat:07,goat:01,road:6e,rode:1f,rowed:cd,home:37,phone:7d,bone:2e,stone:b4,snow:d8,go:0a,no:19,know:ad,so:3b,sew:88,show:43,slow:12,grow:c6,nose:7f,knows:d3,rose:29,rows:4d,hole:51,whole:d8,cold:bf,old:be,clothes:a1,book:3d,look:85,cook:63,good:28,wood:d2,would:18,foot:33,put:e5,full:3e,pull:77,push:66,could:ed,should:90,boot:b3,food:7a,mood:23,moon:75,soon:f9,spoon:69,room:67,school:77,cool:4b,pool:4d,rule:8d,blue:85,blew:44,new:34,knew:d5,two:47,too:bf,to:3c,shoe:44,true:e7,you:6c,zoo:2d,juice:0f,cute:73,few:76,but:7d,cut:53,nut:ce,shut:2e,hut:16,bus:5e,fun:fd,sun:03,son:68,run:a9,one:1f,won:c5,bug:b6,rug:b1,cup:57,up:9e,love:13,come:d9,some:aa,sum:f8,jump:96,duck:5b,luck:8d,truck:5c,judge:15,thumb:cd,young:69,bird:07,word:bf,girl:f3,turn:79,learn:54,work:5f,first:9e,her:2c,fur:5e,nurse:84,shirt:c7,church:37,bite:f4,kite:66,night:46,knight:65,light:cf,right:6b,write:1d,white:4e,time:1b,nine:9b,line:63,fine:7e,five:cf,my:43,eye:6f,buy:cf,by:c8,bye:77,fly:5b,sky:8b,why:69,high:7e,ice:74,nice:e7,rice:f9,mice:74,like:e5,bike:d5,side:f8,ride:95,house:30,mouse:40,out:f1,now:9e,cow:e1,how:23,down:89,town:7c,brown:29,loud:ef,cloud:c5,round:30,sound:8f,mouth:52,south:6e,our:8f,hour:ec,boy:7f,toy:98,joy:9d,coin:b5,oil:b5,noise:b9,voice:03,choice:80,point:5c,there:1a,their:75,where:ef,wear:e8,hair:8b,hare:f0,bear:c7,bare:a5,pair:d4,pear:6c,care:87,chair:8b,here:e4,hear:be,near:2a,ear:68,deer:39,dear:0f,year:24,apple:9a,happy:6d,father:b0,mother:07,brother:b6,money:d0,open:67,music:46,water:bd,better:45,butter:60,letter:a4,sister:47,teacher:74,doctor:0d,paper:33,tiger:ee,summer:8a,winter:d4,number:40,color:02,sugar:6d,measure:35,treasure:79,vision:01,nation:c3,ocean:46,flower:d3,flour:b0,about:ee,banana:61,tomato:78,potato:77,elephant:f2,animal:12,family:61,computer:a1,telephone:5e,alphabet:e0,language:3a,English:13,phonetics:7a,science:26,garden:37,window:16,yellow:8b,purple:bb,orange:83,rabbit:f0,monkey:74,zebra:4e,pizza:38,chicken:6a,kitchen:e9,button:74,baby:de,city:92,pretty:b2,little:94,people:93,table:0b,candle:2b,giant:f1,zero:61,very:88,squirrel:79,thirsty:b6`.split(',').forEach(e=>{const[w,h]=e.split(':');WREC[w.toLowerCase()]={name:'En-us-'+w.toLowerCase()+'.ogg',h}});
+let AUD='rec',RECA=null,RECT=0;
+const commonsPage=f=>'https://commons.wikimedia.org/wiki/File:'+encodeURIComponent(f.name.replace(/ /g,'_'));
+function recSrcs(f){
+  const n=f.name.replace(/ /g,'_'),e=encodeURIComponent(n),p=f.h[0]+'/'+f.h+'/',B='https://upload.wikimedia.org/wikipedia/commons/';
+  const orig=B+p+e,mp3=B+'transcoded/'+p+e+'/'+e+'.mp3';
+  let ogg='';try{ogg=document.createElement('audio').canPlayType('audio/ogg; codecs="vorbis"')}catch(x){}
+  const fp='https://commons.wikimedia.org/wiki/Special:FilePath/'+e;
+  return (/\.wav$/i.test(n)||(ogg&&!/\.opus$/i.test(n))?[orig,mp3]:[mp3,orig]).concat(fp);
+}
+function recStat(m){const el=$('recStat');if(el)el.innerHTML=m}
+function stopRec(){RECN++;if(RECA){try{RECA.pause()}catch(x){}RECA=null}if(RSRC){try{RSRC.stop()}catch(x){}RSRC=null}clearTimeout(RECT)}
+/* play a Commons recording; if it can't load (offline, blocked, unsupported), call onFail */
+const RBUF=new Map();let RSRC=null,RECN=0;
+/* Hiss reduction for old recordings: trim rumble and the hiss band above ~9 kHz,
+   gate the quiet gaps (where static is most audible), then normalize the level. */
+async function cleanBuf(buf){
+  const sr=buf.sampleRate,n=buf.length;
+  const off=new OfflineAudioContext(1,n,sr),src=off.createBufferSource();src.buffer=buf;
+  const hp=off.createBiquadFilter();hp.type='highpass';hp.frequency.value=75;hp.Q.value=.7;
+  const lp=off.createBiquadFilter();lp.type='lowpass';lp.frequency.value=Math.min(9500,sr/2-500);lp.Q.value=.6;
+  const hum=off.createBiquadFilter();hum.type='notch';hum.frequency.value=60;hum.Q.value=8;
+  src.connect(hp);hp.connect(hum);hum.connect(lp);lp.connect(off.destination);src.start();
+  const r=await off.startRendering(),d=r.getChannelData(0);
+  const W=Math.max(1,Math.round(sr*.02)),F=Math.ceil(n/W),rms=new Float32Array(F);
+  for(let i=0;i<F;i++){let a=0,c=0;for(let j=i*W,e=Math.min(n,j+W);j<e;j++){a+=d[j]*d[j];c++}rms[i]=Math.sqrt(a/Math.max(1,c))}
+  const so=Array.from(rms).sort((a,b)=>a-b),floor=so[Math.floor(F*.1)]||0,top=so[F-1]||1;
+  const thr=Math.max(floor*2.2,top*.008);
+  const g=new Float32Array(F);for(let i=0;i<F;i++){const x=rms[i]/thr;g[i]=x>=1?1:Math.max(.12,x*x)}
+  const gh=new Float32Array(F);for(let i=0;i<F;i++){let m=0;for(let k=-6;k<=3;k++){const q=g[i+k];if(q!==undefined&&q>m)m=q}gh[i]=m}
+  const g2=new Float32Array(F);for(let i=0;i<F;i++){let a=0,c=0;for(let k=-2;k<=2;k++){const q=gh[i+k];if(q!==undefined){a+=q;c++}}g2[i]=a/c}
+  let pk=0;
+  for(let j=0;j<n;j++){const fi=j/W-.5,i0=Math.max(0,Math.min(F-1,Math.floor(fi))),i1=Math.min(F-1,i0+1),t=Math.min(1,Math.max(0,fi-i0));d[j]*=g2[i0]+(g2[i1]-g2[i0])*t;const a=Math.abs(d[j]);if(a>pk)pk=a}
+  const nm=pk>0?Math.min(10,.85/pk):1,fd=Math.min(Math.round(sr*.008),n>>1);
+  for(let j=0;j<n;j++)d[j]*=nm;for(let j=0;j<fd;j++){d[j]*=j/fd;d[n-1-j]*=j/fd}
+  return r;
+}
+async function loadClean(f){
+  if(RBUF.has(f.name))return RBUF.get(f.name);
+  const ctx=audioInit();if(!ctx)throw new Error('no audio');
+  for(const url of recSrcs(f)){
+    try{const res=await fetch(url,{mode:'cors'});if(!res.ok)continue;
+      const raw=await res.arrayBuffer();const buf=await new Promise((ok,no)=>{const p=ctx.decodeAudioData(raw,ok,no);if(p&&p.catch)p.catch(no)});
+      const c=await cleanBuf(buf);RBUF.set(f.name,c);return c}catch(e){}
+  }
+  throw new Error('unavailable');
+}
+function playRec(f,onFail){
+  stopRec();if(PLAY&&AU.ctx)hush();
+  const my=RECN;recStat('Loading recording…');
+  loadClean(f).then(buf=>{
+    if(my!==RECN)return;const ctx=AU.ctx;
+    const src=ctx.createBufferSource();src.buffer=buf;const g=ctx.createGain();g.gain.value=1;src.connect(g);g.connect(ctx.destination);src.start();RSRC=src;
+    recStat('🔊 Recording (hiss-reduced): <a href="'+commonsPage(f)+'" target="_blank" rel="noopener">'+esc(f.name)+'</a> · Wikimedia Commons');
+  }).catch(()=>{if(my===RECN)playRecRaw(f,onFail)});
+}
+/* fallback when the file can't be fetched for processing: plain <audio> playback */
+function playRecRaw(f,onFail){
+  const srcs=recSrcs(f);let k=0,ok=false;const a=new Audio();RECA=a;a.preload='auto';
+  const fail=()=>{if(RECA!==a||ok)return;clearTimeout(RECT);
+    if(k<srcs.length){a.src=srcs[k++];RECT=setTimeout(fail,7000);const pr=a.play();if(pr&&pr.catch)pr.catch(()=>{});return}
+    RECA=null;recStat('⚠ The recording couldn’t load (no internet, or blocked by this viewer), so you’re hearing the synthesizer. Download the HTML file and open it while online to hear recordings.');if(onFail)onFail()};
+  a.addEventListener('error',fail);
+  a.addEventListener('playing',()=>{if(RECA!==a)return;ok=true;clearTimeout(RECT);recStat('🔊 Recording: <a href="'+commonsPage(f)+'" target="_blank" rel="noopener">'+esc(f.name)+'</a> · Wikimedia Commons')});
+  fail();
+}
+/* one entry point for a single sound: recording when available and selected, else synth */
+function sound(sym,synthFn,rest){
+  if(rest)vtSet(rest);
+  const f=REC[sym];
+  if(AUD==='rec'&&f){playRec(f,synthFn);return 'rec'}
+  stopRec();synthFn();return 'syn';
+}
+function creditsHTML(){
+  const seen=new Set(),items=[];Object.keys(REC).forEach(k=>{const f=REC[k];if(seen.has(f.name))return;seen.add(f.name);items.push('<a href="'+commonsPage(f)+'" target="_blank" rel="noopener" title="'+esc(f.name)+'">'+esc(k)+'</a>')});
+  return '<div class="note"><b>Recordings</b> come from <a href="https://commons.wikimedia.org/wiki/Category:General_phonetics" target="_blank" rel="noopener">Wikimedia Commons</a> — the same files Wikipedia uses on its IPA charts. Most were recorded by Peter Isotalo; others by Commons contributors. Some are 20 years old and carry background hiss, so the app filters them and silences the quiet gaps before playing. They are free under GFDL / CC BY-SA licenses; each link below opens the file page with its author and license. English word recordings are the Commons “En-us-…” pronunciation files.</div><div class="wl credits">'+items.join('')+'</div>';
+}
+
+/* ================= UI state ================= */
+let MODE='C',ENGHL=false,ROUND=0;
+const SEL={c:null,v:null};
+function setSeg(name,val){document.querySelectorAll(`[data-seg="${name}"] button`).forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===String(val)))}
+document.querySelectorAll('[data-seg]').forEach(g=>g.addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;const n=g.dataset.seg,v=b.dataset.v;setSeg(n,v);
+  if(n==='mode')setMode(v);
+  else if(n==='eng'){ENGHL=v==='1';$('vC').classList.toggle('engOnly',ENGHL);$('vV').classList.toggle('engOnly',ENGHL)}
+  else if(n==='voice'){VOICE=v}
+  else if(n==='aud'){AUD=v;if(v==='syn')stopRec()}
+  else if(n==='round'){ROUND=+v}
+}));
+function setMode(m){
+  MODE=m;['C','V','W'].forEach(k=>$('v'+k).hidden=k!==m);
+  $('engSeg').style.visibility=m==='W'?'hidden':'visible';
+  $('ws').scrollTop=0;
+  if(m==='C'){SEL.c?showC(SEL.c,true):introC()}
+  else if(m==='V'){SEL.v?showV(SEL.v,true):introV()}
+  else{renderW();panelW()}
+}
+$('lblChk').addEventListener('change',e=>$('vtLabels').style.display=e.target.checked?'':'none');
+
+/* ---------- Consonant chart ---------- */
+function buildChart(){
+  const tb=$('cTable');let h='<thead><tr><th></th>';
+  PORDER.forEach(p=>h+=`<th colspan="2" data-place="${p}" title="${esc(PLACES[p][1])}">${PLACES[p][0].replace('Labiodental','Labio-<br>dental').replace('Postalveolar','Post-<br>alveolar')}</th>`);
+  h+='</tr></thead><tbody>';
+  MORDER.forEach(m=>{h+=`<tr><th class="row" data-manner="${m}" title="${esc(MANNERS[m][1])}">${MANNERS[m][0]}</th>`;
+    PORDER.forEach(p=>{['l','r'].forEach(side=>{
+      const c=Object.values(CN).find(x=>x.place===p&&x.manner===m&&(side==='l'?!x.v:x.v));
+      const imp=IMP.has(`${m}-${p}-${side}`);
+      h+=`<td class="${side}${imp?' imp':''}" data-p="${p}" data-m="${m}">${c?`<button class="sym${c.eng||ALLO[c.s]?' en':''}" data-s="${c.s}" title="${esc(phName(c))}">${c.s}</button>`:''}</td>`;
+    })});h+='</tr>'});
+  tb.innerHTML=h+'</tbody>';
+  const sb=s=>`<button class="sym${CN[s].eng||ALLO[s]?' en':''}" data-s="${s}" title="${esc(phName(CN[s]))}">${s}</button>`;
+  $('cNP').innerHTML=[['Clicks',['ʘ','ǀ','ǃ','ǂ','ǁ']],['Voiced implosives',['ɓ','ɗ','ʄ','ɠ','ʛ']],['Ejectives',['pʼ','tʼ','kʼ','sʼ']]].map(g=>`<div class="others"><span class="lab">${g[0]}</span>${g[1].map(sb).join('')}</div>`).join('');
+  $('cOthers').innerHTML='<span class="lab">Other symbols</span>'+['w','ʍ','ɥ','ʜ','ʢ','ʡ','ɕ','ʑ','ɺ','ɧ'].map(sb).join('')+'<span class="lab" style="margin-left:10px">Affricates</span>'+['tʃ','dʒ','ts','dz'].map(sb).join('');
+  $('vC').addEventListener('click',e=>{
+    const b=e.target.closest('.sym');if(b){showC(b.dataset.s);playC(b.dataset.s,'best');return}
+    const th=e.target.closest('th[data-place],th[data-manner]');if(th)showTerm(th.dataset.place,th.dataset.manner);
+  });
+}
+function clearHL(){document.querySelectorAll('.ipa .hl').forEach(x=>x.classList.remove('hl'))}
+function markSel(s){document.querySelectorAll('#vC .sym').forEach(b=>b.classList.toggle('sel',b.dataset.s===s))}
+function introC(){
+  vtSet(stateFor(null));
+  $('pinfo').innerHTML=`<div class="nm" style="text-transform:none">Every consonant has three labels</div>
+  <div class="chips">
+   <div class="chip"><b class="v1">Voicing</b><span>Do the vocal folds vibrate? Put a finger on your throat and say “zzz”, then “sss”.</span></div>
+   <div class="chip"><b>Place</b><span>Where in the mouth the air is squeezed or blocked.</span></div>
+   <div class="chip"><b>Manner</b><span>How much the air is blocked: fully (plosive), nearly (fricative), or barely (approximant).</span></div>
+  </div>
+  <div class="note">So /s/ is a <b>voiceless alveolar fricative</b>, and /z/ is the same sound with voicing. Pick any symbol in the chart to start.</div><div class="sec">Sound credits</div>${creditsHTML()}`;
+}
+const STOPLIKE=['pl','af','tp','tr','ck','im','ej','lt'];
+function playC(s,how){
+  const c=CN[s];if(!c)return;const schwa=VW['ə'],a=VW['a'];
+  if(how==='best')return sound(s,()=>playC(s,'ctx'),stateFor(c));
+  stopRec();
+  let segs;
+  if(how==='ctx')segs=[{ph:a,stress:1,i:0},{ph:c,i:1},{ph:a,i:2}];
+  else{segs=[{ph:c,i:0}];if(STOPLIKE.includes(c.manner))segs.push({ph:schwa,i:1,dur:.12})}
+  playSegs(segs,{rest:stateFor(c)});
+}
+function showC(s,quiet){
+  const c=CN[s];SEL.c=s;markSel(s);clearHL();
+  vtSet(stateFor(c),!!quiet);
+  const pr=PLACES[c.place],mn=MANNERS[c.manner];
+  const pair=Object.values(CN).find(x=>x.place===c.place&&x.manner===c.manner&&x.v!==c.v&&x.s!==s);
+  $('pinfo').innerHTML=`<div class="big">${esc(c.s)}<small>/${esc(c.s)}/</small></div>
+  <div class="nm">${esc(phName(c))}</div>
+  <div class="chips">
+   ${AIR[c.manner]?`<div class="chip"><b class="v1">${AIR[c.manner][0]}</b><span>${AIR[c.manner][1]}</span></div>`:''}${c.manner==='ck'||c.manner==='ej'?'':`<div class="chip"><b class="${c.v?'v1':'v0'}">${c.v?'Voiced':'Voiceless'}</b><span>${c.v?'The vocal folds vibrate while you make it.':'The vocal folds are held apart — no buzz, just air.'}</span></div>`}
+   <div class="chip"><b>${pr[0]}</b><span>${pr[1]}</span></div>
+   <div class="chip"><b>${mn[0]}</b><span>${mn[1]}</span></div>
+  </div>
+  <div class="ex">Heard in: ${c.ex}</div>
+  <div class="btns">${REC[c.s]?'<button class="btn pri" id="pR">▶ Recording</button>':''}<button class="btn${REC[c.s]?'':' pri'}" id="pA">▶ Synth [a${esc(c.s)}a]</button><button class="btn" id="pB">▶ ${STOPLIKE.includes(c.manner)?'['+esc(c.s)+'ə]':'Alone'}</button>${pair?`<button class="btn" id="pP">Pair: ${esc(pair.s)}</button>`:''}</div>
+  <div class="recstat" id="recStat"></div>
+  <div class="note">${c.eng?'<b>English sound.</b> Try it in the Word Builder.':ALLO[c.s]?ALLO[c.s]+' Find it in the Word Builder palette.':'<b>Not an English phoneme</b> — but it is a real speech sound in other languages. Switch the Word Builder to <b>All IPA</b> to use it.'} The voice is a simple <b>formant synthesizer</b>: buzz from the “vocal folds” shaped by tuned filters, plus hiss for fricatives. The <b>Synth</b> buttons use a simple formant synthesizer — robotic on purpose, so you hear the ingredients; <b>Recording</b> plays a real phonetician.</div>`;
+  $('pA').onclick=()=>playC(s,'ctx');$('pB').onclick=()=>playC(s,'alone');
+  if($('pR'))$('pR').onclick=()=>{AUD==='rec'?playRec(REC[s],()=>playC(s,'ctx')):playRec(REC[s],()=>playC(s,'ctx'))};
+  if(pair)$('pP').onclick=()=>{showC(pair.s);playC(pair.s,'best')};
+}
+function showTerm(place,manner){
+  clearHL();markSel(null);SEL.c=null;
+  let title,desc,list;
+  if(place){[title,desc]=PLACES[place];document.querySelectorAll(`#cTable td[data-p="${place}"],#cTable th[data-place="${place}"]`).forEach(x=>x.classList.add('hl'));list=Object.values(CN).filter(c=>c.place===place);
+    const ex=Object.values(CN).find(c=>c.place===place&&c.manner==='pl')||Object.values(CN).find(c=>c.place===place);vtSet(stateFor(ex))}
+  else{[title,desc]=MANNERS[manner];document.querySelectorAll(`#cTable td[data-m="${manner}"],#cTable th[data-manner="${manner}"]`).forEach(x=>x.classList.add('hl'));list=Object.values(CN).filter(c=>c.manner===manner);
+    vtSet(stateFor(list.find(c=>c.place==='al')||list[0]))}
+  $('pinfo').innerHTML=`<div class="sec">${place?'Place of articulation':'Manner of articulation'}</div><div class="nm" style="font-size:20px">${title}</div><div class="ex">${desc}</div>
+   <div class="sec">Sounds in this ${place?'column':'row'}</div><div class="wl">${list.map(c=>`<button data-s="${c.s}" style="font-family:var(--f-ipa);font-size:16px">${esc(c.s)}</button>`).join('')}</div>`;
+  $('pinfo').querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{showC(b.dataset.s);playC(b.dataset.s,'best')});
+}
+
+/* ---------- Vowel chart ---------- */
+const VX=(h,b)=>{const xf=90+(1-h)*150;return xf+b*(470-xf)},VY=h=>52+(1-h)*300;
+function buildVowels(){
+  const sv=$('vsvg');let h='';
+  const P=[[VX(1,0),VY(1)],[VX(1,1),VY(1)],[VX(0,1),VY(0)],[VX(0,0),VY(0)]];
+  h+=`<polygon id="vPoly" points="${P.map(p=>p.join(',')).join(' ')}" fill="#0b1220cc" stroke="#4b5563" stroke-width="1.5" style="cursor:crosshair"/>`;
+  [.667,.333].forEach(y=>h+=`<line x1="${VX(y,0)}" y1="${VY(y)}" x2="${VX(y,1)}" y2="${VY(y)}" stroke="#374151" stroke-width="1" pointer-events="none"/>`);
+  h+=`<line x1="${VX(1,.5)}" y1="${VY(1)}" x2="${VX(0,.5)}" y2="${VY(0)}" stroke="#374151" stroke-width="1" pointer-events="none"/>`;
+  [['Close',1],['Close-mid',.667],['Open-mid',.333],['Open',0]].forEach(([t,y])=>h+=`<text x="${VX(y,0)-42}" y="${VY(y)+4}" text-anchor="end" font-size="11" font-weight="700" fill="#9ca3af" font-family="system-ui,sans-serif" letter-spacing=".5">${t.toUpperCase()}</text>`);
+  [['Front',0],['Central',.5],['Back',1]].forEach(([t,b])=>h+=`<text x="${VX(1,b)}" y="22" text-anchor="middle" font-size="11" font-weight="700" fill="#9ca3af" font-family="system-ui,sans-serif" letter-spacing=".5">${t.toUpperCase()}</text>`);
+  h+='<path id="vDipArrow" fill="none" stroke="#fbbf24" stroke-width="3" stroke-linecap="round" marker-end="url(#vah)" pointer-events="none"/>';
+  h+='<defs><marker id="vah" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M0,0L10,5L0,10z" fill="#fbbf24"/></marker></defs>';
+  Object.values(VW).forEach(v=>{if(v.type!=='V'||v.rc)return;
+    const pairDot=Object.values(VW).some(o=>o!==v&&o.type==='V'&&!o.rc&&o.h===v.h&&Math.abs(o.b-v.b)<.06);
+    const x=VX(v.h,v.b),y=VY(v.h),dx=pairDot?(v.rd?18:-18):(v.rd?16:-16);
+    const lone=!pairDot&&['ɪ','ʊ','ə','æ','ɐ'].includes(v.s);
+    const tx=lone?x:x+dx;
+    h+=`<g class="vsym${v.eng?' en':''}" data-s="${v.s}">${lone?'':`<circle class="dot" cx="${x}" cy="${y}" r="4"/>`}<rect class="hit" x="${tx-16}" y="${y-21}" width="32" height="34" rx="7"/><text x="${tx}" y="${y+10}" text-anchor="middle">${v.s}</text><title>${esc(phName(v))}</title></g>`;
+  });
+  h+='<circle id="vCursor" r="9" fill="#fbbf2455" stroke="#fbbf24" stroke-width="2" style="display:none" pointer-events="none"/>';
+  sv.innerHTML=h;
+  $('vDiph').innerHTML='<span class="lab">English diphthongs</span>'+Object.keys(DIPH).map(k=>`<button class="dk" data-d="${k}">${k}<small>${DIPH[k][2].replace(/<\/?b>/g,'').replace('English ','')}</small></button>`).join('')+
+    `<span class="lab" style="margin-left:10px">R-colored</span>`+['ɝ','ɚ'].map(k=>`<button class="dk" data-d="${k}">${k}<small>${k==='ɝ'?'“bird”':'“butter”'}</small></button>`).join('');
+  sv.addEventListener('click',e=>{const g=e.target.closest('.vsym');if(g){showV(g.dataset.s);playV(g.dataset.s)}});
+  $('vDiph').addEventListener('click',e=>{const b=e.target.closest('.dk');if(b){showV(b.dataset.d);playV(b.dataset.d)}});
+  // free drag
+  let drag=false;
+  const pos=e=>{const r=sv.getBoundingClientRect(),vb=sv.viewBox.baseVal;const x=(e.clientX-r.left)*vb.width/r.width,y=(e.clientY-r.top)*vb.height/r.height;
+    const hh=clamp(1-(y-52)/300,0,1),xf=90+(1-hh)*150,bb=clamp((x-xf)/(470-xf),0,1);return {h:hh,b:bb,x:VX(hh,bb),y:VY(hh)}};
+  const upd=e=>{const p=pos(e),fs=FSC(),rd=ROUND===1;
+    const F1=280+(1-p.h)*500,F2b=lerp(2250-(1-p.h)*650,1250-(1-p.h)*150,p.b),F2=F2b-(rd?400-(1-p.h)*150:0),F3=2500+(1-p.b)*p.h*400-(rd?250:0);
+    sustain(Object.assign(baseP(),{vA:1,F1:F1*fs,F2:F2*fs,F3:F3*fs}));
+    const s=vState(p.h,p.b,rd);vtSet(s);
+    const c=$('vCursor');c.style.display='';c.setAttribute('cx',p.x);c.setAttribute('cy',p.y);
+    freePanel(p.h,p.b,rd,F1,F2,F3)};
+  $('vPoly').addEventListener('pointerdown',e=>{stopRec();drag=true;sv.setPointerCapture(e.pointerId);markV(null);$('vDipArrow').setAttribute('d','');upd(e)});
+  sv.addEventListener('pointermove',e=>{if(drag)upd(e)});
+  const end=()=>{if(!drag)return;drag=false;hush();$('vCursor').style.display='none'};
+  sv.addEventListener('pointerup',end);sv.addEventListener('pointercancel',end);
+}
+function markV(s){document.querySelectorAll('#vV .vsym,#vV .dk').forEach(g=>g.classList.toggle('sel',(g.dataset.s||g.dataset.d)===s))}
+function introV(){
+  vtSet(vState(.5,.5,false));
+  $('pinfo').innerHTML=`<div class="nm" style="text-transform:none">Vowels are tongue positions</div>
+  <div class="chips">
+   <div class="chip"><b>Height</b><span>How high the tongue (and how closed the jaw) is. Say “see” then “saw” and feel your jaw drop.</span></div>
+   <div class="chip"><b>Backness</b><span>Whether the highest part of the tongue is toward the front or the back of the mouth. Glide from “see” to “Sue”.</span></div>
+   <div class="chip"><b>Rounding</b><span>Whether the lips are spread or pushed into a circle.</span></div>
+  </div>
+  <div class="note">Air flows freely for every vowel — it's the <b>shape</b> of the mouth that changes which frequencies ring loudest. Those resonances are called <b>formants</b>: F1 tracks tongue height, F2 tracks front vs. back.</div><div class="sec">Sound credits</div>${creditsHTML()}`;
+}
+function playV(s){const v=VW[s];return sound(s,()=>synthV(s),stateFor(v,v.type==='D'?1:0))}
+function synthV(s){stopRec();const v=VW[s];playSegs([{ph:v,stress:1,i:0,dur:v.type==='D'?.42:.5}],{rest:stateFor(v,v.type==='D'?1:0)})}
+function showV(s,quiet){
+  const v=VW[s];SEL.v=s;markV(s);
+  vtSet(stateFor(v),!!quiet);
+  const arr=$('vDipArrow');
+  if(v.type==='D'){const a=VW[v.parts[0]],b=VW[v.parts[1]];arr.setAttribute('d',`M${VX(a.h,a.b)},${VY(a.h)}L${VX(b.h,b.b)},${VY(b.h)}`)}else arr.setAttribute('d','');
+  const fs=FSC();
+  $('pinfo').innerHTML=`<div class="big">${esc(v.s)}<small>/${esc(v.s)}/</small></div>
+  <div class="nm">${esc(phName(v))}</div>
+  ${v.type==='D'?`<div class="ex">A <b>diphthong</b> is one vowel that <b>glides</b> from one tongue position to another inside a single syllable: here from [${v.parts[0]}] toward [${v.parts[1]}]. Watch the arrow on the chart and the tongue in the diagram.</div>`:
+  v.rc?`<div class="ex">An <b>r-colored vowel</b>: the vowel and the “r” happen at the same time. The tongue bunches or curls, which pulls the <b>third formant (F3)</b> way down — the acoustic signature of English “r”.</div>`:
+  `<div class="chips"><div class="chip"><b>Height</b><span>${hName(v.h)}</span></div><div class="chip"><b>Backness</b><span>${bName(v.b)}</span></div><div class="chip"><b class="${v.rd?'v1':'v0'}">${v.rd?'Rounded':'Unrounded'}</b><span>${v.rd?'Lips pushed into a circle.':'Lips relaxed or spread.'}</span></div></div>`}
+  <div class="fmt"><div><i>F1</i><span>${Math.round(v.F[0]*fs)}</span></div><div><i>F2</i><span>${Math.round(v.F[1]*fs)}</span></div><div><i>F3</i><span>${Math.round(v.F[2]*fs)}</span></div></div>
+  <div class="ex">Heard in: ${v.ex}</div>
+  <div class="btns">${REC[s]?'<button class="btn pri" id="pVR">▶ Recording</button>':''}<button class="btn${REC[s]?'':' pri'}" id="pV">▶ Synth</button></div>
+  <div class="recstat" id="recStat"></div>${s==='ɝ'||s==='ɚ'?'<div class="note">The recording is the English word “er”: in American English it is a stressed /ɝ/.</div>':''}`;
+  $('pV').onclick=()=>synthV(s);if($('pVR'))$('pVR').onclick=()=>playRec(REC[s],()=>synthV(s));
+}
+function freePanel(h,b,rd,F1,F2,F3){
+  const fs=FSC();
+  $('pinfo').innerHTML=`<div class="sec">Free glide</div><div class="nm">${hName(h)} ${bName(b)} ${rd?'rounded':'unrounded'}</div>
+  <div class="fmt"><div><i>F1</i><span>${Math.round(F1*fs)}</span></div><div><i>F2</i><span>${Math.round(F2*fs)}</span></div><div><i>F3</i><span>${Math.round(F3*fs)}</span></div></div>
+  <div class="note">Drag <b>up</b> and F1 falls (tongue rises). Drag <b>back</b> and F2 falls. Switch lips to <b>Rounded</b> below the chart to hear rounding lower F2 and F3 too.</div>`;
+}
+
+/* ---------- Word builder ---------- */
+const W={tok:[],now:-1,slow:false,ch:null,all:false};
+const PAL=[
+ ['Plosives',['p','b','t','d','k','ɡ'],['pin','bin','tin','din','kit','go']],
+ ['Affricates',['tʃ','dʒ'],['chin','jam']],
+ ['Fricatives',['f','v','θ','ð','s','z','ʃ','ʒ','h'],['fan','van','thin','this','sip','zip','ship','measure','hat']],
+ ['Nasals',['m','n','ŋ'],['man','no','sing']],
+ ['Approximants',['l','ɹ','w','j'],['leaf','red','we','yes']],
+ ['Vowels',['i','ɪ','ɛ','æ','ɑ','ɔ','ʊ','u','ʌ','ə','ɝ','ɚ'],['see','sit','bed','cat','spa','law','book','food','cup','about','bird','butter']],
+ ['Diphthongs',['eɪ','aɪ','aʊ','ɔɪ','oʊ'],['day','my','now','boy','go']],
+ ['Allophones',['ɾ','ʔ'],['butter','uh-oh']],
+];
+function allPal(){
+  const ord=x=>{const i=PORDER.indexOf(x.place);return (i<0?20:i)*2+(x.v?1:0)};
+  const G=[['Plosives',['pl']],['Nasals',['na']],['Trills',['tr']],['Taps & flaps',['tp','lt']],['Fricatives',['fr']],['Lateral fricatives',['lf']],['Approximants',['ap']],['Lateral approximants',['la']],['Affricates',['af']],['Clicks',['ck']],['Implosives',['im']],['Ejectives',['ej']]];
+  const out=G.map(([n,ms])=>{const l=Object.values(CN).filter(c=>ms.includes(c.manner)).sort((a,b)=>ord(a)-ord(b));return [n,l.map(c=>c.s),l.map(c=>shortName(c).replace(/^(vd|vl) /,''))]});
+  const vs=Object.values(VW).filter(v=>v.type==='V');
+  out.push(['Vowels',vs.map(v=>v.s),vs.map(v=>v.rc?'r-color':({'close':'cl','near-close':'n-cl','close-mid':'c-mid','mid':'mid','open-mid':'o-mid','near-open':'n-op','open':'op'}[hName(v.h)])+' '+({'front':'fr','near-front':'fr','central':'cen','near-back':'bk','back':'bk'}[bName(v.b)])+(v.rd?' rd':''))]);
+  out.push(PAL.find(g=>g[0]==='Diphthongs'));
+  return out;
+}
+function buildPal(){
+  let h=`<div class="prow" style="align-items:center"><div class="seg" id="wSet"><span class="lbl">Sounds</span><button data-v="0" aria-pressed="${!W.all}">English</button><button data-v="1" aria-pressed="${W.all}">All IPA</button></div><span class="note">${W.all?'Every IPA symbol. Words that use non-English sounds are checked as “not English”.':'The 24 consonants and vowels of American English, plus two common allophones.'}</span></div>`;
+  const row=gs=>'<div class="prow">'+gs.map(g=>`<div class="pg"><span class="gl">${g[0]}</span><div class="ks">${g[1].map((s,i)=>`<button class="key${isV(s)?' v':''}" data-k="${s}" title="${esc(phName(PH[s]))}"><b>${s}</b><i>${g[2][i]}</i></button>`).join('')}</div></div>`).join('')+'</div>';
+  if(W.all){const A=allPal();h+=row(A.slice(0,4));h+=row(A.slice(4,6));h+=row(A.slice(6,9));h+=row(A.slice(9,12));h+=row(A.slice(12))}
+  else{h+=row(PAL.slice(0,5));h+=row(PAL.slice(5))}
+  h+=`<div class="prow"><div class="pg"><span class="gl">Marks</span><div class="ks">
+   <button class="key m" data-k="ˈ" title="Primary stress: put it before the stressed syllable"><b>ˈ</b><i>stress</i></button>
+   <button class="key m" data-k="." title="Syllable break"><b>.</b><i>syllable</i></button>
+   <button class="key ctl" data-c="back" title="Delete last (Backspace)"><b>⌫</b><i>delete</i></button>
+   <button class="key ctl" data-c="clear" title="Clear"><b>✕</b><i>clear</i></button>
+   <button class="key ctl" data-c="play" title="Play (Enter)" style="border-color:#2563eb"><b>▶</b><i>play</i></button></div></div></div>`;
+  $('wPal').innerHTML=h;
+}
+function palEvents(){
+  $('wPal').addEventListener('click',e=>{
+    const sg=e.target.closest('#wSet button');if(sg){W.all=sg.dataset.v==='1';buildPal();return}
+    const b=e.target.closest('.key');if(!b)return;
+    if(b.dataset.k){addTok(b.dataset.k)}
+    else if(b.dataset.c==='back')delTok(W.tok.length-1);
+    else if(b.dataset.c==='clear'){W.tok=[];renderW()}
+    else if(b.dataset.c==='play')playW();
+  });
+}
+function addTok(s){
+  if(MARKS.has(s)){const last=W.tok[W.tok.length-1];if(last&&MARKS.has(last))W.tok.pop();if(!W.tok.length&&s==='.')return}
+  W.tok.push(s);renderW();
+  if(PH[s]){const p=PH[s];sound(s,()=>playSegs(p.type==='C'?(['pl','af'].includes(p.manner)?[{ph:p,i:0},{ph:VW['ə'],i:1,dur:.1}]:[{ph:p,i:0}]):[{ph:p,stress:1,i:0,dur:.3}],{rest:stateFor(p,p.type==='D'?1:0)}),stateFor(p,p.type==='D'?1:0))}
+}
+function delTok(i){if(i<0)return;W.tok.splice(i,1);renderW()}
+function wordSegs(){
+  const syl=syllabify(W.tok),out=[];
+  syl.forEach(sy=>{[...sy.on,...sy.nu,...sy.co].forEach(it=>out.push({ph:PH[it.s],i:it.i,stress:sy.st===1&&sy.nu.includes(it)?1:0}))});
+  if(!syl.some(s=>s.st===1)){const f=out.find(o=>o.ph.type!=='C');if(f)f.stress=1}
+  return out;
+}
+function playW(){
+  stopRec();const segs=wordSegs();if(!segs.length)return;
+  playSegs(segs,{slow:W.slow,onSeg:i=>{W.now=i;document.querySelectorAll('#wSyl .tile').forEach(t=>t.classList.toggle('now',+t.dataset.i===i))}});
+}
+function renderW(){
+  const tok=W.tok;
+  $('wTrans').innerHTML=tok.length?`<span class="sl">/</span>${esc(tok.join(''))}<span class="sl">/</span>`:'<span class="ph">tap sounds below to build a word</span>';
+  const syl=syllabify(tok);
+  if(!segsOf(tok).length){$('wSyl').innerHTML='<div class="empty">Try /k/ + /æ/ + /t/ … then swap one sound and see what changes.</div>'}
+  else $('wSyl').innerHTML=syl.map(sy=>{
+    const t=(it,cls,lab)=>`<div class="tile ${cls}" data-i="${it.i}" title="${esc(phName(PH[it.s]))}"><span>${esc(it.s)}</span><i>${lab}</i><button class="x" data-del="${it.i}" aria-label="Remove">×</button></div>`;
+    return `<div class="syl${sy.st===1?' st':''}${sy.bad||!sy.nu.length?' bad':''}"><span class="sh">${sy.st===1?'ˈ stressed':'syllable'}</span>${sy.on.map(i=>t(i,'on','onset')).join('')}${sy.nu.map(i=>t(i,'nu','nucleus')).join('')}${sy.co.map(i=>t(i,'co','coda')).join('')}${!sy.nu.length?'<div class="tile nu" style="opacity:.5;border-style:dashed"><span>?</span><i>nucleus</i></div>':''}</div>`;
+  }).join('');
+  const j=judge(tok),vd=$('wVerdict');
+  if(!j){vd.hidden=true;$('wLists').hidden=true}
+  else{
+    vd.hidden=false;vd.className='verdict '+j.kind;
+    if(j.kind==='real'){const ws=j.words;
+      vd.innerHTML=`<div class="vh">✓ Real English word: ${ws.map(w=>`<span class="wordchip">${esc(w.w)}</span>`).join(' ')}</div>
+      ${j.allo?'<div class="vd">Your <b>[ɾ]</b> or <b>[ʔ]</b> is how American English often pronounces /t/ (or /d/) here — an <b>allophone</b>. Dictionaries write the phoneme /t/; narrow transcription shows the flap or glottal stop.</div>':''}
+      <div class="vd">${ws.length>1?`<b>Homophones!</b> ${ws.map(w=>'“'+esc(w.w)+'”').join(' and ')} are spelled differently but are made of exactly the same sounds. IPA writes each sound one way, so it can tell you how a word is said even when spelling can't.`:'These sounds, in this order, make a word in the built-in list of about '+DICT.length+' common words.'}</div>`}
+    else if(j.kind==='poss')vd.innerHTML=`<div class="vh">◐ Possible English word — but not in the word list</div><div class="vd">Every onset, nucleus and coda follows English <b>phonotactics</b> (the rules for which sounds can sit next to each other), so this could be an English word, like the made-up “blick” /blɪk/. ${DICT.length} words is a small list, though — it might be a real word we just don't have.</div>`;
+    else if(j.kind==='frn')vd.innerHTML=`<div class="vh">🌐 Uses sounds English doesn't have: ${j.list.map(x=>'<span style="font-family:var(--f-ipa)">/'+esc(x)+'/</span>').join(' ')}</div><div class="vd">So it can't be an English word — but sequences like this are words in other languages. German “Bach” is /bax/, French “rouge” is /ʁuʒ/, Zulu “iqanda” starts its second syllable with the click /ǃ/. Click a sound in the Consonants or Vowels view to see where it's used.</div>`;
+    else vd.innerHTML=`<div class="vh">✕ Not a possible English word</div><div class="vd">${j.why}</div>`;
+    $('wLists').hidden=false;
+    const segs=segsOf(tok);
+    const mins=DICT.filter(d=>{if(d.segs.length!==segs.length)return false;const df=d.segs.map((x,k)=>k).filter(k=>d.segs[k]!==segs[k]);return df.length===1&&isV(d.segs[df[0]])===isV(segs[df[0]])});
+    const seen=new Set();const uniq=a=>a.filter(d=>{if(seen.has(d.w))return false;seen.add(d.w);return true});
+    const comp=uniq(DICT.filter(d=>d.segs.length>segs.length&&segs.every((x,k)=>d.segs[k]===x))).slice(0,14);
+    const chip=d=>`<button data-w="${esc(d.w)}">${esc(d.w)}<em>/${esc(d.toks.join(''))}/</em></button>`;
+    $('wMin').innerHTML=mins.length?mins.slice(0,16).map(chip).join(''):'<span class="none">No words in the list differ by exactly one sound.</span>';
+    $('wComp').innerHTML=comp.length?comp.map(chip).join(''):'<span class="none">No listed words start with these sounds.</span>';
+  }
+  if(MODE==='W'&&!W.ch)panelWord(j);
+}
+$('wSyl').addEventListener('click',e=>{
+  const x=e.target.closest('[data-del]');if(x){e.stopPropagation();delTok(+x.dataset.del);return}
+  const t=e.target.closest('.tile[data-i]');if(t){const p=PH[W.tok[+t.dataset.i]];if(p){const s=W.tok[+t.dataset.i];sound(s,()=>playSegs(p.type==='C'?[{ph:p,i:0}]:[{ph:p,stress:1,i:0,dur:.3}],{rest:stateFor(p,p.type==='D'?1:0)}),stateFor(p,p.type==='D'?1:0))}}
+});
+$('wLists').addEventListener('click',e=>{const b=e.target.closest('[data-w]');if(b)loadWord(b.dataset.w)});
+function loadWord(w){const d=BYWORD.get(String(w).toLowerCase());if(!d)return false;W.tok=d.toks.slice();renderW();playW();return true}
+function panelW(){
+  if(W.ch)return panelChallenge();
+  panelWord(judge(W.tok));
+}
+function panelWord(j){
+  const real=j&&j.kind==='real'?j.words[0].w:null;
+  $('pinfo').innerHTML=`<div class="sec">Hear it</div>
+  <div class="btns"><button class="btn pri" id="wPlay">▶ Play sounds (synth)</button><button class="btn" id="wNat" ${real?'':'disabled'} title="A recorded American English speaker (Wikimedia Commons) when available, otherwise your device's voice">🔊 Real voice${real?': “'+esc(real)+'”':''}</button></div>
+  <div class="recstat" id="recStat"></div>
+  <div class="seg" data-seg="slow" style="align-self:flex-start"><span class="lbl">Speed</span><button data-v="0" aria-pressed="${!W.slow}">Normal</button><button data-v="1" aria-pressed="${W.slow}">Slow</button></div>
+  <div class="note">Single sounds you tap play as <b>recordings</b>; a whole word is <b>synthesized</b> so the diagram can glide through every sound in step. Watch the diagram as it plays: each sound has its own target shape, and speech is the tongue, lips and velum <b>gliding between targets</b> (coarticulation).</div>
+  <div class="sec">Look up a word</div>
+  <div class="inrow"><input id="wLook" placeholder="e.g. thought, knight, music" autocomplete="off"><button class="btn" id="wGo">Show IPA</button></div>
+  <div class="note" id="wLookMsg"></div>
+  <div class="sec">Challenge</div>
+  <div class="note">Get a word in ordinary spelling and build its IPA transcription yourself.</div>
+  <div class="btns"><button class="btn grn" id="wCh">🎯 Start challenge</button></div>`;
+  $('wPlay').onclick=playW;
+  $('wNat').onclick=()=>{if(!real)return;const tts=()=>{if(!sayNatural(real))$('wLookMsg').textContent='This browser has no built-in speech voice.';else recStat('🔊 Using your device’s built-in voice (no Commons recording of “'+esc(real)+'” could be loaded).')};
+    const f=WREC[real.toLowerCase()];if(AUD==='rec'&&f)playRec(f,tts);else tts()};
+  $('pinfo').querySelector('[data-seg="slow"]').onclick=e=>{const b=e.target.closest('button');if(!b)return;W.slow=b.dataset.v==='1';setSeg('slow',b.dataset.v)};
+  const go=()=>{const v=$('wLook').value.trim();if(!v)return;if(!loadWord(v)){$('wLookMsg').innerHTML='“'+esc(v)+'” isn\'t in the built-in word list — try building it from sounds!'}};
+  $('wGo').onclick=go;$('wLook').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}};
+  $('wCh').onclick=()=>{W.ch={n:0,ok:0,word:null,done:false};nextChallenge()};
+}
+function nextChallenge(){
+  const pool=DICT.filter(d=>d.w!=='I'&&(!W.ch.word||d.w!==W.ch.word.w));
+  W.ch.word=pool[Math.floor(Math.random()*pool.length)];W.ch.done=false;W.ch.res=null;W.tok=[];renderW();panelChallenge();
+}
+const LENIENT=s=>s.map((x,k,a)=>x==='ɔ'&&a[k+1]!=='ɹ'?'ɑ':x==='ʌ'?'ə':x==='ɝ'?'ɚ':x);
+function checkChallenge(){
+  const c=W.ch,mine=segsOf(W.tok),ans=c.word.segs;if(!mine.length)return;
+  const exact=BYKEY.get(mine.join(' '))||[];
+  if(mine.join(' ')===ans.join(' ')||exact.some(d=>d.segs.join(' ')===ans.join(' '))){c.ok++;c.res=['ok','✓ Correct! /'+c.word.toks.join('')+'/'+(exact.length>1?' — and that also spells '+exact.filter(d=>d.w!==c.word.w).map(d=>'“'+d.w+'”').join(', ')+'.':'')]}
+  else if(LENIENT(mine).join(' ')===LENIENT(ans).join(' ')){c.ok++;c.res=['mid','≈ Accepted. The list writes <span>/'+c.word.toks.join('')+'/</span>; yours differs only in a vowel that many accents merge (like ɑ/ɔ in “cot/caught”).']}
+  else{
+    let diff='';const n=Math.max(mine.length,ans.length);for(let k=0;k<n;k++)if(mine[k]!==ans[k]){diff=mine[k]&&ans[k]?' Look at sound '+(k+1)+': you have /'+mine[k]+'/, the answer has /'+ans[k]+'/.':mine.length<ans.length?' You are missing a sound.':' You have an extra sound.';break}
+    c.res=['no','✕ Not quite. Answer: <span>/'+c.word.toks.join('')+'/</span>.'+diff];
+  }
+  c.n++;c.done=true;panelChallenge();
+}
+function panelChallenge(){
+  const c=W.ch;
+  $('pinfo').innerHTML=`<div class="chal"><div class="score">Challenge · ${c.ok} / ${c.n} correct</div>
+   <div class="prompt">Transcribe this word:<b>${esc(c.word.w)}</b></div>
+   <div class="btns"><button class="btn" id="chSay">🔊 Hear it</button>${c.done?'<button class="btn" id="chPlay">▶ Play answer</button>':''}</div>
+   ${c.res?`<div class="res ${c.res[0]}">${c.res[1]}</div>`:'<div class="note">Build it with the keys, then check. Think about the <b>sounds</b>, not the letters — “knight” has no k sound!</div>'}
+   <div class="btns">${c.done?'<button class="btn grn" id="chNext">Next word →</button>':'<button class="btn pri" id="chCheck">Check</button><button class="btn" id="chSkip">Skip</button>'}<button class="btn" id="chEnd">End</button></div></div>`;
+  $('chSay').onclick=()=>{const tts=()=>{if(!sayNatural(c.word.w)){const t=W.tok;W.tok=c.word.toks.slice();playW();W.tok=t}};const f=WREC[c.word.w.toLowerCase()];if(AUD==='rec'&&f)playRec(f,tts);else tts()};
+  if($('chPlay'))$('chPlay').onclick=()=>{W.tok=c.word.toks.slice();renderW();playW()};
+  if($('chCheck'))$('chCheck').onclick=checkChallenge;
+  if($('chSkip'))$('chSkip').onclick=()=>{c.n++;c.res=['no','Skipped. Answer: <span>/'+c.word.toks.join('')+'/</span>'];c.done=true;panelChallenge()};
+  if($('chNext'))$('chNext').onclick=nextChallenge;
+  $('chEnd').onclick=()=>{W.ch=null;panelW()};
+}
+document.addEventListener('keydown',e=>{
+  if(MODE!=='W'||e.target.matches('input,textarea'))return;
+  if(e.key==='Backspace'){e.preventDefault();delTok(W.tok.length-1)}
+  else if(e.key==='Enter'){e.preventDefault();if(W.ch&&!W.ch.done)checkChallenge();else playW()}
+});
+
+/* ================= init ================= */
+buildChart();buildVowels();buildPal();palEvents();
+setSeg('mode','C');setSeg('aud','rec');setSeg('eng','0');setSeg('voice','lo');setSeg('round','0');
+vtRender(VT.cur);readout(VT.cur);
+setMode('C');
+if('speechSynthesis' in window)speechSynthesis.getVoices();
+})();
+</script>
+</body></html>

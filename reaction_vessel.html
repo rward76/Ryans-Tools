@@ -8,7 +8,7 @@
 --blue7:#1d4ed8;--blue6:#2563eb;--blue5:#3b82f6;--blue4:#60a5fa;--blue3:#93c5fd;
 --purple6:#9333ea;--purple4:#c084fc;--pink4:#f472b6;
 --emerald6:#059669;--emerald5:#10b981;--emerald4:#34d399;
---amber3:#fcd34d;--amber4:#fbbf24;--rose4:#fb7185;
+--amber3:#fcd34d;--amber4:#fbbf24;
 --f-sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
 --f-mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace}
 [hidden]{display:none!important}
@@ -49,7 +49,6 @@ aside{width:384px;background:var(--g900);border-right:1px solid var(--g800);over
 .ctl label{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--g300);min-width:0}
 .ctl output{text-align:right;font:12px var(--f-mono);color:var(--blue3);font-variant-numeric:tabular-nums}
 .ctl label .sym{font:700 13px var(--f-mono);font-style:italic;color:#fff;width:14px}
-.tag{margin-left:auto;font:600 8.5px var(--f-mono);text-transform:uppercase;letter-spacing:.06em;padding:1px 5px;border-radius:999px;border:1px solid var(--g700);color:var(--g400)}
 input[type=range]{width:100%;accent-color:var(--blue5);margin:0}
 .btns{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
 .btn{font-size:11px;background:var(--g700);color:var(--g100);border:0;padding:6px;border-radius:8px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .15s}
@@ -63,8 +62,7 @@ select:hover{border-color:var(--g600)}select:focus-visible{outline:2px solid var
 select option{color:var(--g100);background:var(--g800);font-weight:600}
 .rxb{display:flex;flex-direction:column;gap:9px;min-width:0}
 .rxh{font-size:11px;font-weight:700;color:var(--amber3);text-transform:uppercase;letter-spacing:.05em}
-.enrow{display:flex;align-items:center;justify-content:space-between;gap:12px;border-block:1px solid rgba(55,65,81,.6);padding-block:9px;font-size:12px;font-weight:600;color:var(--g200)}
-.enrow{cursor:pointer}
+.enrow{display:flex;align-items:center;justify-content:space-between;gap:12px;border-block:1px solid rgba(55,65,81,.6);padding-block:9px;font-size:12px;font-weight:600;color:var(--g200);cursor:pointer}
 .sw{display:flex;align-items:center;gap:8px;font-weight:500;color:var(--g400);position:relative}
 .sw input{position:absolute;right:0;width:36px;height:20px;margin:0;opacity:0;cursor:pointer}
 .sw i{width:36px;height:20px;border-radius:999px;background:var(--g700);position:relative;transition:background .15s;flex:none}
@@ -145,7 +143,7 @@ canvas.dia{width:100%;height:204px;display:block;background:var(--g950);border:1
 <header>
   <div class="brand">
     <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h13l-3-3"/><path d="M20 15H7l3 3"/></svg></div>
-    <h1><span class="grad">Reaction Vessel</span> <span class="badge-v">v1.6</span></h1>
+    <h1><span class="grad">Reaction Vessel</span> <span class="badge-v">v1.7</span></h1>
   </div>
   <div class="hctl">
     <div class="seg" role="group" aria-label="Simulation speed"><span class="lbl">Speed</span><button data-spd="0.5" aria-pressed="false">½×</button><button data-spd="1" aria-pressed="true">1×</button><button data-spd="2" aria-pressed="false">2×</button><button data-spd="4" aria-pressed="false">4×</button></div>
@@ -221,8 +219,8 @@ const VOL_NM=1.85; // nm³ per length unit cubed: makes one molecule at 1 atm, 3
 const SP=[
  {n:'A',c:'#60a5fa'},{n:'B',c:'#fbbf24'},{n:'C',c:'#34d399'},{n:'D',c:'#f472b6'},{n:'E',c:'#c084fc'},{n:'F',c:'#fb923c'},
  {n:'I₁',c:'#22d3ee',g:1},{n:'I₂',c:'#a3e635',g:1},{n:'J₁',c:'#f0abfc',g:1},{n:'J₂',c:'#fde68a',g:1},
- {n:'X',c:'#6b7280',inert:1},{n:'Cat 1',c:'#e7e5e4',cat:0,ring:'#d97706'},{n:'Cat 2',c:'#e7e5e4',cat:1,ring:'#db2777'}];
-const [sA,sB,sC,sD,sE,sF,sI1,sI2,sJ1,sJ2,sX,sCat1,sCat2]=SP.map((_,i)=>i);
+ {n:'X',c:'#6b7280',inert:1},{n:'Cat 1',cat:0},{n:'Cat 2',cat:1}];
+const [sA,sB,sC,,sE,,sI1,sI2,sJ1,sJ2,sX,sCat1,sCat2]=SP.map((_,i)=>i);
 const INT=[[sI1,sI2],[sJ1,sJ2]];
 SP.forEach(s=>s.m=1);SP[sCat1].m=SP[sCat2].m=8;
 
@@ -291,7 +289,7 @@ let flashes=[];
 let g=1; // Carnahan-Starling contact factor: cancels crowding so the gas stays ideal at high pressure
 const counts=new Int32Array(SP.length);
 const ema=new Float64Array(SP.length);
-let ev=[{f:0,r:0,cat:0,all:0},{f:0,r:0,cat:0,all:0}],rate=[{f:0,r:0},{f:0,r:0}];
+let ev=[{f:0,r:0},{f:0,r:0}],rate=[{f:0,r:0},{f:0,r:0}];
 
 /* cell list */
 const NX=26,CS=W/NX,NY=Math.ceil(HMAX/CS)+1;const head=new Int32Array(NX*NY*NX),nxt=new Int32Array(MAXN);
@@ -323,7 +321,7 @@ function rebuild(){
       const d=cat[r.i].n?cat[r.i].d:0,GTc=Math.max(GT-d,Math.max(GL,GR)+0.2);
       const both=(L.length===2&&Rr.length===2);
       const wL=L.length===2?wPair(L):0,wR=Rr.length===2?wPair(Rr):0,wM=both?Math.min(wL,wR):0;
-      const add=(F,To,Gf,dir,w,wOther)=>{
+      const add=(F,To,Gf,dir)=>{
         const e=Math.exp(-(GT-Gf)/RT),ec=Math.exp(-(GTc-Gf)/RT);
         const c={to:To,rxn:r.i,dir,last:k===n-1,catBit:1<<r.i};
         if(F.length===2){const s=both?wM/wL_(F):1;c.p=e*s;c.pc=ec*s;
@@ -337,9 +335,8 @@ function rebuild(){
 }
 let catCount=0;const catIdx=new Int32Array(128);
 function nearMid(x,y,z){let m=0;const R2=RCAT*RCAT;for(let k=0;k<catCount;k++){const c=catIdx[k],dx=x-px[c],dy=y-py[c],dz=z-pz[c];if(dx*dx+dy*dy+dz*dz<R2)m|=1<<SP[sp[c]].cat}return m}
-function react(c,i,j,nb){
+function react(c,i,j){
   const mx=j<0?px[i]:(px[i]+px[j])/2,my=j<0?py[i]:(py[i]+py[j])/2,mz=j<0?pz[i]:(pz[i]+pz[j])/2;
-  const wasCat=nb&c.catBit;
   if(c.to.length===1){
     sp[i]=c.to[0];px[i]=mx;py[i]=my;pz[i]=mz;fresh[i]=1;thermal(i);if(j>=0){dead[j]=1}
   }else{
@@ -354,7 +351,7 @@ function react(c,i,j,nb){
     const rel=(vx[a]-vx[b])*ux+(vy[a]-vy[b])*uy+(vz[a]-vz[b])*uz; // make sure the two fragments fly apart
     if(rel<0){const f=-rel*1.02,ma=SP[sp[a]].m,mb=SP[sp[b]].m,t=ma+mb;vx[a]+=ux*f*mb/t;vy[a]+=uy*f*mb/t;vz[a]+=uz*f*mb/t;vx[b]-=ux*f*ma/t;vy[b]-=uy*f*ma/t;vz[b]-=uz*f*ma/t}
   }
-  const e=ev[c.rxn];e.all++;if(wasCat)e.cat++;
+  const e=ev[c.rxn];
   if(c.last){if(c.dir>0)e.f++;else e.r++}
   if(flashes.length<80)flashes.push({x:mx,y:my,z:mz,t:0,c:c.dir>0?'96,165,250':'251,191,36',int:!c.last});
 }
@@ -367,7 +364,7 @@ function collide(i,j){
   if(!fresh[i]&&!fresh[j]){
     const l=pairCh[sp[i]][sp[j]];
     if(l){const u=rnd();let acc=0;const nb=catCount?nearMid(px[i]+dx/2,py[i]+dy/2,pz[i]+dz/2):0;
-      for(const c of l){acc+=((nb&c.catBit)?c.pc:c.p)/g;if(u<acc){react(c,i,j,nb);return}}}
+      for(const c of l){acc+=((nb&c.catBit)?c.pc:c.p)/g;if(u<acc){react(c,i,j);return}}}
   }
   const mi=SP[sp[i]].m,mj=SP[sp[j]].m,f=2*dot/((mi+mj)*r2);
   vx[i]+=f*mj*dx;vy[i]+=f*mj*dy;vz[i]+=f*mj*dz;vx[j]-=f*mi*dx;vy[j]-=f*mi*dy;vz[j]-=f*mi*dz;
@@ -400,7 +397,7 @@ function step(){
     if(dead[i]||fresh[i])continue;
     const l=uniCh[sp[i]];
     if(l){let kt=0;const b=near[i];for(const c of l)kt+=(b&c.catBit)?c.kc:c.k;
-      if(rnd()<1-Math.exp(-kt*DT)){let u=rnd()*kt;for(const c of l){u-=(b&c.catBit)?c.kc:c.k;if(u<=0){react(c,i,-1,b);break}}continue}}
+      if(rnd()<1-Math.exp(-kt*DT)){let u=rnd()*kt;for(const c of l){u-=(b&c.catBit)?c.kc:c.k;if(u<=0){react(c,i,-1);break}}continue}}
     if(rnd()<GAM*DT)thermal(i);
   }
   time+=DT;
@@ -444,14 +441,13 @@ const cv=$('cv'),ctx=cv.getContext('2d');let cw=0,ch=0,dpr=1;
 function resize(){dpr=Math.min(window.devicePixelRatio||1,2);cw=cv.clientWidth;ch=cv.clientHeight;cv.width=Math.round(cw*dpr);cv.height=Math.round(ch*dpr);
   for(const id of ['dia0','dia1','tc']){const c=$(id);c.width=Math.round(c.clientWidth*dpr);c.height=Math.round(c.clientHeight*dpr)}}
 new ResizeObserver(resize).observe($('vp'));
-function makeSprite(hex,ring){
+function makeSprite(hex){
   const s=64,c=document.createElement('canvas');c.width=c.height=s;const x=c.getContext('2d');
   const r=parseInt(hex.slice(1,3),16),gg=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
   const grd=x.createRadialGradient(s*.36,s*.33,s*.03,s*.5,s*.5,s*.5);
   grd.addColorStop(0,'rgba(255,255,255,.95)');grd.addColorStop(.22,`rgb(${Math.min(255,r+50)},${Math.min(255,gg+50)},${Math.min(255,b+50)})`);
   grd.addColorStop(.7,`rgb(${r},${gg},${b})`);grd.addColorStop(1,`rgb(${r*.35|0},${gg*.35|0},${b*.35|0})`);
   x.fillStyle=grd;x.beginPath();x.arc(s/2,s/2,s/2-.5,0,Math.PI*2);x.fill();
-  if(ring){x.lineWidth=7;x.strokeStyle=ring;x.beginPath();x.arc(s/2,s/2,s/2-4,0,Math.PI*2);x.stroke()}
   return c}
 function makeGlow(hex){
   const s=96,c=document.createElement('canvas');c.width=c.height=s;const x=c.getContext('2d');
@@ -459,7 +455,7 @@ function makeGlow(hex){
   const grd=x.createRadialGradient(s/2,s/2,s*.08,s/2,s/2,s/2);
   grd.addColorStop(0,`rgba(${r},${gg},${b},.95)`);grd.addColorStop(.35,`rgba(${r},${gg},${b},.42)`);grd.addColorStop(1,`rgba(${r},${gg},${b},0)`);
   x.fillStyle=grd;x.fillRect(0,0,s,s);return c}
-SP.forEach(s=>{s.spr=makeSprite(s.c,s.ring);if(s.g)s.glow=makeGlow(s.c)});
+SP.forEach(s=>{if(s.cat==null)s.spr=makeSprite(s.c);if(s.g)s.glow=makeGlow(s.c)});
 let yaw=.65,pitch=.32,zoom=1,camD=120,camCy=14,camF=null,focal=1;
 function proj(x,y,z,o){
   const X=x-W/2,Y=y-camCy,Z=z-W/2,cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),spp=Math.sin(pitch);
@@ -632,7 +628,7 @@ function drawTC(){
   tx.setTransform(dpr,0,0,dpr,0,0);tx.clearRect(0,0,w,h);
   const l=30,r=26,t=8,b=16,list=activeSpecies();
   let mx=10;for(const p of hist)for(const s of list)if(p.c[s]>mx)mx=p.c[s];for(const s of list)if(pred[s]>mx)mx=pred[s];
-  const e=10**Math.floor(Math.log10(mx)),nm_=Math.ceil(mx/(e/2))*e/2;mx=nm_;
+  const e=10**Math.floor(Math.log10(mx));mx=Math.ceil(mx/(e/2))*e/2;
   const X=i=>l+(w-l-r)*i/239,Y=v=>h-b-(h-t-b)*v/mx;
   tx.font='10px ui-monospace,Menlo,monospace';tx.textBaseline='middle';tx.textAlign='right';tx.fillStyle='#6b7280';tx.strokeStyle='rgba(229,231,235,.06)';tx.lineWidth=1;
   for(const f of [0,.5,1]){const y=Y(mx*f);tx.beginPath();tx.moveTo(l,y);tx.lineTo(w-r,y);tx.stroke();tx.fillText(Math.round(mx*f),l-5,y)}
@@ -666,8 +662,8 @@ function ui_mech(){
    <div class="flow"><span>reverse</span><div class="tr rv"><span id="fr${r.i}"></span></div><b id="rv${r.i}"></b></div></div>`).join('');
   $('insp').innerHTML='<span class="ot">Particles</span>'+rows.filter(s=>s!==sX).map(s=>`<div class="lg"><i style="background:${SP[s].c}${SP[s].g?';box-shadow:0 0 6px 1px '+SP[s].c:''}"></i><span>${SP[s].n}${SP[s].g?' glows':''}</span><span id="l${s}">0</span></div>`).join('');
 }
-function setCat(k,n){const s=k?sCat2:sCat1;tally();const d=n-counts[s];if(d>0)addSp(s,d);else if(d<0)removeSp(s,-d);cat[k].n=n;rebuild();tally();
-  const t=cat[0].n+cat[1].n;$('catPill').textContent=t?t+' in box':'off'}
+function setCat(k,n){const s=k?sCat2:sCat1;tally();const d=n-counts[s];if(d>0)addSp(s,d);else if(d<0)removeSp(s,-d);cat[k].n=n;rebuild();tally();catPill()}
+function catPill(){const t=cat[0].n+cat[1].n;$('catPill').textContent=t?t+' in box':'off'}
 const VMIN=A*HMIN,VMAX=A*HMAX,vS=v=>Math.round(Math.log(v/VMIN)/Math.log(VMAX/VMIN)*1000),Sv=s=>VMIN*Math.pow(VMAX/VMIN,s/1000);
 $('tR').oninput=e=>{const T2=+e.target.value,f=Math.sqrt(T2/Tset);Tset=T2;Ts=T2/300;for(let i=0;i<N;i++){vx[i]*=f;vy[i]*=f;vz[i]*=f}$('tOut').textContent=T2+' K';$('rtPill').textContent=`RT = ${(RGAS*T2).toFixed(2)} kJ/mol`;rebuild();dirtyEq=true};
 $('vR').oninput=e=>{Vset=Sv(+e.target.value);dirtyEq=true};
@@ -682,12 +678,11 @@ function fill(which){
   n.forEach((v,s)=>addSp(s,v));
   if(cat[0].n)addSp(sCat1,cat[0].n);if(rxns[1]&&cat[1].n)addSp(sCat2,cat[1].n);
   tally();for(let s=0;s<SP.length;s++)ema[s]=counts[s];
-  ev=[{f:0,r:0,cat:0,all:0},{f:0,r:0,cat:0,all:0}];rate=[{f:0,r:0},{f:0,r:0}];dirtyEq=true;
+  ev=[{f:0,r:0},{f:0,r:0}];rate=[{f:0,r:0},{f:0,r:0}];dirtyEq=true;
 }
 function restart(){
   if(!rxns[1])cat[1].n=0;
-  rebuild();ui_mech();fill('R');
-  const t=cat[0].n+cat[1].n;$('catPill').textContent=t?t+' in box':'off';
+  rebuild();ui_mech();fill('R');catPill();
 }
 $('startR').onclick=()=>fill('R');$('startP').onclick=()=>fill('P');
 function resetAll(){draft=defDraft();RX.forEach(r=>r.nodes=defNodes(r.i));sel=[0,0];commit();cat=[{n:0,d:8},{n:0,d:8}];Tset=300;Ts=1;$('tR').value=300;$('tOut').textContent='300 K';$('rtPill').textContent='RT = 2.49 kJ/mol';Vset=V_1ATM;$('vR').value=vS(Vset);H=Ht=Vset/A;restart()}
@@ -696,7 +691,7 @@ function setRunning(r){running=r;$('playBtn').setAttribute('aria-pressed',!r);$(
 $('playBtn').onclick=()=>setRunning(!running);
 document.querySelectorAll('[data-spd]').forEach(b=>b.onclick=()=>{speed=+b.dataset.spd;document.querySelectorAll('[data-spd]').forEach(q=>q.setAttribute('aria-pressed',q===b))});
 
-function ui(dtS){
+function ui(){
   tally();
   const list=activeSpecies().concat(sX);
   const tot=nGas();
@@ -733,7 +728,7 @@ $('viewBtn').onclick=()=>{yaw=.65;pitch=.32;setZoom(1)};
 window.addEventListener('keydown',e=>{if(e.code==='Space'&&e.target.tagName!=='BUTTON'&&e.target.tagName!=='SELECT'){e.preventDefault();setRunning(!running)}else if(e.key==='r'||e.key==='R')fill('R')});
 
 /* ---------- Loop ---------- */
-let last=performance.now(),carry=0,tickUI=0,lastSolve=0,simT0=0;
+let last=performance.now(),carry=0,tickUI=0,lastSolve=0;
 function bookkeep(dtSim){ // dtSim in displayed seconds
   tally();
   const a=Math.min(1,dtSim/5);for(let s=0;s<SP.length;s++)ema[s]+=(counts[s]-ema[s])*a;

@@ -53,7 +53,8 @@ main{display:flex;flex-direction:column;gap:40px;min-width:0}
 .tool p{margin:0;color:var(--g400);flex:1}
 .cats{display:flex;flex-direction:column;gap:28px}
 .cat-h{display:flex;align-items:center;gap:10px;margin:0 0 12px;font-size:18px}
-.cat-h .n{font-size:11px;font-weight:600;color:var(--g400);background:var(--g800);border:1px solid var(--g700);border-radius:999px;padding:1px 8px}
+.sec-h h3 .n{display:inline-block;margin-left:10px;text-transform:none;letter-spacing:0;vertical-align:1px}
+.cat-h .n,.sec-h h3 .n{font-size:11px;font-weight:600;color:var(--g400);background:var(--g800);border:1px solid var(--g700);border-radius:999px;padding:1px 8px}
 .tool .foot{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .tags{display:flex;gap:6px;flex-wrap:wrap}
 .tag{font-size:11px;padding:1px 8px;border-radius:999px;background:var(--g800);border:1px solid var(--g700);color:var(--g300)}
@@ -136,7 +137,7 @@ footer{border-top:1px solid var(--g800);background:var(--g900);padding:16px;text
   </section>
 
   <section id="tools">
-    <div class="sec-h"><h3>Tools</h3><div class="seg" id="filters"></div></div>
+    <div class="sec-h"><h3>Tools<span class="n" id="toolCount"></span></h3><div class="seg" id="filters"></div></div>
     <div class="cats" id="toolGrid"></div>
   </section>
 
@@ -198,17 +199,18 @@ const ICONS = {
   machines: "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M2 13L22 8\"/><path d=\"M12 10.5l-4 9h8z\"/><path d=\"M4 19.5h16\"/><rect x=\"2.5\" y=\"7\" width=\"4\" height=\"4\" rx=\".6\"/></svg>",
   flask: "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M9 3h6M10 3v6.2L4.6 18.4A1.7 1.7 0 0 0 6.1 21h11.8a1.7 1.7 0 0 0 1.5-2.6L14 9.2V3\"/><path d=\"M7.5 14h9\"/></svg>",
   protein: "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3.5 20.5h3.4V9.4h2.1L5.2 3.6 1.4 9.4h2.1z\" fill=\"currentColor\" stroke-width=\"1\"/><path d=\"M10.3 3.5h3.4v11.1h2.1l-3.8 5.8-3.8-5.8h2.1z\" fill=\"currentColor\" stroke-width=\"1\" opacity=\".8\"/><path d=\"M17.1 20.5h3.4V9.4h2.1l-3.8-5.8-3.8 5.8h2.1z\" fill=\"currentColor\" stroke-width=\"1\"/></svg>",
+  ipa: "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 10c0-4 3.6-7 8-7s8 3 8 7c0 2-1 3.6-2.4 4.6L18 21h-5l-1-3\"/><path d=\"M8.5 11.5c1.2 1.4 2.4 2 3.6 2s2.2-.6 3-1.6\"/><path d=\"M2 15.5h1.5M2 18.5h3\"/></svg>",
   music: "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M9 18V5l12-2v13\"/><circle cx=\"6\" cy=\"18\" r=\"3\"/><circle cx=\"18\" cy=\"16\" r=\"3\"/></svg>"
 };
 // Ribbons a tool can carry through its status field. status: "default" isn't listed here, so it shows no ribbon. To add another, add a line here and a matching .ribbon-<key> style.
 const RIBBONS = { "new": "New", "half-baked": "Half-baked" };
 const TOOLS = [
   // ---- Biology ----
-  { title: "Cell Tour", icon: ICONS.cell, version: "v4.0", category: "Biology", href: "cell_tour.html", status: "default",
+  { title: "Cell Tour", icon: ICONS.cell, version: "v4.1", category: "Biology", href: "cell_tour.html", status: "default",
     desc: "Take a guided tour of a cell and its organelles." },
   { title: "Human Cell Tour", icon: ICONS.humancell, version: "v1.7", category: "Biology", href: "human_cell_tour.html", status: "default",
     desc: "Take a guided tour of different types of human cells." },
-  { title: "Anatomy Tour", icon: ICONS.anatomy, version: "v2.5", category: "Biology", href: "anatomy_tour.html", status: "default",
+  { title: "Anatomy Tour", icon: ICONS.anatomy, version: "v2.6", category: "Biology", href: "anatomy_tour.html", status: "default",
     desc: "Explore the organ systems of the human body layer by layer." },
   { title: "Cloning Workbench", icon: ICONS.cloning, version: "v3.1", category: "Biology", href: "cloning_workbench.html", status: "default",
     desc: "Walk through molecular cloning: digest, react, assemble, transform." },
@@ -219,26 +221,26 @@ const TOOLS = [
     desc: "Build, analyze, and react molecule in 3D." },
   { title: "Atomic Orbital Builder", icon: ICONS.orbital, version: "v2.1", category: "Chemistry", href: "atomic_orbital_builder.html", status: "default",
     desc: "See how spherical harmonics leads to the shapes of atomic orbitals." },
-  { title: "Reaction Vessel", icon: ICONS.equilibrium, version: "v1.6", category: "Chemistry", href: "reaction_vessel.html", status: "default",
+  { title: "Reaction Vessel", icon: ICONS.equilibrium, version: "v1.7", category: "Chemistry", href: "reaction_vessel.html", status: "default",
     desc: "Simulate dynamic chemical equilibrium in reversible reactions." },
-  { title: "Solutions Calculator", icon: ICONS.flask, version: "v2.1", category: "Chemistry", href: "solutions_calculator.html", status: "default",
+  { title: "Solutions Calculator", icon: ICONS.flask, version: "v2.7", category: "Chemistry", href: "solutions_calculator.html", status: "default",
     desc: "Work through dimensional analysis, molarity, and dilution." },
   // ---- Physics ----
   { title: "Phase Change Piston", icon: ICONS.piston, version: "v2.1", category: "Physics", href: "phase_change_piston.html", status: "default",
     desc: "Heat, cool, and compress a gas in a piston to change phases." },
   { title: "Optics Bench", icon: ICONS.optics, version: "v1.0", category: "Physics", href: "optics_bench.html", status: "half-baked",
     desc: "Trace light rays through lenses and mirrors." },
-  { title: "Solar System Builder", icon: ICONS.orbits, version: "v2.0", category: "Physics", href: "solar_system_builder.html", status: "default",
+  { title: "Solar System Builder", icon: ICONS.orbits, version: "v2.1", category: "Physics", href: "solar_system_builder.html", status: "default",
     desc: "Explore the solar system or make your own." },
   // ---- Engineering ----
   { title: "Bridge & Tower Lab", icon: ICONS.bridge, version: "v1.4", category: "Engineering", href: "bridge_tower_lab.html", status: "half-baked",
     desc: "Build bridges and towers from beams and cables, load them with weights, and see where they fail." },
   { title: "Simple Machines Lab", icon: ICONS.machines, version: "v1.0", category: "Engineering", href: "simple_machines_lab.html", status: "half-baked",
     desc: "Explore levers, pulleys, wedges, screws and inclined planes, and measure their mechanical advantage." },
-  { title: "Gear Train", icon: ICONS.gears, version: "v2.0", category: "Engineering", href: "gear_train.html", status: "default",
+  { title: "Gear Train", icon: ICONS.gears, version: "v2.1", category: "Engineering", href: "gear_train.html", status: "default",
     desc: "Build simple gear trains." },
   // ---- Math ----
-  { title: "Graphing Calculator", icon: ICONS.graph, version: "v2.7", category: "Math", href: "graphing_calculator.html", status: "default",
+  { title: "Graphing Calculator", icon: ICONS.graph, version: "v2.8", category: "Math", href: "graphing_calculator.html", status: "default",
     desc: "Plot and explore equations and functions in 2D." },
   { title: "Fourier Transform Playground", icon: ICONS.fourier, version: "v3.1", category: "Math", href: "fourier_transform_playground.html", status: "default",
     desc: "Analyze signals with fourier transforms up to 3 dimensions." },
@@ -260,10 +262,12 @@ const TOOLS = [
   { title: "World Builder", icon: ICONS.world, version: "v1.0", category: "Computing & Simulation", href: "world_builder.html", status: "half-baked",
     desc: "Build a planet: sculpt continents, pick its star, tilt and atmosphere, and see plates, currents and climate zones." },
   // ---- Arts ----
-  { title: "Music Theory Composer", icon: ICONS.music, version: "v3.5", category: "Arts", href: "music_theory_composer.html", status: "half-baked",
+  { title: "Music Theory Composer", icon: ICONS.music, version: "v3.6", category: "Arts", href: "music_theory_composer.html", status: "half-baked",
     desc: "Make harmonies and rhythms" },
-  { title: "Color Theory Palette", icon: ICONS.color, version: "v1.9", category: "Arts", href: "color_theory_palette.html", status: "half-baked",
-    desc: "Mix light and paint, build palettes on the color wheel, and check them in colorblind and black-and-white views." }
+  { title: "Color Theory Palette", icon: ICONS.color, version: "v2.0", category: "Arts", href: "color_theory_palette.html", status: "half-baked",
+    desc: "Mix light and paint, build palettes on the color wheel, and check them in colorblind and black-and-white views." },
+  { title: "Linguistic Alphabet", icon: ICONS.ipa, version: "v1.5", category: "Arts", href: "linguistic_alphabet.html", status: "new",
+    desc: "Learn the sounds of the International Phonetic Alphabet, then string them into real words." }
   // Add a tool by copying a line above: title, version (optional), category, href (path to the HTML file), desc
   // status: "default" (no ribbon), "new" or "half-baked" (ribbon on the corner of the tile)
 ];
@@ -305,6 +309,7 @@ function renderTools() {
   $('filters').append(b);
 });
 renderTools();
+$('toolCount').textContent = TOOLS.length;   // total number of tools, shown next to the Tools heading
 
 // About
 $('aName').textContent = ABOUT.name; $('aRole').textContent = ABOUT.role; $('aEmail').textContent = ABOUT.email;

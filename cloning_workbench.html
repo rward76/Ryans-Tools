@@ -4,20 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Cloning Workbench</title>
-<style>body{margin:0}img{max-width:100%}</style>
-<title>Cloning Workbench</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
 /* Layout: header bench switcher + 384px control rail (side table pinned on top) + floating-panel viewport */
 :root{color-scheme:dark;
 --g950:#030712;--g900:#111827;--g800:#1f2937;--g700:#374151;--g600:#4b5563;--g500:#6b7280;--g400:#9ca3af;--g300:#d1d5db;--g200:#e5e7eb;--g100:#f3f4f6;
 --blue7:#1d4ed8;--blue6:#2563eb;--blue5:#3b82f6;--blue4:#60a5fa;--blue3:#93c5fd;--purple6:#9333ea;--purple4:#c084fc;--pink4:#f472b6;
---emerald6:#059669;--emerald5:#10b981;--emerald4:#34d399;--amber4:#fbbf24;--amber3:#fcd34d;--rose4:#fb7185;--sky4:#38bdf8;
+--emerald6:#059669;--emerald5:#10b981;--emerald4:#34d399;--amber4:#fbbf24;--amber3:#fcd34d;--rose4:#fb7185;
 --f-sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
 --f-mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace}
 html,body{height:100%}
 [hidden]{display:none!important}
-body{background:var(--g950);color:var(--g100);font-family:var(--f-sans);font-size:14px;display:flex;flex-direction:column;overflow:hidden}
+body{margin:0;background:var(--g950);color:var(--g100);font-family:var(--f-sans);font-size:14px;display:flex;flex-direction:column;overflow:hidden}
 *,*:before,*:after{box-sizing:border-box}
 button,select,input{font:inherit;color:inherit}
 button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--blue5);outline-offset:2px}
@@ -52,7 +50,7 @@ aside{width:384px;background:var(--g900);border-right:1px solid var(--g800);over
 .card-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .card-h .t,.card-h label{font-size:12px;font-weight:700;color:var(--g200);text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:8px}
 .pill{font-size:10px;background:var(--g700);color:var(--g300);padding:2px 8px;border-radius:999px;font-family:var(--f-mono);white-space:nowrap}
-.c-blue{color:var(--blue4)}.c-purple{color:var(--purple4)}.c-emerald{color:var(--emerald4)}.c-amber{color:var(--amber3)}.c-pink{color:var(--pink4)}.c-rose{color:var(--rose4)}
+.c-blue{color:var(--blue4)}.c-purple{color:var(--purple4)}.c-emerald{color:var(--emerald4)}.c-amber{color:var(--amber3)}.c-pink{color:var(--pink4)}
 .btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}.btns.three{grid-template-columns:1fr 1fr 1fr}
 .btn{font-size:11px;background:var(--g700);color:var(--g100);border:0;padding:7px 10px;border-radius:8px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .15s}
 .btn:hover{background:var(--g600)}.btn.warn:hover{background:#7f1d1d}
@@ -145,24 +143,6 @@ main{flex:1;display:flex;min-width:0;background:#11182780;padding:8px}
 .toast{top:12px;right:12px;padding:6px 12px;font-size:12px;color:var(--amber3);opacity:0;transform:translateY(-4px);transition:opacity .2s,transform .2s;max-width:45%;pointer-events:none}
 .toast.show{opacity:1;transform:none}
 
-.insp 
-
-
-.ib .row2 span:last-child{font-family:var(--f-mono);color:var(--g200);font-variant-numeric:tabular-nums;text-align:right}
-.ib p{margin:2px 0 0;font-size:11px;line-height:1.5;color:var(--g300)}
-.bench{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:14px;max-width:1200px;margin-inline:auto}
-.bench>.bsec:first-child{margin-top:30px}
-.bcard{background:#11182799;border:1px solid var(--g800);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:border-color .15s;min-width:0}
-.bcard:hover{border-color:var(--g600)}
-.bcard[aria-pressed=true]{border-color:var(--blue5);box-shadow:0 0 0 1px var(--blue5) inset}
-.bcard h4{margin:0;font-size:13px;font-weight:700;color:var(--g100);display:flex;justify-content:space-between;gap:8px;align-items:baseline}
-.bcard h4 em{font:400 10.5px var(--f-mono);color:var(--g500);font-style:normal}
-.bcard p{margin:0;font-size:11.5px;line-height:1.5;color:var(--g400)}
-.bcard svg{width:100%;height:auto;display:block}
-.bsec{font-size:11px;font-weight:700;color:var(--g400);text-transform:uppercase;letter-spacing:.06em;grid-column:1/-1;margin-top:4px;display:flex;align-items:center;gap:10px}
-.bsec:after{content:"";flex:1;height:1px;background:var(--g800)}
-.tagrow{display:flex;flex-wrap:wrap;gap:4px}
-.pair{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .tag{font:10px var(--f-mono);border:1px solid var(--g700);border-radius:4px;padding:1px 6px;color:var(--g400)}
 .cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;max-width:1240px;margin-inline:auto}
 .cstep{background:#11182799;border:1px solid var(--g800);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
@@ -176,16 +156,11 @@ main{flex:1;display:flex;min-width:0;background:#11182780;padding:8px}
 .junc .lab{color:var(--g500);font-size:10.5px;display:block;white-space:pre-wrap;margin-top:5px;line-height:1.5}
 .jrow{display:flex;flex-direction:column;gap:4px}
 .jt{font-size:11px;color:var(--g400);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
-.ftable{width:100%;border-collapse:collapse;font-size:12px}
-.ftable th,.ftable td{padding:6px 4px;border-top:1px solid var(--g800);text-align:left}
-.ftable th{font-size:10.5px;color:var(--g500);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
-.ftable td:last-child{font-family:var(--f-mono);text-align:right;color:var(--g200)}
 .feat{cursor:pointer}.feat:hover{opacity:.82}
 .site{cursor:pointer}.site:hover text{fill:#fff}
-#plSvg{width:100%;height:100%;display:block}
 @media(max-width:1180px){.cols{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:1023px){body{overflow:auto;display:block;height:auto}html{height:auto}.row{flex-direction:column;overflow:visible}main{order:-1;height:66vh;min-height:400px;flex:none;padding-left:max(8px,env(safe-area-inset-left,0px));padding-right:max(8px,env(safe-area-inset-right,0px))}aside{width:auto;border-right:0;overflow:visible;padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px))}.hctl{justify-content:flex-start}}
-@media(max-width:640px){.sub{display:none}.insp{width:200px}.vp-tool{display:none}}
+@media(max-width:640px){.sub{display:none}.vp-tool{display:none}}
 @media(prefers-reduced-motion:reduce){.toast,.seg button{transition:none}}
 </style>
 
@@ -230,7 +205,7 @@ main{flex:1;display:flex;min-width:0;background:#11182780;padding:8px}
     <p class="desc" id="plDesc"></p>
     <dl class="stats" id="plStats"></dl>
   </div>
-  <div class="card" id="plPanel">
+  <div class="card">
     <button type="button" class="card-h cardtog" id="plPanelTog" aria-expanded="true"><span class="t"><svg class="i c-purple" viewBox="0 0 16 16" fill="currentColor"><path d="M2 8a6 6 0 0 1 6-6v3a3 3 0 0 0-3 3z"/><path d="M14 8a6 6 0 0 1-6 6v-3a3 3 0 0 0 3-3z" opacity=".5"/></svg> Features &amp; sites</span><span class="hgrp"><span class="pill" id="plSitePill"></span><span class="togbox" id="plPanelLbl">Hide</span></span></button>
     <div id="plPanelBody">
       <div class="sub">Restriction sites</div>
@@ -403,12 +378,8 @@ const MONO='ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace',SANS='u
 const COMP={A:'T',T:'A',G:'C',C:'G',U:'A',N:'N'};
 const comp=s=>s.replace(/./g,c=>COMP[c]||c);
 const rc=s=>comp(s).split('').reverse().join('');
-const toRNA=s=>s.replace(/T/g,'U');
 const BASECOL={A:'#34d399',T:'#fb7185',U:'#f472b6',G:'#fbbf24',C:'#60a5fa'};
 const CODON={};{const B='TCAG',A='FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG';let k=0;for(const a of B)for(const b of B)for(const c of B)CODON[a+b+c]=A[k++]}
-const AA={A:['Ala','Alanine','np'],R:['Arg','Arginine','bas'],N:['Asn','Asparagine','pol'],D:['Asp','Aspartate','acid'],C:['Cys','Cysteine','pol'],Q:['Gln','Glutamine','pol'],E:['Glu','Glutamate','acid'],G:['Gly','Glycine','np'],H:['His','Histidine','bas'],I:['Ile','Isoleucine','np'],L:['Leu','Leucine','np'],K:['Lys','Lysine','bas'],M:['Met','Methionine','np'],F:['Phe','Phenylalanine','np'],P:['Pro','Proline','np'],S:['Ser','Serine','pol'],T:['Thr','Threonine','pol'],W:['Trp','Tryptophan','np'],Y:['Tyr','Tyrosine','pol'],V:['Val','Valine','np'],'*':['Stop','Stop codon','stop']};
-const CLS={np:'#fbbf24',pol:'#34d399',acid:'#fb7185',bas:'#60a5fa',stop:'#9ca3af'};
-const aaCol=a=>CLS[(AA[a]||AA['*'])[2]];
 
 /* ---------- enzymes ---------- */
 const ENZ={NdeI:['CATATG',2],NheI:['GCTAGC',1],BamHI:['GGATCC',1],EcoRI:['GAATTC',1],SacI:['GAGCTC',5],SalI:['GTCGAC',1],HindIII:['AAGCTT',1],NotI:['GCGGCCGC',2],XhoI:['CTCGAG',1],KpnI:['GGTACC',5],XbaI:['TCTAGA',1],PstI:['CTGCAG',5],SmaI:['CCCGGG',3],BglII:['AGATCT',1],ScaI:['AGTACT',3],PvuII:['CAGCTG',3],SphI:['GCATGC',5],NcoI:['CCATGG',1]};
@@ -420,12 +391,6 @@ const siteText=e=>{const[s,c]=ENZ[e];return s.slice(0,c)+'^'+s.slice(c)};
 
 /* ---------- sequence helpers ---------- */
 function randSeq(rnd,n){let s='';for(let i=0;i<n;i++)s+='ACGT'[(rnd()*4)|0];return s}
-function scrub(s,rnd){let out=s,guard=0;
- for(;;){let hit=false;
-  for(const e of ENZL){const r=ENZ[e][0];let i=out.indexOf(r);
-   while(i>=0){const k=i+2,b=out[k];out=out.slice(0,k)+('ACGT'.replace(b,'')[(rnd()*3)|0])+out.slice(k+1);hit=true;i=out.indexOf(r,i+1)}}
-  if(!hit||++guard>40)break}
- return out}
 function geneSeq(key,len,seed){const rnd=mulberry(seed);let s='ATG';
  while(s.length<len-3){let c;do{c=randSeq(rnd,3)}while(CODON[c]==='*');s+=c}
  return scrubKeep(s,rnd)+'TAA'}
@@ -891,8 +856,6 @@ function prMake(){const pp=primerPlan();if(!pp){toast('This plasmid has no gene 
  toast('Primer pair on the side table');refreshAll()}
 $('prMake').onclick=prMake;
 
-const genesAround=()=>Object.keys(GENES).filter(k=>Object.values(PLASMIDS).some(P=>P.features.some(f=>f.gene===k&&f.dir>0)));
-const geneHome=gk=>Object.values(PLASMIDS).find(P=>P.gene===gk&&!P.construct)||Object.values(PLASMIDS).find(P=>P.features.some(f=>f.gene===gk&&f.dir>0))||null;
 
 /* ---------- circular map ---------- */
 function arcPath(cx,cy,r1,r2,a,b,len,dir){const A=p=>p/len*Math.PI*2-Math.PI/2,tip=dir?Math.min((b-a)*.35,len*.012):0;
@@ -1354,15 +1317,6 @@ function dgView(t,pieces){
  const ends=p?`<div class="cstep"><h3><em>3</em>Ends of the band you picked</h3>${endDiagram(p.e5,true)}${endDiagram(p.e3,false)}</div>`
   :`<div class="cstep"><h3><em>3</em>Ends</h3><p class="desc">${pieces.length?(DIG.ran?'Pick a band to see what its ends look like.':'Run the gel first.'):'Choose the enzymes first.'}</p></div>`;
  return warn+cutAnim+gel+ends}
-function linView(F,pieces){const w=760,sc=w/F.len;
- let s=`<svg viewBox="0 0 ${w} 86" style="width:100%;height:auto"><rect x="0" y="36" width="${w}" height="18" rx="4" fill="#1f2937" stroke="#374151"/>`;
- if(F.gene!=null){const x=F.geneStart*sc,ww=GENES[F.gene].len*sc;
-  s+=`<rect x="${x}" y="32" width="${ww}" height="26" rx="4" fill="${rgba(GENES[F.gene].col,.85)}"/><text x="${x+ww/2}" y="49" text-anchor="middle" font-size="11" font-weight="700" fill="#0b1220" font-family="${SANS}">${GENES[F.gene].name}</text>`}
- const sites=linSites(F.seq);
- [...DIG.enz].forEach(e=>(sites[e]||[]).forEach(p=>{const x=(p-1+ENZ[e][1])*sc;
-  s+=`<line x1="${x}" y1="22" x2="${x}" y2="68" stroke="#fbbf24" stroke-width="2"/><text x="${x}" y="16" text-anchor="middle" font-size="10" fill="#fcd34d" font-family="${SANS}">${e}</text>`}));
- s+=`<text x="2" y="76" font-size="10" fill="#6b7280" font-family="${MONO}">${endName(F.end5)}</text><text x="${w-2}" y="76" text-anchor="end" font-size="10" fill="#6b7280" font-family="${MONO}">${endName(F.end3)}</text></svg>`;
- return s}
 function dgKeep(){if(!DIG.ran){toast('Run the gel first — you cannot pick a band that has not been separated');return}
  const sel=DIG.band!=null?DIG.bands[DIG.band]:null;
  if(!sel){toast('Click the band you want to cut out');return}
@@ -1714,9 +1668,6 @@ function protLook(R){
   label:`${FLUOR[fl[0]].name} fluorescence${keys.length>1?', carried by the whole fusion':''}`};
  if(keys.includes('lacz'))return{col:'#60a5fa',glow:false,label:'blue, but only on an X-gal plate'};
  return{col:'#60a5fa',glow:false,label:keys.length?'no colour of its own':'nothing to see'};}
-const madeName=R=>R&&R.fusion&&R.fusion.through&&R.fusion.through.length>1
- ? R.fusion.through.map(f=>f.name).join('\u2013')
- : (R&&R.gene?GENES[R.gene].name:'protein');
 
 /* ---- cell-level animations ---- */
 function drawCell(){const{ctx,w,h}=fitCanvas($('ceCanvas'));ctx.clearRect(0,0,w,h);

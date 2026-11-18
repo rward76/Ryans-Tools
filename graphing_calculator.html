@@ -5,7 +5,7 @@
 <title>Graphing Calculator</title>
 <style>
 /* Layout: header bar · 384px expression sidebar · full-height graph viewport with floating panels (same shell as the suite's other apps). Dark-only by design. */
-:root{color-scheme:dark;--g950:#030712;--g900:#111827;--g800:#1f2937;--g700:#374151;--g600:#4b5563;--g500:#6b7280;--g400:#9ca3af;--g300:#d1d5db;--g200:#e5e7eb;--g100:#f3f4f6;--blue7:#1d4ed8;--blue6:#2563eb;--blue5:#3b82f6;--blue4:#60a5fa;--blue3:#93c5fd;--purple6:#9333ea;--purple4:#c084fc;--pink4:#f472b6;--emerald6:#059669;--emerald5:#10b981;--emerald4:#34d399;--amber3:#fcd34d;--amber4:#fbbf24;--rose4:#fb7185;--f-sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--f-mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;--f-math:"Cambria Math","STIX Two Math","Latin Modern Math","STIX Two Text","Times New Roman",serif}
+:root{color-scheme:dark;--g950:#030712;--g900:#111827;--g800:#1f2937;--g700:#374151;--g600:#4b5563;--g500:#6b7280;--g400:#9ca3af;--g300:#d1d5db;--g200:#e5e7eb;--g100:#f3f4f6;--blue7:#1d4ed8;--blue6:#2563eb;--blue5:#3b82f6;--blue4:#60a5fa;--blue3:#93c5fd;--purple6:#9333ea;--purple4:#c084fc;--pink4:#f472b6;--emerald5:#10b981;--emerald4:#34d399;--amber3:#fcd34d;--amber4:#fbbf24;--rose4:#fb7185;--f-sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--f-mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;--f-math:"Cambria Math","STIX Two Math","Latin Modern Math","STIX Two Text","Times New Roman",serif}
 [hidden]{display:none!important}
 html,body{height:100%;margin:0}
 body{background:var(--g950);color:var(--g100);font-family:var(--f-sans);font-size:14px;display:flex;flex-direction:column;overflow:hidden;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box}
@@ -42,7 +42,7 @@ aside{width:384px;background:var(--g900);border-right:1px solid var(--g800);over
 .card.collapsed>*:not(.card-h){display:none}
 .card.collapsed .card-h .pill{display:none}
 .pill{font-size:10px;background:var(--g700);color:var(--g300);padding:2px 8px;border-radius:999px;font-family:var(--f-mono);white-space:nowrap}
-.c-blue{color:var(--blue4)}.c-purple{color:var(--purple4)}.c-emerald{color:var(--emerald4)}.c-amber{color:var(--amber4)}
+.c-blue{color:var(--blue4)}.c-purple{color:var(--purple4)}.c-amber{color:var(--amber4)}
 .chips{display:flex;flex-wrap:wrap;gap:5px}
 .chip{font:600 11.5px var(--f-sans);background:var(--g800);color:var(--g300);border:1px solid var(--g700);border-radius:999px;padding:4px 10px;cursor:pointer;white-space:nowrap}
 .chip:hover{border-color:var(--g500);color:#fff}
@@ -65,9 +65,6 @@ aside{width:384px;background:var(--g900);border-right:1px solid var(--g800);over
 .toggles{display:flex;flex-direction:column;gap:9px;font-size:12px}
 .tog{display:flex;align-items:center;justify-content:space-between;gap:10px;color:var(--g300);cursor:pointer}
 .tog input{width:16px;height:16px;accent-color:var(--emerald5);cursor:pointer;margin:0}
-.muted{color:var(--g500);font-size:11px;margin:0;line-height:1.6}
-.muted code{font-family:var(--f-mono);color:var(--g300);background:var(--g950);border:1px solid var(--g800);border-radius:4px;padding:0 4px}
-.muted b{color:var(--g300)}
 .btnrow{display:flex;gap:8px}
 .btnrow .btn{flex:1}
 .btn{font-size:11.5px;background:var(--g700);color:var(--g100);border:0;padding:7px 10px;border-radius:8px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .15s}
@@ -138,7 +135,6 @@ aside{width:384px;background:var(--g900);border-right:1px solid var(--g800);over
 .mq .rad{white-space:nowrap;display:inline-flex;align-items:stretch;margin:0 .05em}
 .mq .rad .ovl{align-self:baseline}
 .rsv{width:.55em;flex:none;margin-right:-1px;overflow:visible}
-.mq .rs{font-size:1.1em}
 .mq .ovl{border-top:1.2px solid currentColor;padding:1px .12em 0}
 .mq .br{font-size:1.35em;line-height:0;vertical-align:-.08em;color:var(--g300)}
 .mq .pc{color:var(--g400)}
@@ -229,7 +225,7 @@ main{flex:1;display:flex;min-width:0;background:#11182780;padding:8px}
 <header>
   <div class="brand">
     <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4.5C8 4 7 5 6.6 7.5L5 19c-.4 2-1.6 2.5-3 2"/><path d="M4 10h5"/><path d="M13 9c-1.2 2-1.2 6 0 8M21 9c1.2 2 1.2 6 0 8"/><path d="M15 10.5l4 5M19 10.5l-4 5"/></svg></div>
-    <h1><span class="grad">Graphing Calculator</span> <span class="badge-v">v2.7</span></h1>
+    <h1><span class="grad">Graphing Calculator</span> <span class="badge-v">v2.8</span></h1>
   </div>
   <div class="hctl">
     <div class="seg" id="angSeg" role="group" aria-label="Angle units"><span class="lbl">Angles</span><button data-v="rad" aria-pressed="true">Radians</button><button data-v="deg" aria-pressed="false">Degrees</button></div>
@@ -1725,7 +1721,6 @@ function backspace(f){const {blk,i}=f.cur;
 function del(f){const {blk,i}=f.cur;
   if(i<blk.length){const n=blk[i];if(n.t==='c'||isEmptyNode(n))blk.splice(i,1);else enter(f,n[KEYS(n)[0]],false);return}
   if(blk.pn)mvRight(f)}
-function clearAll(f){f.root.length=0;f.cur={blk:f.root,i:0};f.anchor=null;f.ta.value='';commit(f)}
 function typeChar(f,c){
   // subscripts hold only letters and digits: anything else steps out of them first, as in Desmos
   if(f.cur.blk.pn&&f.cur.blk.pn.t==='sub'&&!/^[a-zA-Z0-9α-ωΑ-Ω]$/.test(c)&&c!=='_'){const b=f.cur.blk;f.cur={blk:b.po,i:b.po.indexOf(b.pn)+1}}
